@@ -1,0 +1,181 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    <div class="row align-items-start">
+
+        <div class="col-sm-6 p-3 border-end">
+            <!-- CREATE SHIFT SECTION -->
+            <h3 class="p-3">New shift</h3>
+            <form action="{% url 'index' %}" method="post">
+                {% csrf_token %}
+                <div class="row form-group  pt-3 pb-3 border-bottom">
+                    <div class="col-12">
+                        <select class="form-select mb-4" name="venue">
+                            {% for venue in venues %}
+                                <option value="{{ venue.id }}">{{ venue }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <select class="form-select mb-4" name="shift_provider">
+                            {% for provider in providers %}
+                                <option value="{{ provider.id }}">{{ provider.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <label for="date" class="col-sm-1 col-form-label">Date</label>
+                    <div class="col-sm-11">
+                        <div class="input-group date" id="datepicker">
+                            <input type="text" class="form-control" name="date">
+                            <span class="input-group-append">
+                                <span class="input-group-text bg-white d-block">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="submit" class="btn btn-primary mt-4">Create</button>
+                    </div>
+                </div>
+
+            </form>
+            <!-- RESULT SECTION -->
+            <h3 class="p-3"> Shifts on {{month_text}} - {{year}}</h3>
+            <form action="{% url 'filtershift'%}" method="post">
+                {% csrf_token %}
+                <div class="row form-group  pt-2 pb-2">
+                    <div class="col-sm-12">
+                        <select class="form-select mb-3" name="month">
+                            {% for num, text in monthdict %}
+                            # Mantiene seleccionado en el select el mes mostrado
+                                {% if num == month %}
+                                    <option selected value="{{num}}">{{text}}</option>
+                                {% else %}
+                                    <option value="{{num}}">{{text}}</option>
+                                {% endif%}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-12">
+                        <select class="form-select mb-3" name="year">
+                            {% for anno in years %}
+                                {% if anno == year %}
+                                    <option selected value="{{anno}}">{{anno}}</option>
+                                {% else %}
+                                    <option value="{{anno}}">{{anno}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-12">
+                        <button type="submit" class="btn btn-primary">Show</button>
+                    </div>
+                </div>
+            </form>
+            <caption>List of shifts</caption>
+
+
+            {% for shift in shifts%}
+            <div class="card mb-3">
+              <div class="row g-0">
+                <div class="col-md-2 text-center">
+                  <img src="/static/img/{{shift.venue.commercial_name}}.png" class="img-fluid rounded-start" width="70">
+                </div>
+                <div class="col-md-4">
+                  <div class="card-body">
+                    <h5 class="card-title">{{shift.date}}</h5>
+                    <h6 class="card-text">{{shift.shift_provider.name}}</h6>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card-body">
+                      <p class="card-text text-center m-0 p-0"><small class="text-body-secondary">Number of employees</small></p>
+                      <h4 class="card-title text-center">{{shift.employees.count}}</h4>
+                  </div>
+                </div>
+                <div class="col-md-2 text-center">
+                  <a href="{% url 'setservice' shift.id %}"><h1><i class="fa fa-wrench pt-4"></i></h1></a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <div class="col-sm-6 p-4">
+
+            <!-- UPDATE/ADD EMPLOYEES SHIFT SECTION -->
+            {% if edit %}
+                <h1 class="p-3"> {{editshift.venue}} - {{editshift.date}}</h1>
+                <h5 class="px-3 pb-3">{{editshift.shift_provider.name}}</h5>
+                {% if not service_selected %}
+                    <form action="{% url 'setservice' editshift.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="row form-group pt-4 pb-2 border-bottom">
+                            <div class="col-sm-10">
+                                <select class="form-select mb-3" name="service">
+                                    {% for service in services %}
+                                        <option value="{{service.id}}">{{service.name}} : {{service.servicefee}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-sm-2">
+                                <button type="submit" class="btn btn-primary">Add</button>
+                            </div>
+                        </div>
+                    </form>
+                {% else %}
+
+                    <h6 class="px-3 pb-3">Service : {{editshift.service_provided.name}}</h6>
+                    <h6 class="px-3 pb-3 border-bottom">{{editshift.service_provided.servicefee}}</h6>
+                {% endif%}
+
+                {% if service_selected %}
+                    {% for employee in working %}
+                    <div class="card mb-3">
+                      <div class="row g-0">
+
+                        <div class="col-md-10">
+                          <div class="card-body">
+                            <h5 class="card-title">{{employee.first_name}} {{employee.last_name}}</h5>
+                          </div>
+                        </div>
+
+                        <div class="col-md-2 text-center">
+                          <a href="{% url 'deleteemployeeshift' editshift.id employee.id %}"><h1><i class="fa fa-trash"></i></h1></a>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+
+                    <form action="{% url 'addemployee' editshift.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="row form-group pt-4 pb-2 border-top">
+                            <div class="col-sm-10">
+                                <select class="form-select mb-3" name="employee">
+                                    {% for employee in not_working %}
+                                        <option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+
+                            <div class="col-sm-2">
+                                {% if not_working %}
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-primary" disabled>Add</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                {% endif%}
+
+            {% endif %}
+        </div>
+    </div>
+
+
+{% endblock %}
