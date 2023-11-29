@@ -1,0 +1,25 @@
+{% extends "users/layoutmain.html" %}
+{% load static %}
+{% block body %}
+<!--<div class="row m-0 vh-100 justify-content-center align-items-center"> -->
+
+
+    <div class="px-4 pt-5 my-5 text-center border-bottom">
+        <h1 class="display-4 fw-bold text-body-emphasis">Make your holidays unforgettable</h1>
+        <div class="col-lg-6 mx-auto">
+            <p class="lead mb-4" id="fade">You won't have to worry about nothing but enjoying your holidays, just let us organize every single detail to make your trip to Marbella special</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
+                <button type="button" class="btn btn-primary btn-lg px-4 me-sm-3">Nightclubs</button>
+                <button type="button" class="btn btn-primary btn-lg px-4 me-sm-3">Dayclubs</button>
+                <button type="button" class="btn btn-primary btn-lg px-4 me-sm-3">Restaurants</button>
+            </div>
+        </div>
+        <div class="overflow-hidden" style="max-height: 30vh;">
+            <div class="container px-5">
+                <img src="{% static 'img/party.jpg' %}" class="img-fluid  rounded-3 shadow-lg mb-4" alt="Beluxe parties" width="700" height="500" loading="lazy">
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
