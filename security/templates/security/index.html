@@ -79,7 +79,7 @@
 
 
             {% for shift in shifts%}
-            <div class="card mb-3">
+            <div class="card mb-3 bg-light">
               <div class="row g-0">
                 <div class="col-md-2 text-center">
                   <img src="/static/img/{{shift.venue.commercial_name}}.png" class="img-fluid rounded-start" width="70">
@@ -133,25 +133,20 @@
                     <h6 class="px-3 pb-3">Service : {{editshift.service_provided.name}}</h6>
                     <h6 class="px-3 pb-3 border-bottom">{{editshift.service_provided.servicefee}}</h6>
                 {% endif%}
-
+                
                 {% if service_selected %}
+                    <div class="row">
                     {% for employee in working %}
-                    <div class="card mb-3">
-                      <div class="row g-0">
-
-                        <div class="col-md-10">
-                          <div class="card-body">
-                            <h5 class="card-title">{{employee.first_name}} {{employee.last_name}}</h5>
-                          </div>
-                        </div>
-
-                        <div class="col-md-2 text-center">
-                          <a href="{% url 'deleteemployeeshift' editshift.id employee.id %}"><h1><i class="fa fa-trash"></i></h1></a>
-                        </div>
-                      </div>
-                    </div>
+                        <div class="col-md-3 my-3">
+                            <div class="card text-center bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{employee.first_name}} {{employee.last_name}}</h6>
+                                    <a href="{% url 'deleteemployeeshift' editshift.id employee.id %}" class="btn btn-primary">Delete</a>
+                                </div>
+                            </div>
+                        </div>                    
                     {% endfor %}
-
+                    </div>
                     <form action="{% url 'addemployee' editshift.id %}" method="post">
                         {% csrf_token %}
                         <div class="row form-group pt-4 pb-2 border-top">
