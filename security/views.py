@@ -4,41 +4,13 @@ from .forms import ShiftForm
 import datetime
 # Create your views here.
 
-YEARS_CHOICE = []
-for year in range(2022, (datetime.datetime.now().year+3)):
-    YEARS_CHOICE.append(str(year))
 
 CURRENT_MONTH = str(datetime.datetime.now().month)
 CURRENT_YEAR = str(datetime.datetime.now().year)
-MONTH31 = [1, 3, 5, 7, 8, 10, 12]
-MONTHDICT = {
-    "1":'JAN',
-    "2":'FEB',
-    "3":'MAR',
-    "4":'APR',
-    "5":'MAY',
-    "6":'JUN',
-    "7":'JUL',
-    "8":'AUG',
-    "9":'SEP',
-    "10":'OCT',
-    "11":'NOV',
-    "12":'DIC'
-}
-
-
-def shift_filter(month, year):
-    init_date = year + "-" + month + "-01"
-    if month in MONTH31:
-        end_date = year + "-" + month + "-31"
-    else:
-        end_date = year + "-" + month + "-30"
-    shift_data = Shift.objects.filter(date__range=[init_date, end_date])
-    return shift_data
-
+TODAY = datetime.date.today()
 
 def index(request):
-    shift_data = shift_filter(CURRENT_MONTH, CURRENT_YEAR)
+    shift_data = Shift.objects.filter(date=TODAY)
 
     if request.method == "POST":
         form = ShiftForm(request.POST)
@@ -52,36 +24,28 @@ def index(request):
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
         "shifts": shift_data,
-        "years": YEARS_CHOICE,
-        "month": CURRENT_MONTH,
-        "year": CURRENT_YEAR,
-        "month_text": MONTHDICT[CURRENT_MONTH],
-        "monthdict": MONTHDICT.items(),
         "edit": False,
         "service_selected": False,
+        "date":TODAY,
     })
 
 
 
-def filtershift(request, month=CURRENT_MONTH, year=CURRENT_YEAR):
-    shift_data = shift_filter(month, year)
-
+def filtershift(request, date=TODAY):
     if request.method == "POST":
-        month = request.POST["month"]
-        year = request.POST["year"]
-        shift_data = shift_filter(month, year)
-
+        datesent = request.POST["dateSearch"] 
+        month = int(datesent[0:2])
+        day = int(datesent[3:5])
+        year = int(datesent[6:10])
+        date = datetime.date(year,month,day)
+    shift_data = Shift.objects.filter(date=date)
     return render(request, 'security/index.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
         "shifts": shift_data,
-        "years": YEARS_CHOICE,
-        "month": month,
-        "year": year,
-        "month_text": MONTHDICT[month],
-        "monthdict": MONTHDICT.items(),
         "edit": False,
         "service_selected": False,
+        "date": date
     })
 
 
@@ -110,10 +74,7 @@ def setservice(request, shift_id):
     for emp in employees:
         if emp not in working and emp.provider == provider:
             not_working.append(emp)
-    month = str(shift.date.month)
-    year = str(shift.date.year)
-    shift_data = shift_filter(month, year)
-
+    shift_data = Shift.objects.filter(date=shift.date)
 
 
     return render(request, 'security/index.html', {
@@ -121,11 +82,6 @@ def setservice(request, shift_id):
         "providers": Provider.objects.all(),
         "services": services,
         "shifts": shift_data,
-        "years": YEARS_CHOICE,
-        "month": month,
-        "year": year,
-        "month_text": MONTHDICT[month],
-        "monthdict": MONTHDICT.items(),
         "edit": True,
         "editshift": shift,
         "working": working,
@@ -152,9 +108,7 @@ def addemployee(request, shift_id):
     for emp in employees:
         if emp not in working and emp.provider == provider:
             not_working.append(emp)
-    month = str(shift.date.month)
-    year = str(shift.date.year)
-    shift_data = shift_filter(month, year)
+    shift_data = Shift.objects.filter(date=shift.date)
 
 
 
@@ -163,11 +117,6 @@ def addemployee(request, shift_id):
         "providers": Provider.objects.all(),
         "services": services,
         "shifts": shift_data,
-        "years": YEARS_CHOICE,
-        "month": month,
-        "year": year,
-        "month_text": MONTHDICT[month],
-        "monthdict": MONTHDICT.items(),
         "edit": True,
         "editshift": shift,
         "working": working,
@@ -191,9 +140,7 @@ def deleteemployeeshift(request, shift_id, employee_id):
     for emp in employees:
         if emp not in working and emp.provider == provider:
             not_working.append(emp)
-    month = str(shift.date.month)
-    year = str(shift.date.year)
-    shift_data = shift_filter(month, year)
+    shift_data = Shift.objects.filter(date=shift.date)
 
 
 
@@ -202,11 +149,6 @@ def deleteemployeeshift(request, shift_id, employee_id):
         "providers": Provider.objects.all(),
         "services": services,
         "shifts": shift_data,
-        "years": YEARS_CHOICE,
-        "month": month,
-        "year": year,
-        "month_text": MONTHDICT[month],
-        "monthdict": MONTHDICT.items(),
         "edit": True,
         "editshift": shift,
         "working": working,

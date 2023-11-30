@@ -41,68 +41,52 @@
                 </div>
             </form>
             <!-- RESULT SECTION -->
-            <h3 class="p-3"> Shifts on {{month_text}} - {{year}}</h3>
+            <h3 class="p-3"> Shifts on {{date}}</h3>
             <form class="form-floating" action="{% url 'filtershift'%}" method="post">
                 {% csrf_token %}
                 <div class="row form-group  pt-2 pb-2">
-                    <div class="form-floating">
-                        <select class="form-select mb-3" name="month">
-                            {% for num, text in monthdict %}
-                            # Mantiene seleccionado en el select el mes mostrado
-                                {% if num == month %}
-                                    <option selected value="{{num}}">{{text}}</option>
-                                {% else %}
-                                    <option value="{{num}}">{{text}}</option>
-                                {% endif%}
-                            {% endfor %}
-                        </select>
-                        <label for="month">Select the month</label>
+                    <label for="date">Select a date</label>
+                    <div class="input-group date" id="datepicker1">
+                        <input type="text" class="form-control" name="dateSearch">
+                        <span class="input-group-append">
+                            <span class="input-group-text bg-white d-block">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+                        </span>
                     </div>
-                    <div class="form-floating">
-                        <select class="form-select mb-3" name="year">
-                            {% for anno in years %}
-                                {% if anno == year %}
-                                    <option selected value="{{anno}}">{{anno}}</option>
-                                {% else %}
-                                    <option value="{{anno}}">{{anno}}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                        <label for="year">Select the year</label>
-                    </div>
-                    <div class="col-sm-12">
+                    <div class="col-sm-12 mt-3">
                         <button type="submit" class="btn btn-primary">Show</button>
                     </div>
                 </div>
             </form>
             <caption>List of shifts</caption>
 
-
-            {% for shift in shifts%}
-            <div class="card mb-3 bg-light">
-              <div class="row g-0">
-                <div class="col-md-2 text-center">
-                  <img src="/static/img/{{shift.venue.commercial_name}}.png" class="img-fluid rounded-start" width="70">
-                </div>
-                <div class="col-md-4">
-                  <div class="card-body">
-                    <h5 class="card-title">{{shift.date}}</h5>
-                    <h6 class="card-text">{{shift.shift_provider.name}}</h6>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card-body">
-                      <p class="card-text text-center m-0 p-0"><small class="text-body-secondary">Number of employees</small></p>
-                      <h4 class="card-title text-center">{{shift.employees.count}}</h4>
-                  </div>
-                </div>
-                <div class="col-md-2 text-center">
-                  <a href="{% url 'setservice' shift.id %}"><h1><i class="fa fa-wrench pt-4"></i></h1></a>
-                </div>
-              </div>
+            <div class="row gx-1">
+                {% for shift in shifts%}
+                    <div class="col-6 p-2">
+                        <div class="col m-1 bg-light">
+                            <div class="col text-center">
+                                <img src="/static/img/{{shift.venue.commercial_name}}.png" class="img-fluid rounded-start" width="70">
+                            </div>
+                            <div class="col text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{shift.date}}</h5>
+                                    <h6 class="card-text">{{shift.shift_provider.name}}</h6>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="card-body">
+                                    <p class="card-text text-center m-0 p-0"><small class="text-body-secondary">Number of employees</small></p>
+                                    <h4 class="card-title text-center">{{shift.employees.count}}</h4>
+                                </div>
+                            </div>
+                            <div class="col text-center">
+                                <a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-
         </div>
 
         <div class="col-sm-6 p-4">
