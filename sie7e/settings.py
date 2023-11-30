@@ -31,7 +31,7 @@ SECRET_KEY = key
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    '51.20.94.43',
+
 ]
 
 
