@@ -4,9 +4,9 @@
     <div class="row align-items-start">
 
         <div class="col-sm-6 p-3 border-end">
-            <!-- CREATE CALENDAR -->
+            <!-- SEARCH FORM -->
             <div class="row">
-                <div class="col-5 bg-light border">
+                <div class="col-md-5 bg-light border">
                     <form action="{% url 'index' %}" method="post">
                         {% csrf_token %}
                         <div class="row form-group pt-3 pb-3">
@@ -32,7 +32,8 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-7">
+                <!-- CREATE CALENDAR -->
+                <div class="col-md-7">
                     <div class="row text-center">
                             <div class="col"><h5>{{monthtext}} - {{year}}</h5></div>
                     </div>
@@ -45,7 +46,7 @@
                         <div class="d-flex text-center">
                             {% for day in week %}
                                 {% if day.month == month %}
-                                    <div class="p-1 flex-fill "><a href="{% url 'filtershift' day %}"><h4>{{day.day}}</h4></a></div>
+                                    <div class="p-1 flex-fill "><a href="{% url 'filtershift' day %}"><h6>{{day.day}}</h6></a></div>
                                 {% else %}
                                     <div class="p-1 flex-fill">-</div>
                                 {% endif %}
