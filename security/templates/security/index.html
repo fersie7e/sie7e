@@ -4,90 +4,124 @@
     <div class="row align-items-start">
 
         <div class="col-sm-6 p-3 border-end">
-            <!-- CREATE SHIFT SECTION -->
-            <h3 class="p-3">New shift</h3>
-            <form action="{% url 'index' %}" method="post">
-                {% csrf_token %}
-                <div class="row form-group pt-3 pb-3 border-bottom">
-                    <div class="form-floating">
-                        <select class="form-select mb-3" name="venue">
-                            {% for venue in venues %}
-                                <option value="{{ venue.id }}">{{ venue }}</option>
-                            {% endfor %}
-                        </select>
-                        <label for="venue">Select the venue</label>
-                    </div>
-                    <div class="form-floating">
-                        <select class="form-select mb-3" name="shift_provider">
-                            {% for provider in providers %}
-                                <option value="{{ provider.id }}">{{ provider.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <label class="formlabel" for="venue">Select the provider</label>
-                    </div>
-                    <label for="date">Select a date</label>
-                    <div class="input-group date" id="datepicker">
-                        <input type="text" class="form-control" name="date">
-                        <span class="input-group-append">
-                            <span class="input-group-text bg-white d-block">
-                                <i class="fa fa-calendar"></i>
-                            </span>
-                        </span>
-                    </div>
-                    
-                    <div class="col-sm-12">
-                        <button type="submit" class="btn btn-primary mt-4">Create</button>
-                    </div>
-                </div>
-            </form>
-            <!-- RESULT SECTION -->
-            <h3 class="p-3"> Shifts on {{date}}</h3>
-            <form class="form-floating" action="{% url 'filtershift'%}" method="post">
-                {% csrf_token %}
-                <div class="row form-group  pt-2 pb-2">
-                    <label for="date">Select a date</label>
-                    <div class="input-group date" id="datepicker1">
-                        <input type="text" class="form-control" name="dateSearch">
-                        <span class="input-group-append">
-                            <span class="input-group-text bg-white d-block">
-                                <i class="fa fa-calendar"></i>
-                            </span>
-                        </span>
-                    </div>
-                    <div class="col-sm-12 mt-3">
-                        <button type="submit" class="btn btn-primary">Show</button>
-                    </div>
-                </div>
-            </form>
-            <caption>List of shifts</caption>
-
-            <div class="row gx-1">
-                {% for shift in shifts%}
-                    <div class="col-6 p-2">
-                        <div class="col m-1 bg-light">
-                            <div class="col text-center">
-                                <img src="/static/img/{{shift.venue.commercial_name}}.png" class="img-fluid rounded-start" width="70">
+            <!-- CREATE CALENDAR -->
+            <div class="row">
+                <div class="col-5 bg-light border">
+                    <form action="{% url 'index' %}" method="post">
+                        {% csrf_token %}
+                        <div class="row form-group pt-3 pb-3">
+                            <div class="form-floating">
+                                <select class="form-select mb-3" name="year">
+                                    {% for year in year_choice %}
+                                        <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="venue">Select the year</label>
                             </div>
-                            <div class="col text-center">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{shift.date}}</h5>
-                                    <h6 class="card-text">{{shift.shift_provider.name}}</h6>
-                                </div>
+                            <div class="form-floating">
+                                <select class="form-select mb-3" name="month">
+                                    {% for number,month in months.items %}
+                                        <option value="{{ number }}">{{ month }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="formlabel" for="venue">Select the provider</label>
                             </div>
-                            <div class="col">
-                                <div class="card-body">
-                                    <p class="card-text text-center m-0 p-0"><small class="text-body-secondary">Number of employees</small></p>
-                                    <h4 class="card-title text-center">{{shift.employees.count}}</h4>
-                                </div>
-                            </div>
-                            <div class="col text-center">
-                                <a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Edit</a>
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" class="btn btn-primary mt-4">Go</button>
                             </div>
                         </div>
+                    </form>
+                </div>
+                <div class="col-7">
+                    <div class="row text-center">
+                            <div class="col"><h5>{{monthtext}} - {{year}}</h5></div>
                     </div>
-                {% endfor %}
+                    <div class="d-flex text-center">
+                        {% for day in days %}
+                            <div class="p-1 flex-fill"><h6>{{day}}</h6></div>
+                        {% endfor %}
+                    </div>
+                    {% for week in cal %}
+                        <div class="d-flex text-center">
+                            {% for day in week %}
+                                {% if day.month == month %}
+                                    <div class="p-1 flex-fill "><a href="{% url 'filtershift' day %}"><h4>{{day.day}}</h4></a></div>
+                                {% else %}
+                                    <div class="p-1 flex-fill">-</div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
+            {% if date_selected == True %}
+                <!-- CREATE SHIFT SECTION -->
+                <div class="row">
+                    <div class="bg-light border my-3 px-2">
+                        <h3 class="p-1 mt-2"> Add a shift on {{date}}</h3>
+                        <form action="{% url 'addshift' %}" method="post">
+                            {% csrf_token %}
+                            <div class="row form-group pb-2">
+                                <form class="form-floating">
+                                    <input type="text" class="form-control" name="date" hidden="True" value="{{date}}">
+                                </form>
+                                <div class="form-floating">
+                                    <select class="form-select mb-3" name="venue">
+                                        {% for venue in venues %}
+                                            <option value="{{ venue.id }}">{{ venue }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="venue">Select the venue</label>
+                                </div>
+                                <div class="form-floating">
+                                    <select class="form-select mb-1" name="shift_provider">
+                                        {% for provider in providers %}
+                                            <option value="{{ provider.id }}">{{ provider.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label class="formlabel" for="venue">Select the provider</label>
+                                </div>
+                                
+                                
+                                <div class="col-sm-12">
+                                    <button type="submit" class="btn btn-primary mt-1">Create</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- RESULT SECTION -->
+                
+                <caption>List of shifts</caption>
+                <div class="row gx-1">
+                    {% for shift in shifts%}
+                        <div class="col-6 p-2">
+                            <div class="col m-1 bg-light border">
+                                <div class="col text-center">
+                                    <img src="/static/img/{{shift.venue.commercial_name}}.png" class="img-fluid rounded-start" width="70">
+                                </div>
+                                <div class="col text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{shift.date}}</h5>
+                                        <h6 class="card-text">{{shift.shift_provider.name}}</h6>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card-body">
+                                        <p class="card-text text-center m-0 p-0"><small class="text-body-secondary">Number of employees</small></p>
+                                        <h4 class="card-title text-center">{{shift.employees.count}}</h4>
+                                    </div>
+                                </div>
+                                <div class="col text-center mb-2">
+                                    <a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Edit</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
         </div>
+            
 
         <div class="col-sm-6 p-4">
 
