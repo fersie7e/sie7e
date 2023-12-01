@@ -84,7 +84,7 @@ def filtershift(request, date=TODAY):
     cal = calendar.Calendar().monthdatescalendar(year,month)
     shift_data = Shift.objects.filter(date=date)
 
-    return render(request, 'security/index.html', {
+    return render(request, 'security/filter.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
         "shifts": shift_data,
@@ -147,7 +147,7 @@ def setservice(request, shift_id):
     shift_data = Shift.objects.filter(date=shift.date)
 
 
-    return render(request, 'security/index.html', {
+    return render(request, 'security/set.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
         "services": services,

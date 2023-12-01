@@ -1,0 +1,78 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    <div class="row h-100">
+        <div class="row text-start mt-2">
+            <p><a href="{% url 'index' %}">inicio</a> > filter</p>
+        </div>
+        <div class="col p-3 ">
+            {% if date_selected == True %}
+                <!-- CREATE SHIFT SECTION -->
+                <div class="row">
+                    <div class="bg-light border my-3 px-2">
+                        <h3 class="p-1 mt-2"> Add a shift on {{date}}</h3>
+                        <form action="{% url 'addshift' %}" method="post">
+                            {% csrf_token %}
+                            <div class="row form-group pb-2">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" name="date" hidden="True" value="{{date}}">
+                                </div>
+                                <div class="form-floating">
+                                    <select class="form-select mb-3" name="venue">
+                                        {% for venue in venues %}
+                                            <option value="{{ venue.id }}">{{ venue }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="venue">Select the venue</label>
+                                </div>
+                                <div class="form-floating">
+                                    <select class="form-select mb-1" name="shift_provider">
+                                        {% for provider in providers %}
+                                            <option value="{{ provider.id }}">{{ provider.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="venue">Select the provider</label>
+                                </div>
+                                
+                                
+                                <div class="col-sm-12">
+                                    <button type="submit" class="btn btn-primary mt-1">Create</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- RESULT SECTION -->
+                <caption>List of shifts</caption>
+                <div class="row gx-1">
+                    {% for shift in shifts%}
+                        <div class="col-6 p-2">
+                            <div class="col m-1 bg-light border">
+                                <div class="col text-center">
+                                    <img src="/static/img/{{shift.venue.commercial_name}}.png" class="img-fluid rounded-start" width="70">
+                                </div>
+                                <div class="col text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{shift.date}}</h5>
+                                        <h6 class="card-text">{{shift.shift_provider.name}}</h6>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card-body">
+                                        <p class="card-text text-center m-0 p-0"><small class="text-body-secondary">Number of employees</small></p>
+                                        <h4 class="card-title text-center">{{shift.employees.count}}</h4>
+                                    </div>
+                                </div>
+                                <div class="col text-center mb-2">
+                                    <a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Edit</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}  
+        </div>
+    </div>
+
+
+{% endblock %}
