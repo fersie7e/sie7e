@@ -5,17 +5,18 @@
         <div class="row text-start mt-2">
             <p><a href="{% url 'index' %}">inicio</a> > <a href="{% url 'filtershift' editshift.date %}">filter</a> > set</p>
         </div>
-        <div class="col p-4 bg-light border">
+        <div class="col p-4 border">
             <div class="row">
                 <!-- UPDATE/ADD EMPLOYEES SHIFT SECTION -->
                 {% if edit %}
                     <h1 class="p-3"> {{editshift.venue}} - {{editshift.date}}</h1>
                     <h5 class="px-3 pb-3">{{editshift.shift_provider.name}}</h5>
                     {% if not service_selected %}
-                        <form action="{% url 'setservice' editshift.id %}" method="post">
+                        <form class="bg-light text-start" action="{% url 'setservice' editshift.id %}" method="post">
                             {% csrf_token %}
-                            <div class="row form-group pt-4 pb-2 border-bottom">
+                            <div class="row form-group pt-4 pb-2">
                                 <div class="col-sm-10">
+                                    <label for="service">Choose the service to provide</label>
                                     <select class="form-select mb-3" name="service">
                                         {% for service in services %}
                                             <option value="{{service.id}}">{{service.name}} : {{service.servicefee}}</option>
@@ -24,21 +25,42 @@
                                 </div>
 
                                 <div class="col-sm-2">
-                                    <button type="submit" class="btn btn-primary">Add</button>
+                                    <button type="submit" class="btn btn-primary mt-4">Set</button>
                                 </div>
                             </div>
                         </form>
                     {% else %}
 
                         <h6 class="px-3 pb-3">Service : {{editshift.service_provided.name}}</h6>
-                        <h6 class="px-3 pb-3 border-bottom">{{editshift.service_provided.servicefee}}</h6>
+                        <h6 class="px-3 pb-3">{{editshift.service_provided.servicefee}}</h6>
                     {% endif%}
                     
                     {% if service_selected %}
+                        <form class="bg-light border" action="{% url 'addemployee' editshift.id %}" method="post">
+                            {% csrf_token %}
+                            <div class="row form-group pt-4 pb-2 text-start">
+                                <div class="col-sm-10">
+                                    <label for="employee">Choose the employee to add to the shift</label>
+                                    <select class="form-select mb-3" name="employee">
+                                        {% for employee in not_working %}
+                                            <option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                </div>
+                                <div class="col-sm-2">
+                                    {% if not_working %}
+                                        <button type="submit" class="btn btn-primary mt-4">Add</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-primary mt-4" disabled>Add</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </form>
                         <div class="row">
                         {% for employee in working %}
                             <div class="col-md-3 my-3">
-                                <div class="card text-center bg-white">
+                                <div class="card text-center bg-white shadow">
                                     <div class="card-body">
                                         <h6 class="card-title">{{employee.first_name}} {{employee.last_name}}</h6>
                                         <a href="{% url 'deleteemployeeshift' editshift.id employee.id %}" class="btn btn-primary">Delete</a>
@@ -47,27 +69,7 @@
                             </div>                    
                         {% endfor %}
                         </div>
-                        <form action="{% url 'addemployee' editshift.id %}" method="post">
-                            {% csrf_token %}
-                            <div class="row form-group pt-4 pb-2 border-top">
-                                <div class="col-sm-10">
-                                    <select class="form-select mb-3" name="employee">
-                                        {% for employee in not_working %}
-                                            <option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>
-                                        {% endfor %}
-                                    </select>
-
-                                </div>
-
-                                <div class="col-sm-2">
-                                    {% if not_working %}
-                                        <button type="submit" class="btn btn-primary">Add</button>
-                                    {% else %}
-                                        <button type="submit" class="btn btn-primary" disabled>Add</button>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </form>
+                        
                     {% endif%}
                 {% endif %}
             </div>
