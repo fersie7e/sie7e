@@ -12,7 +12,7 @@
                     <h1 class="p-3"> {{editshift.venue}} - {{editshift.date}}</h1>
                     <h5 class="px-3 pb-3">{{editshift.shift_provider.name}}</h5>
                     {% if not service_selected %}
-                        <form class="bg-light text-start" action="{% url 'setservice' editshift.id %}" method="post">
+                        <form class="bg-light text-start border" action="{% url 'setservice' editshift.id %}" method="post">
                             {% csrf_token %}
                             <div class="row form-group pt-4 pb-2">
                                 <div class="col-10">
