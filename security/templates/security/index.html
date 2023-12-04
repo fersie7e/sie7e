@@ -8,36 +8,40 @@
         </div>
         <div class="col p-3">
             <!-- SEARCH FORM -->
-            <div class="row border p-3">
+            <div class="row p-3">
                 <h2>Choose a date in the calendar</h2>
-                <div class="col-md-5 bg-light border">
+                <div class="col bg-light border text-start">
                     <form action="{% url 'index' %}" method="post">
                         {% csrf_token %}
                         <div class="row form-group pt-3 pb-3">
-                            <div class="form-floating">
+                            <div class="col-sm-5">
+                                <label for="year">Select the year</label>
                                 <select class="form-select mb-3" name="year">
                                     {% for year in year_choice %}
                                         <option value="{{ year }}">{{ year }}</option>
                                     {% endfor %}
                                 </select>
-                                <label class="text-start" for="venue">Select the year</label>
                             </div>
-                            <div class="form-floating">
+                            <div class="col-sm-5">
+                                <label for="month">Select the provider</label>
                                 <select class="form-select mb-3" name="month">
                                     {% for number,month in months.items %}
                                         <option value="{{ number }}">{{ month }}</option>
                                     {% endfor %}
                                 </select>
-                                <label class="formlabel" for="venue">Select the provider</label>
                             </div>
-                            <div class="col-sm-12 text-center">
-                                <button type="submit" class="btn btn-primary mt-4">Go</button>
+                            <div class="col-sm-2">
+                                <div class="col-sm-12 text-center">
+                                    <button type="submit" class="btn btn-primary mt-4">Go</button>
+                                </div>
                             </div>
                         </div>
                     </form>
                 </div>
+            </div>
+            <div class="row p-3 d-inline-block">
                 <!-- CREATE CALENDAR -->
-                <div class="col-md-7">
+                <div class="col border bg-light shadow p-3">
                     <div class="row text-center">
                             <div class="col"><h5>{{monthtext}} - {{year}}</h5></div>
                     </div>
