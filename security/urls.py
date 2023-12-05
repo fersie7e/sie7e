@@ -9,4 +9,7 @@ urlpatterns = [
     path("add/<int:shift_id>/", views.addemployee, name="addemployee"),
     path("delete/<int:shift_id>/<int:employee_id>", views.deleteemployeeshift, name="deleteemployeeshift"),
     path("set/<int:shift_id>", views.setservice, name="setservice"),
+    path("invoice", views.invoiceGen, name="invoicegen"),
+    path("invoicefilter/", views.invoicefilter, name="invoicefilter"),
+    path("invoicedetail/<int:invoice_id>", views.invoicedetail, name="invoicedetail"),
 ]

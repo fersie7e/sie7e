@@ -1,0 +1,52 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row h-100 d-inline-block">
+        <div class="row text-start mt-2">
+            <p>inicio</p>
+        </div>
+        <div class="col p-3">
+            <!-- SEARCH FORM -->
+            <div class="row p-3">
+                <h2>Select the date to show results</h2>
+                <div class="col-6 bg-light border text-start">
+                    <h6>{{ invoice.invoice_venue.commercial_name }}</h6>
+                    <p>{{ invoice.invoice_venue.business_name }}</p>
+                    <p>{{ invoice.invoice_venue.address }}</p>
+                    <p>{{ invoice.invoice_venue.cif }}</p>
+                </div>
+                <div class="col-6 bg-light border text-start">
+                    <h6>{{ invoice.invoice_provider.name }}</h6>
+                    <p>{{ invoice.invoice_provider.address }}</p>
+                    <p>{{ invoice.invoice_venue.cif }}</p>
+                </div>
+            </div>
+            <caption>List of shifts</caption>
+                <div class="row gx-1">
+                    {% for shift in invoice.shifts.all %}
+                        <div class="col-6 col-sm-4 p-2">
+                            <div class="col m-1 p-2 bg-light border">
+                                <div class="col text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{shift.date}}</h5>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card-body">
+                                        <p class="card-text text-center m-0 p-0"><small class="text-body-secondary">TOTAL</small></p>
+                                        <h4 class="card-title text-center">{{shift.employees.count}}</h4>
+                                    </div>
+                                </div>
+                                <div class="col text-center my-2">
+                                    <a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+        </div>
+    </div>
+    
+
+{% endblock %}

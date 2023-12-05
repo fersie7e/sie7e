@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .models import Venue, Shift, Employee, Provider, Service
+from .models import Venue, Shift, Employee, Provider, Service, Invoice, Fee
 from .forms import ShiftForm
 import calendar
 import datetime
@@ -11,15 +11,15 @@ YEARS_CHOICE = []
 for year in range(2022, datetime.datetime.now().year + 4):
     YEARS_CHOICE.append(year)
 
-MONTHS = {	'01':'January',
-		'02':'February',
-		'03':'March',
-		'04':'April',
-		'05':'May',
-		'06':'June',
-		'07':'July',
-		'08':'August',
-		'09':'September',
+MONTHS = {	'1':'January',
+		'2':'February',
+		'3':'March',
+		'4':'April',
+		'5':'May',
+		'6':'June',
+		'7':'July',
+		'8':'August',
+		'9':'September',
 		'10':'October',
 		'11':'November',
 		'12':'December'		}
@@ -146,7 +146,6 @@ def setservice(request, shift_id):
             not_working.append(emp)
     shift_data = Shift.objects.filter(date=shift.date)
 
-
     return render(request, 'security/set.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
@@ -172,43 +171,82 @@ def setservice(request, shift_id):
 
 def addemployee(request, shift_id):
     shift = Shift.objects.get(pk=shift_id)
-    provider = shift.shift_provider
-    employees = Employee.objects.filter(provider=provider)
-    services = provider.services.all()
-
-
     if request.method == "POST":
         employee_id = request.POST["employee"]
         employee = Employee.objects.get(pk=employee_id)
         shift.employees.add(employee)
-
-    working = shift.employees.filter(provider=provider)
-    not_working=[]
-    for emp in employees:
-        if emp not in working and emp.provider == provider:
-            not_working.append(emp)
-    shift_data = Shift.objects.filter(date=shift.date)
-
     return HttpResponseRedirect(reverse("setservice", args=(shift_id,)))
 
 
 
 def deleteemployeeshift(request, shift_id, employee_id):
     shift = Shift.objects.get(pk=shift_id)
-    provider = shift.shift_provider
-    services = provider.services.all()
-    employees = Employee.objects.filter(provider=provider)
     employee = Employee.objects.get(pk=employee_id)
-
     shift.employees.remove(employee)
-
-    working = shift.employees.filter(provider=provider)
-    not_working = []
-    for emp in employees:
-        if emp not in working and emp.provider == provider:
-            not_working.append(emp)
-    shift_data = Shift.objects.filter(date=shift.date)
-
     return HttpResponseRedirect(reverse("setservice", args=(shift_id,)))
 
     
+def invoiceGen(request):
+    amount = 0
+    success = False
+    if request.method == "POST":
+        month = request.POST['month']
+        year = request.POST['year']
+        venue_id = request.POST['invoice_venue']
+        provider_id = request.POST['invoice_provider']
+        venue = Venue.objects.get(pk=venue_id)
+        provider = Provider.objects.get(pk=provider_id)
+        
+        invoice = Invoice(invoice_venue=venue,
+                          invoice_provider=provider,
+                          month=month,
+                          year=year
+                          )
+        invoice.save()
+        
+        shifts = Shift.objects.filter(venue=venue, shift_provider=provider, date__year=year, date__month=month, invoiced=False)
+        for shift in shifts:
+            working_number = shift.employees.count()
+            fee = shift.service_provided.servicefee.fee
+            total_shift = working_number * fee
+            amount = amount + total_shift
+            invoice.amount = amount
+            invoice.shifts.add(shift)
+            invoice.save()
+            shift.invoiced = True
+            shift.save()
+            success = True
+
+    return render(request, 'security/invoice_gen.html', {
+        "venues": Venue.objects.all(),
+        "providers": Provider.objects.all(),
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "success": success,
+    })
+
+
+def invoicefilter(request):
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    if request.method == "POST":
+        month = request.POST['month']
+        year = request.POST['year']
+
+    invoices = Invoice.objects.filter(year=year, month=month)
+    return render(request, 'security/invoice_filter.html', {
+        "invoices": invoices,
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+    })
+
+
+def invoicedetail(request, invoice_id):
+    invoice = Invoice.objects.get(pk=invoice_id)
+    return render(request, 'security/invoice_detail.html', {
+        "invoice": invoice,
+    })
+
+

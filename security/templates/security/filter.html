@@ -63,7 +63,12 @@
                                     </div>
                                 </div>
                                 <div class="col text-center mb-2">
-                                    <a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Edit</a>
+                                    {% if shift.invoiced %}
+                                        <h3>INVOICED</h3>
+                                    {% else %}
+                                        <a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Edit</a>
+                                    {% endif%}
+                                    
                                 </div>
                             </div>
                         </div>

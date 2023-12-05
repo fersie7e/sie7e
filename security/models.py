@@ -44,7 +44,7 @@ class Provider(models.Model):
     services = models.ManyToManyField(Service, blank=True, related_name="services")
 
     def __str__(self):
-        return f"{self.name} - {self.cif}"
+        return f"{self.name}"
 
 
 class Employee(models.Model):
@@ -65,11 +65,20 @@ class Shift(models.Model):
     employees = models.ManyToManyField(Employee, blank=True, related_name="employees")
     shift_provider = models.ForeignKey(Provider, on_delete=models.SET_NULL, null=True, related_name="shift_provider")
     service_provided = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name="service_provided")
+    invoiced = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.date} - {self.venue}"
 
 
+class Invoice(models.Model):
+    invoice_venue = models.ForeignKey(Venue, on_delete=models.PROTECT, related_name="invoice_venue")
+    invoice_provider = models.ForeignKey(Provider, on_delete=models.PROTECT, related_name="invoice_provider")
+    month = models.PositiveIntegerField()
+    year = models.PositiveIntegerField()
+    shifts = models.ManyToManyField(Shift, blank=True ,related_name="shifts")
+    amount = models.FloatField(default=0)
 
-
+    def __str__(self):
+        return f"{self.month}/{self.year}: {self.invoice_venue} - {self.invoice_provider} Total: {self.amount} €"
 

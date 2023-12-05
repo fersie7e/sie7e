@@ -49,7 +49,7 @@
 
                                 </div>
                                 <div class="col-2 px-2">
-                                    {% if not_working %}
+                                    {% if not_working and editshift.invoiced %}
                                         <button type="submit" class="btn btn-primary mt-4">Add</button>
                                     {% else %}
                                         <button type="submit" class="btn btn-primary mt-4" disabled>Add</button>
@@ -63,7 +63,9 @@
                                 <div class="card text-center bg-white shadow">
                                     <div class="card-body">
                                         <h6 class="card-title">{{employee.first_name}} {{employee.last_name}}</h6>
-                                        <a href="{% url 'deleteemployeeshift' editshift.id employee.id %}" class="btn btn-primary">Delete</a>
+                                        {% if not editshift.invoiced %}
+                                            <a href="{% url 'deleteemployeeshift' editshift.id employee.id %}" class="btn btn-primary">Delete</a>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>                    
