@@ -214,8 +214,9 @@ def invoiceGen(request):
             invoice.shifts.add(shift)
             invoice.save()
             shift.invoiced = True
+            shift.invoice_num = invoice.pk
             shift.save()
-            success = True
+        success = True
 
     return render(request, 'security/invoice_gen.html', {
         "venues": Venue.objects.all(),
@@ -245,8 +246,13 @@ def invoicefilter(request):
 
 def invoicedetail(request, invoice_id):
     invoice = Invoice.objects.get(pk=invoice_id)
+    shifts = invoice.shifts.all()
+    total_shifts = 0
+    for shift in shifts:
+        total_shifts += shift.employees.count()
     return render(request, 'security/invoice_detail.html', {
         "invoice": invoice,
+        "total_shifts": total_shifts,
     })
 
 

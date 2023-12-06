@@ -25,7 +25,7 @@ class Fee(models.Model):
     salary = models.FloatField()
 
     def __str__(self):
-        return f"fee: {self.fee} salary: {self.salary}"
+        return f"fee: {self.fee} € - salary: {self.salary} €"
 
 
 class Service(models.Model):
@@ -66,6 +66,7 @@ class Shift(models.Model):
     shift_provider = models.ForeignKey(Provider, on_delete=models.SET_NULL, null=True, related_name="shift_provider")
     service_provided = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name="service_provided")
     invoiced = models.BooleanField(default=False)
+    invoice_num = models.IntegerField(null=True)
 
     def __str__(self):
         return f"{self.date} - {self.venue}"

@@ -1,16 +1,20 @@
 {% extends 'security/layoutmain.html' %}
 {% load static %}
 {% block body %}
-    <div class="row ">
+    <div class="row d-inline-block ">
         <div class="row text-start mt-2">
-            <p><a href="{% url 'index' %}">inicio</a> > <a href="{% url 'filtershift' editshift.date %}">filter</a> > set</p>
+            {% if editshift.invoiced %}
+                <p><a href="{% url 'invoicefilter' %}">Invoices</a> > <a href="{% url 'invoicedetail' editshift.invoice_num %}">filter</a> > details</p>
+            {% else %}
+                <p><a href="{% url 'index' %}">inicio</a> > <a href="{% url 'filtershift' editshift.date %}">filter</a> > set</p>
+            {% endif %}
         </div>
         <div class="col p-4 border">
             <div class="row">
                 <!-- UPDATE/ADD EMPLOYEES SHIFT SECTION -->
                 {% if edit %}
-                    <h1 class="p-3"> {{editshift.venue}} - {{editshift.date}}</h1>
-                    <h5 class="px-3 pb-3">{{editshift.shift_provider.name}}</h5>
+                    <h4> {{editshift.venue}} - {{editshift.date}}</h4>
+                    <h5>{{editshift.shift_provider.name}}</h5>
                     {% if not service_selected %}
                         <form class="bg-light text-start border" action="{% url 'setservice' editshift.id %}" method="post">
                             {% csrf_token %}
@@ -30,33 +34,34 @@
                             </div>
                         </form>
                     {% else %}
-
-                        <h6 class="px-3 pb-3">Service : {{editshift.service_provided.name}}</h6>
-                        <h6 class="px-3 pb-3">{{editshift.service_provided.servicefee}}</h6>
+                        <p class="fs-6 lh-1"><span class="fw-bold">Service: </span> {{editshift.service_provided.name}}</p>
+                        <p class="fs-6 lh-1"><span class="fw-bold">Fee: </span>{{editshift.service_provided.servicefee.fee}}</p>
                     {% endif%}
                     
                     {% if service_selected %}
-                        <form class="bg-light border" action="{% url 'addemployee' editshift.id %}" method="post">
-                            {% csrf_token %}
-                            <div class="row form-group pt-4 pb-2 text-start">
-                                <div class="col-10">
-                                    <label for="employee">Choose the employee to add to the shift</label>
-                                    <select class="form-select mb-3" name="employee">
-                                        {% for employee in not_working %}
-                                            <option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>
-                                        {% endfor %}
-                                    </select>
+                        {% if not editshift.invoiced %}
+                            <form class="bg-light border" action="{% url 'addemployee' editshift.id %}" method="post">
+                                {% csrf_token %}
+                                <div class="row form-group pt-4 pb-2 text-start">
+                                    <div class="col-10">
+                                        <label for="employee">Choose the employee to add to the shift</label>
+                                        <select class="form-select mb-3" name="employee">
+                                            {% for employee in not_working %}
+                                                <option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>
+                                            {% endfor %}
+                                        </select>
 
+                                    </div>
+                                    <div class="col-2 px-2">
+                                        {% if not_working  %}
+                                            <button type="submit" class="btn btn-primary mt-4">Add</button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-primary mt-4" disabled>Add</button>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                <div class="col-2 px-2">
-                                    {% if not_working and editshift.invoiced %}
-                                        <button type="submit" class="btn btn-primary mt-4">Add</button>
-                                    {% else %}
-                                        <button type="submit" class="btn btn-primary mt-4" disabled>Add</button>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        {% endif %}
                         <div class="row">
                         {% for employee in working %}
                             <div class="col-md-3 my-3">
