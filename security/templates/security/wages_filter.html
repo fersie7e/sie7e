@@ -2,81 +2,76 @@
 {% load static %}
 {% block body %}
     
-    <div class="row h-100 d-inline-block">
+    <div class="row h-100">
         <div class="row text-start mt-2">
             <p>Wages</p>
         </div>
-        <div class="col p-3">
-            <!-- SEARCH FORM -->
-            <div class="row p-3">
-                <h2>Select the date</h2>
-                <div class="col bg-light border text-start">
-                    <form action="{% url 'wagesfilter' %}" method="post">
-                        {% csrf_token %}
-                        <div class="row form-group pt-3 pb-3">
-                            <div class="col-sm-6">
-                                <label for="year">Select the year</label>
-                                <select class="form-select mb-3" name="year">
-                                    {% for year in year_choice %}
-                                        <option value="{{ year }}">{{ year }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-sm-6">
-                                <label for="month">Select the month</label>
-                                <select class="form-select mb-3" name="month">
-                                    {% for number,month in months.items %}
-                                        <option value="{{ number }}">{{ month }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label for="wages_provider">Select the provider</label>
-                                <select class="form-select mb-1" name="wages_provider">
-                                    {% for provider in providers %}
-                                        <option value="{{ provider.id }}">{{ provider.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col">
-                                <div class="col-sm-12 text-center">
-                                    <button type="submit" class="btn btn-primary mt-4">Search</button>
-                                </div>
+        <div class="row p-3">
+            <h2>Select the date</h2>
+            <div class="col bg-light border text-start">
+                <form action="{% url 'wagesfilter' %}" method="post">
+                    {% csrf_token %}
+                    <div class="row form-group pt-3 pb-3">
+                        <div class="col-sm-6">
+                            <label for="year">Select the year</label>
+                            <select class="form-select mb-3" name="year">
+                                {% for year in year_choice %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="month">Select the month</label>
+                            <select class="form-select mb-3" name="month">
+                                {% for number,month in months.items %}
+                                    <option value="{{ number }}">{{ month }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="wages_provider">Select the provider</label>
+                            <select class="form-select mb-1" name="wages_provider">
+                                {% for provider in providers %}
+                                    <option value="{{ provider.id }}">{{ provider.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" class="btn btn-primary mt-4">Search</button>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
-            <div class="row">
-                <div class="col text-end">
-                    <h3 >{{total_wages}} €</h3>
-                </div>
+        </div>
+        <div class="row">
+            <div class="col text-end">
+                <h3 >{{total_wages}} €</h3>
             </div>
-            <div class="col text-start">
-                List of wages on {{month}} / {{year}}
-            </div>
-                <div class="row gx-1">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col" class="text-start">Employee</th>
-                            <th scope="col">Shifts</th>
-                            <th scope="col">Total</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for key,item in wages.items %}
-                            <tr>
-                                <td class="text-start">{{key}}</td>
-                                <td>{{item.0}}</td>
-                                <td>{{item.1}} €</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-
-                    
-                </div>
+        </div>
+        <div class="col text-start">
+            List of wages on {{month}} / {{year}}
+        </div>
+        <div class="row gx-1">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col" class="text-start">Employee</th>
+                    <th scope="col">Shifts</th>
+                    <th scope="col">Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for key,item in wages.items %}
+                    <tr>
+                        <td class="text-start">{{key}}</td>
+                        <td>{{item.0}}</td>
+                        <td>{{item.1}} €</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
     

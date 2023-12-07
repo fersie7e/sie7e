@@ -2,68 +2,100 @@
 {% load static %}
 {% block body %}
     
-    <div class="row h-100 d-inline-block">
+    <div class="row h-100">
+
         <div class="row text-start mt-2">
             <p>Inicio</p>
         </div>
-        <div class="col p-3">
-            <!-- SEARCH FORM -->
-            <div class="row p-3">
-                <h2>Choose a date in the calendar</h2>
-                <div class="col bg-light border text-start">
-                    <form action="{% url 'index' %}" method="post">
-                        {% csrf_token %}
-                        <div class="row form-group pt-3 pb-3">
-                            <div class="col-sm-5">
-                                <label for="year">Select the year</label>
-                                <select class="form-select mb-3" name="year">
-                                    {% for year in year_choice %}
-                                        <option value="{{ year }}">{{ year }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-sm-5">
-                                <label for="month">Select the provider</label>
-                                <select class="form-select mb-3" name="month">
-                                    {% for number,month in months.items %}
-                                        <option value="{{ number }}">{{ month }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-sm-2">
-                                <div class="col-sm-12 text-center">
-                                    <button type="submit" class="btn btn-primary mt-4">Go</button>
-                                </div>
+
+        <div class="row p-3">
+            <h2>Choose a date in the calendar</h2>
+            <div class="col bg-light border text-start">
+                <form action="{% url 'index' %}" method="post">
+                    {% csrf_token %}
+                    <div class="row form-group pt-3 pb-3">
+                        <div class="col">
+                            <label for="year">Select the year</label>
+                            <select class="form-select mb-3" name="year">
+                                {% for year in year_choice %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="month">Select the provider</label>
+                            <select class="form-select mb-3" name="month">
+                                {% for number,month in months.items %}
+                                    <option value="{{ number }}">{{ month }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" class="btn btn-primary mt-4">Go</button>
                             </div>
                         </div>
-                    </form>
-                </div>
-            </div>
-            <div class="row p-3 d-inline-block">
-                <!-- CREATE CALENDAR -->
-                <div class="col border bg-light shadow p-3">
-                    <div class="row text-center">
-                            <div class="col"><h5>{{monthtext}} - {{year}}</h5></div>
                     </div>
-                    <div class="d-flex text-end">
-                        {% for day in days %}
-                            <div class="p-1 flex-fill"><h6>{{day}}</h6></div>
-                        {% endfor %}
-                    </div>
-                    {% for week in cal %}
-                        <div class="d-flex text-end">
-                            {% for day in week %}
-                                {% if day.month == month %}
-                                    <div class="p-1 flex-fill "><a href="{% url 'filtershift' day %}"><h6>{{day.day}}</h6></a></div>
-                                {% else %}
-                                    <div class="p-1 flex-fill">-</div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% endfor %}
-                </div>
+                </form>
             </div>
         </div>
+
+        <div class="d-flex d-inline-block justify-content-center p-3">
+            <!-- CREATE CALENDAR -->
+            <div class="border bg-light p-3">
+                <div class="text-center">
+                        <div class="col"><h5>{{monthtext}} - {{year}}</h5></div>
+                </div>
+                <div class="d-flex text-end">
+                    {% for day in days %}
+                        <div class="p-1 flex-fill"><h6>{{day}}</h6></div>
+                    {% endfor %}
+                </div>
+                {% for week in cal %}
+                    <div class="d-flex text-end">
+                        {% for day in week %}
+                            {% if day.month == month %}
+                                <div class="p-1 flex-fill "><a href="{% url 'filtershift' day %}"><h6>{{day.day}}</h6></a></div>
+                            {% else %}
+                                <div class="p-1 flex-fill">-</div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col text-start">
+            List of shifts on {{month}} / {{year}}
+        </div>
+        
+        <div class="row gx-1">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col" class="text-start">Date</th>
+                    <th scope="col" class="text-start">Venue</th>
+                    <th scope="col" class="text-start">Status</th>
+                    <th scope="col" class="text-start"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for shift in shifts %}
+                    <tr>
+                        <td class="text-start">{{shift.date}}</td>
+                        <td class="text-start">{{shift.venue}}</td>
+                        {% if shift.invoiced %}
+                            <td class="text-start text-danger">Invoiced</td>
+                        {% else %}
+                            <td class="text-start text-success">Pending</td>
+                        {% endif %}
+                        <td><a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Details</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
     </div>
     
 

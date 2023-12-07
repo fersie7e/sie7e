@@ -2,69 +2,70 @@
 {% load static %}
 {% block body %}
     
-    <div class="row h-100 d-inline-block">
+    <div class="row h-100">
+
         <div class="row text-start mt-2">
             <p>Invoices</p>
         </div>
-        <div class="col p-3">
-            <!-- SEARCH FORM -->
-            <div class="row p-3">
-                <h2>Select the date</h2>
-                <div class="col bg-light border text-start">
-                    <form action="{% url 'invoicefilter' %}" method="post">
-                        {% csrf_token %}
-                        <div class="row form-group pt-3 pb-3">
-                            <div class="col-sm-6">
-                                <label for="year">Select the year</label>
-                                <select class="form-select mb-3" name="year">
-                                    {% for year in year_choice %}
-                                        <option value="{{ year }}">{{ year }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-sm-6">
-                                <label for="month">Select the provider</label>
-                                <select class="form-select mb-3" name="month">
-                                    {% for number,month in months.items %}
-                                        <option value="{{ number }}">{{ month }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            
-                            <div class="col">
-                                <div class="col-sm-12 text-center">
-                                    <button type="submit" class="btn btn-primary mt-4">Search</button>
-                                </div>
+
+        <div class="row p-3">
+            <h2>Select the date</h2>
+            <div class="col bg-light border text-start">
+                <form action="{% url 'invoicefilter' %}" method="post">
+                    {% csrf_token %}
+                    <div class="row form-group pt-3 pb-3">
+                        <div class="col-sm-6">
+                            <label for="year">Select the year</label>
+                            <select class="form-select mb-3" name="year">
+                                {% for year in year_choice %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="month">Select the provider</label>
+                            <select class="form-select mb-3" name="month">
+                                {% for number,month in months.items %}
+                                    <option value="{{ number }}">{{ month }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col">
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" class="btn btn-primary mt-4">Search</button>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
-            <caption>List of Invoices on {{month}} / {{year}}</caption>
-                <div class="row gx-1">
-                    {% for invoice in invoices %}
-                        <div class="col-6 col-sm-4 p-2">
-                            <div class="col m-1 p-2 bg-light border">
-                                <div class="col text-center">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{invoice.month}}/{{invoice.year}} - {{invoice.invoice_venue}}</h5>
-                                        <h6 class="card-title">{{invoice.invoice_provider}}</h6>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="card-body">
-                                        <p class="card-text text-center m-0 p-0"><small class="text-body-secondary">TOTAL</small></p>
-                                        <h4 class="card-title text-center">{{invoice.amount}} €</h4>
-                                    </div>
-                                </div>
-                                <div class="col text-center my-2">
-                                    <a href="{% url 'invoicedetail' invoice.id %}" class="btn btn-primary">Details</a>
-                                </div>
+        </div>
+
+        <caption>List of Invoices on {{month}} / {{year}}</caption>
+        <div class="row gx-1">
+            {% for invoice in invoices %}
+                <div class="col-6 col-sm-4 p-2">
+                    <div class="col m-1 p-2 bg-light border">
+                        <div class="col text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">{{invoice.month}}/{{invoice.year}} - {{invoice.invoice_venue}}</h5>
+                                <h6 class="card-title">{{invoice.invoice_provider}}</h6>
                             </div>
                         </div>
-                    {% endfor %}
+                        <div class="col">
+                            <div class="card-body">
+                                <p class="card-text text-center m-0 p-0"><small class="text-body-secondary">TOTAL</small></p>
+                                <h4 class="card-title text-center">{{invoice.amount}} €</h4>
+                            </div>
+                        </div>
+                        <div class="col text-center my-2">
+                            <a href="{% url 'invoicedetail' invoice.id %}" class="btn btn-primary">Details</a>
+                        </div>
+                    </div>
                 </div>
+            {% endfor %}
         </div>
+        
     </div>
     
 

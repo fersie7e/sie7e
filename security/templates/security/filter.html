@@ -2,47 +2,48 @@
 {% load static %}
 {% block body %}
     <div class="row h-100">
+
         <div class="row text-start mt-2">
             <p><a href="{% url 'index' %}">Inicio</a> > filter</p>
         </div>
-        <div class="col p-3 ">
+
+        <div class="row p-3 ">
             {% if date_selected == True %}
                 <!-- CREATE SHIFT SECTION -->
-                <div class="row">
-                    <div class="col bg-light text-start border my-3 px-2">
-                        <h3 class="p-1 mt-2"> Add a shift on {{date}}</h3>
-                        <form action="{% url 'addshift' %}" method="post">
-                            {% csrf_token %}
-                            <div class="row form-group text-start pb-2">
-                                <div class="col-sm-5">
-                                    <input type="text" class="form-control" name="date" hidden="True" value="{{date}}">
-                                    <label for="venue">Select the venue</label>
-                                    <select class="form-select mb-3" name="venue">
-                                        {% for venue in venues %}
-                                            <option value="{{ venue.id }}">{{ venue }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-sm-5">
-                                    <label for="shift_provider">Select the provider</label>
-                                    <select class="form-select mb-1" name="shift_provider">
-                                        {% for provider in providers %}
-                                            <option value="{{ provider.id }}">{{ provider.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-sm-2">
-                                    <div class="col-sm-12 text-center">
-                                        <button type="submit" class="btn btn-primary mt-4">Create</button>
-                                    </div>
-                                </div>
-                                
+                <h2>Add a shift on {{date}}</h2>
+                <div class="col bg-light text-start border">
+                    <form action="{% url 'addshift' %}" method="post">
+                        {% csrf_token %}
+                        <div class="row form-group text-start p-3">
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" name="date" hidden="True" value="{{date}}">
+                                <label for="venue">Select the venue</label>
+                                <select class="form-select mb-3" name="venue">
+                                    {% for venue in venues %}
+                                        <option value="{{ venue.id }}">{{ venue }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                        </form>
-                    </div>
+                            <div class="col-sm-5">
+                                <label for="shift_provider">Select the provider</label>
+                                <select class="form-select mb-1" name="shift_provider">
+                                    {% for provider in providers %}
+                                        <option value="{{ provider.id }}">{{ provider.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="col-sm-12 text-center">
+                                    <button type="submit" class="btn btn-primary mt-4">Create</button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </form>
                 </div>
-                <!-- RESULT SECTION -->
-                <caption>List of shifts</caption>
+                <div class="row">
+                    <caption>List of shifts</caption>
+                </div>
                 <div class="row gx-1">
                     {% for shift in shifts%}
                         <div class="col-6 p-2">
@@ -76,6 +77,7 @@
                 </div>
                 {% endif %}  
         </div>
+
     </div>
 
 
