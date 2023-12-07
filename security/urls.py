@@ -12,4 +12,6 @@ urlpatterns = [
     path("invoice", views.invoiceGen, name="invoicegen"),
     path("invoicefilter/", views.invoicefilter, name="invoicefilter"),
     path("invoicedetail/<int:invoice_id>", views.invoicedetail, name="invoicedetail"),
+    path("wagesfilter/", views.wagesfilter, name="wagesfilter"),
+    path("wagesemployee/", views.wagesemployee, name="wagesemployee"),
 ]

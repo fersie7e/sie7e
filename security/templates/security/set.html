@@ -6,7 +6,7 @@
             {% if editshift.invoiced %}
                 <p><a href="{% url 'invoicefilter' %}">Invoices</a> > <a href="{% url 'invoicedetail' editshift.invoice_num %}">filter</a> > details</p>
             {% else %}
-                <p><a href="{% url 'index' %}">inicio</a> > <a href="{% url 'filtershift' editshift.date %}">filter</a> > set</p>
+                <p><a href="{% url 'index' %}">Inicio</a> > <a href="{% url 'filtershift' editshift.date %}">filter</a> > set</p>
             {% endif %}
         </div>
         <div class="col p-4 border">

@@ -8,7 +8,7 @@ import datetime
 # Create your views here.
 
 YEARS_CHOICE = []
-for year in range(2022, datetime.datetime.now().year + 4):
+for year in range(2023, datetime.datetime.now().year + 2):
     YEARS_CHOICE.append(year)
 
 MONTHS = {	'1':'January',
@@ -54,8 +54,6 @@ def index(request):
         monthtext = MONTHS.get(str(month))
         year = int(request.POST["year"])
         cal = calendar.Calendar().monthdatescalendar(year,month)
-
-
     return render(request, 'security/index.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
@@ -76,14 +74,12 @@ def index(request):
 
 
 def filtershift(request, date=TODAY):
-    
     date_formatted = parseDate(date)
     month = date_formatted.month
     year = date_formatted.year
     monthtext = MONTHS.get(str(month))
     cal = calendar.Calendar().monthdatescalendar(year,month)
     shift_data = Shift.objects.filter(date=date)
-
     return render(request, 'security/filter.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
@@ -124,7 +120,6 @@ def setservice(request, shift_id):
     provider = shift.shift_provider
     employees = Employee.objects.filter(provider=provider)
     services = provider.services.all()
-
     if shift.service_provided:
         service = shift.service_provided
         service_selected = True
@@ -138,14 +133,12 @@ def setservice(request, shift_id):
         else:
             service_selected = False
             service = services
-
     working = shift.employees.filter(provider=provider)
     not_working = []
     for emp in employees:
         if emp not in working and emp.provider == provider:
             not_working.append(emp)
     shift_data = Shift.objects.filter(date=shift.date)
-
     return render(request, 'security/set.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
@@ -196,14 +189,12 @@ def invoiceGen(request):
         provider_id = request.POST['invoice_provider']
         venue = Venue.objects.get(pk=venue_id)
         provider = Provider.objects.get(pk=provider_id)
-        
         invoice = Invoice(invoice_venue=venue,
                           invoice_provider=provider,
                           month=month,
                           year=year
                           )
         invoice.save()
-        
         shifts = Shift.objects.filter(venue=venue, shift_provider=provider, date__year=year, date__month=month, invoiced=False)
         for shift in shifts:
             working_number = shift.employees.count()
@@ -217,7 +208,6 @@ def invoiceGen(request):
             shift.invoice_num = invoice.pk
             shift.save()
         success = True
-
     return render(request, 'security/invoice_gen.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
@@ -233,7 +223,6 @@ def invoicefilter(request):
     if request.method == "POST":
         month = request.POST['month']
         year = request.POST['year']
-
     invoices = Invoice.objects.filter(year=year, month=month)
     return render(request, 'security/invoice_filter.html', {
         "invoices": invoices,
@@ -255,4 +244,72 @@ def invoicedetail(request, invoice_id):
         "total_shifts": total_shifts,
     })
 
+
+def wagesfilter(request):
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    providers = Provider.objects.all()
+    if request.method == "POST":
+        month = request.POST['month']
+        year = request.POST['year']
+        provider_id = request.POST['wages_provider']
+        provider = Provider.objects.get(pk=provider_id)
+        shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
+    else:
+        shifts = Shift.objects.filter(date__year=year, date__month=month)
+    wages = {}
+    total_wages = 0
+    for shift in shifts:
+        employees = shift.employees.all()
+        for employee in employees:
+            key = employee.first_name + " " + employee.last_name
+            if key in wages:
+                wages[key] = [wages.get(key)[0] + 1, 0]
+            else:
+                wages[key] = [1,0]
+        salary = shift.service_provided.servicefee.salary
+    for name,list in wages.items():
+        list[1] = int(list[0]) * salary
+        wages[name] = list
+        total_wages += list[1]
+    return render(request, 'security/wages_filter.html', {
+        "shifts": shifts,
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "wages": wages,
+        "providers": providers,
+        "total_wages": total_wages,
+    })
+
+def wagesemployee(request):
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    employees = Employee.objects.all()
+    employee = None
+    show = False
+    if request.method == "POST":
+        month = request.POST['month']
+        year = request.POST['year']
+        employee_id = request.POST['wages_employee']
+        employee = Employee.objects.get(pk=employee_id)
+        show = True
+    shifts = Shift.objects.filter(date__year=year, date__month=month)
+    worked_shifts = []
+    for shift in shifts:
+        if employee in shift.employees.all():
+            worked_shifts.append(shift)
+    return render(request, 'security/wages_employee.html', {
+        "shifts": shifts,
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "worked_shifts": worked_shifts,
+        "total_shifts": len(worked_shifts),
+        "employees": employees,
+        "employee": employee,
+        "show":show,
+    })
 
