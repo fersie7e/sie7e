@@ -1,0 +1,73 @@
+{% extends 'security/layoutpdf.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row py-4">
+        <h2 class="text-end">Invoice nº {{invoice.pk}} ({{invoice.month}}/{{invoice.year}})</h2>
+        <div class="col-6 text-start mt-4 py-2">
+            <h6>{{invoice.invoice_venue.business_name}} ({{invoice.invoice_venue.commercial_name}})</h6>
+            <p><small>{{invoice.invoice_venue.address}}</small></p>
+            <p><small>{{invoice.invoice_venue.cif}}</small></p>
+        </div>
+        <div class="col-6 text-end mt-4 py-2">
+            <h6>{{invoice.invoice_provider.name}}</h6>
+            <p><small>{{invoice.invoice_provider.address}}</small></p>
+            <p><small>{{invoice.invoice_venue.cif}}</small></p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <table class="table mt-4 text-end">
+            <thead>
+                <tr>
+                    <th>
+                        <small>Amount of shifts: {{total_shifts}}</small>
+                        <h2>Total due: <strong>{{invoice.amount}} €</strong></h2>
+                    </th>
+                </tr>
+            </thead>
+            
+        </table>
+    </div>
+
+    <div class="row mt-4">
+        <caption><small>List of shifts</small></caption>
+        
+        <table class="table mt-4">
+            <thead>
+            <tr>
+                <th class="text-start" scope="col">Date</th>
+                <th class="text-end" scope="col">Nº Employees</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for shift in invoice.shifts.all %}
+                {% if forloop.counter == 20 %} 
+                    <tr  style="break-before: page;">
+                {% else %}
+                    <tr>
+                {% endif %}
+                    <td class="text-start"><small>{{shift.date}}</small></td>
+                    <td class="text-end"><small>{{shift.employees.count}}</small></td>
+                    
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row">
+        <table class="table mt-4 text-end">
+            <thead>
+                <tr>
+                    <th>
+                        <small>Amount of shifts: {{total_shifts}}</small>
+                        <h2>Total due: <strong>{{invoice.amount}} €</strong></h2>
+                    </th>
+                </tr>
+            </thead>
+            
+        </table>
+    </div>
+    
+{% endblock %}

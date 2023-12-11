@@ -1,0 +1,54 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row h-100">
+
+        <div class="row text-start mt-2">
+            <p><a href="{% url 'invoicefilter' %}">Invoices</a> > filter</p>
+        </div>
+
+        <div class="row">
+            <h2>Invoice nº {{invoice.pk}} details ({{invoice.month}}/{{invoice.year}})</h2>
+            <div class="col-6 bg-light border-start border-top border-bottom text-start">
+                <h6 class="mt-2">{{invoice.invoice_venue.commercial_name}}</h6>
+                <p class="lh-1">{{invoice.invoice_venue.business_name}}</p>
+                <p class="lh-1">{{invoice.invoice_venue.address}}</p>
+                <p class="lh-1">{{invoice.invoice_venue.cif}}</p>
+            </div>
+            <div class="col-6 bg-light border text-end">
+                <h6 class="mt-2">{{invoice.invoice_provider.name}}</h6>
+                <p class="lh-1">{{invoice.invoice_provider.address}}</p>
+                <p class="lh-1">{{invoice.invoice_venue.cif}}</p>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col text-end">
+                Amount of shifts: {{total_shifts}}
+                <h3 >Total due : <strong>{{invoice.amount}} €</strong></h3>
+            </div>
+        </div>
+
+        <caption>List of shifts</caption>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Nº Employees</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for shift in invoice.shifts.all %}
+                    <tr>
+                        <td>{{shift.date}}</td>
+                        <td>{{shift.employees.count}}</td>
+                        <td><a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Details</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            
+    </div>
+{% endblock %}

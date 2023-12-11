@@ -1,6 +1,11 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
+from django.template.loader import render_to_string
+
+from weasyprint import HTML
+from weasyprint.text.fonts import FontConfiguration
+
 from .models import Venue, Shift, Employee, Provider, Service, Invoice, Fee
 from .forms import ShiftForm
 import calendar
@@ -72,7 +77,6 @@ def index(request):
         return HttpResponseRedirect(reverse("login"))
     if not request.user.is_superuser:
         return HttpResponseRedirect(reverse("invoicefilter"))
-        
 
     cal = calendar.Calendar().monthdatescalendar(CURRENT_YEAR,CURRENT_MONTH)
     monthtext = MONTHS.get(str(CURRENT_MONTH))
@@ -86,6 +90,7 @@ def index(request):
         year = int(request.POST["year"])
         cal = calendar.Calendar().monthdatescalendar(year,month)
     shift_data = Shift.objects.filter(date__month=month, date__year=year).order_by('date')
+    
     return render(request, 'security/index.html', {
         "shifts": shift_data,
         "cal":cal,
@@ -103,6 +108,7 @@ def filtershift(request, date=TODAY):
         return HttpResponseRedirect(reverse("login"))
     
     shift_data = Shift.objects.filter(date=date)
+    
     return render(request, 'security/filter.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
@@ -124,6 +130,7 @@ def addshift(request):
             form.save()
         else:
             form = ShiftForm() 
+    
     return HttpResponseRedirect(reverse("filtershift", args=(date,)))
 
 
@@ -153,6 +160,7 @@ def setservice(request, shift_id):
     for emp in employees:
         if emp not in working and emp.provider == provider:
             not_working.append(emp)
+    
     return render(request, 'security/set.html', {
         "services": services,
         "editshift": shift,
@@ -172,6 +180,7 @@ def addemployee(request, shift_id):
         employee_id = request.POST["employee"]
         employee = Employee.objects.get(pk=employee_id)
         shift.employees.add(employee)
+    
     return HttpResponseRedirect(reverse("setservice", args=(shift_id,)))
 
 
@@ -181,6 +190,7 @@ def deleteemployeeshift(request, shift_id, employee_id):
     shift = Shift.objects.get(pk=shift_id)
     employee = Employee.objects.get(pk=employee_id)
     shift.employees.remove(employee)
+    
     return HttpResponseRedirect(reverse("setservice", args=(shift_id,)))
 
     
@@ -218,7 +228,8 @@ def invoiceGen(request):
             shift.invoice_num = invoice.pk
             shift.save()
         success = True
-    return render(request, 'security/invoice_gen.html', {
+    
+    return render(request, 'security/invoices/invoice_gen.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
         "months": MONTHS,
@@ -252,7 +263,7 @@ def invoicefilter(request):
             if invoice.invoice_venue in venues_allowed:
                 invoices_filtered.append(invoice)
 
-    return render(request, 'security/invoice_filter.html', {
+    return render(request, 'security/invoices/invoice_filter.html', {
         "invoices": invoices_filtered,
         "month": month,
         "year": year,
@@ -270,10 +281,35 @@ def invoicedetail(request, invoice_id):
     total_shifts = 0
     for shift in shifts:
         total_shifts += shift.employees.count()
-    return render(request, 'security/invoice_detail.html', {
+    
+    return render(request, 'security/invoices/invoice_detail.html', {
         "invoice": invoice,
         "total_shifts": total_shifts,
     })
+
+
+def invoicepdf(request, invoice_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
+    invoice = Invoice.objects.get(pk=invoice_id)
+    shifts = invoice.shifts.all()
+    total_shifts = 0
+    for shift in shifts:
+        total_shifts += shift.employees.count()
+    context = {
+        "invoice": invoice,
+        "total_shifts": total_shifts,
+    }
+    html = render_to_string("security/invoices/invoice_pdf.html", context)
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = "inline; invoice.pdf"
+
+    font_config = FontConfiguration()
+    HTML(string=html).write_pdf(response, font_config=font_config)
+
+    return response
 
 
 def wagesfilter(request):
@@ -282,6 +318,7 @@ def wagesfilter(request):
     providers_allowed = get_providers_allowed(request.user)
     if not providers_allowed:
         return HttpResponseRedirect(reverse("invoicefilter"))
+    
     month = CURRENT_MONTH
     year = CURRENT_YEAR
     if request.method == "POST":
@@ -308,7 +345,8 @@ def wagesfilter(request):
         list[1] = int(list[0]) * salary
         wages[name] = list
         total_wages += list[1]
-    return render(request, 'security/wages_filter.html', {
+    
+    return render(request, 'security/wages/wages_filter.html', {
         "month": month,
         "year": year,
         "months": MONTHS,
@@ -324,6 +362,7 @@ def wagesemployee(request):
     providers_allowed = get_providers_allowed(request.user)
     if not providers_allowed:
         return HttpResponseRedirect(reverse("invoicefilter"))
+    
     month = CURRENT_MONTH
     year = CURRENT_YEAR
     employees = get_employees_allowed(request.user)
@@ -340,7 +379,8 @@ def wagesemployee(request):
     for shift in shifts:
         if employee in shift.employees.all():
             worked_shifts.append(shift)
-    return render(request, 'security/wages_employee.html', {
+    
+    return render(request, 'security/wages/wages_employee.html', {
         "shifts": shifts,
         "month": month,
         "year": year,
