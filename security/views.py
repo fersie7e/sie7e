@@ -71,6 +71,23 @@ def get_employees_allowed(user):
             employees_allowed.append(employee)
     return employees_allowed
 
+def calc_wages(shifts, providers):
+    wages = {}
+    salary = 0
+    result = []
+    for shift in shifts:
+        if shift.shift_provider in providers:
+            employees = shift.employees.all()
+            for employee in employees:
+                key = employee.first_name + " " + employee.last_name
+                if key in wages:
+                    wages[key] = [wages.get(key)[0] + 1, 0]
+                else:
+                    wages[key] = [1,0]
+        salary = shift.service_provided.servicefee.salary
+    result.append(wages)
+    result.append(salary)
+    return result
 
 def index(request):
     if not request.user.is_authenticated:
@@ -329,20 +346,14 @@ def wagesfilter(request):
         shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
     else:
         shifts = Shift.objects.filter(date__year=year, date__month=month)
-    wages = {}
+    
     total_wages = 0
-    for shift in shifts:
-        if shift.shift_provider in providers_allowed:
-            employees = shift.employees.all()
-            for employee in employees:
-                key = employee.first_name + " " + employee.last_name
-                if key in wages:
-                    wages[key] = [wages.get(key)[0] + 1, 0]
-                else:
-                    wages[key] = [1,0]
-            salary = shift.service_provided.servicefee.salary
+
+    result = calc_wages(shifts=shifts, providers=providers_allowed)
+    wages = result[0]
+
     for name,list in wages.items():
-        list[1] = int(list[0]) * salary
+        list[1] = int(list[0]) * result[1]
         wages[name] = list
         total_wages += list[1]
     
@@ -355,6 +366,74 @@ def wagesfilter(request):
         "providers": providers_allowed,
         "total_wages": total_wages,
     })
+
+def wagesfilterpdf(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    
+    
+    return render(request, 'security/wages/wages_filter_pdf.html', {
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "providers": providers_allowed,
+    })
+
+def wagespdf(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    provider = None
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    if request.method == "POST":
+        month = request.POST['month']
+        year = request.POST['year']
+        provider_id = request.POST['wages_provider']
+        provider = Provider.objects.get(pk=provider_id)
+        shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
+    else:
+        shifts = Shift.objects.filter(date__year=year, date__month=month)
+  
+    total_wages = 0
+    result = calc_wages(shifts=shifts, providers=providers_allowed)
+    wages = result[0]
+
+    for name,list in wages.items():
+        list[1] = int(list[0]) * result[1]
+        wages[name] = list
+        total_wages += list[1]
+    
+    context = {
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "wages": wages,
+        "provider": provider,
+        "providers": providers_allowed,
+        "total_wages": total_wages,
+    }
+    html = render_to_string("security/wages/wages_pdf.html", context)
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = "inline; invoice.pdf"
+
+    font_config = FontConfiguration()
+    HTML(string=html).write_pdf(response, font_config=font_config)
+
+    return response
+    
 
 def wagesemployee(request):
     if not request.user.is_authenticated:

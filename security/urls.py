@@ -14,5 +14,7 @@ urlpatterns = [
     path("invoicedetail/<int:invoice_id>", views.invoicedetail, name="invoicedetail"),
     path("invoicepdf/<int:invoice_id>", views.invoicepdf, name="invoicepdf"),
     path("wagesfilter/", views.wagesfilter, name="wagesfilter"),
+    path("wagesfilterpdf/", views.wagesfilterpdf, name="wagesfilterpdf"),
+    path("wagespdf/", views.wagespdf, name="wagespdf"),
     path("wagesemployee/", views.wagesemployee, name="wagesemployee"),
 ]
