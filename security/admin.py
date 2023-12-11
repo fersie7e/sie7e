@@ -18,7 +18,7 @@ class ShiftAdmin(admin.ModelAdmin):
 
 
 class ProviderAdmin(admin.ModelAdmin):
-    filter_horizontal = ("services",)
+    filter_horizontal = ("services", "users")
 
 
 class InvoiceAdmin(admin.ModelAdmin):

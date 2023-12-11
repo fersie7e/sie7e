@@ -41,8 +41,39 @@ def parseDate(date):
     date_formated = datetime.date(year, month, day)
     return date_formated
 
+def get_venues_allowed(user):
+    venues = Venue.objects.all()
+    venues_allowed = []
+    for venue in venues:
+        if user in venue.users.all():
+            venues_allowed.append(venue)
+    return venues_allowed
+
+def get_providers_allowed(user):
+    providers = Provider.objects.all()
+    providers_allowed = []
+    for provider in providers:
+        if user in provider.users.all():
+            providers_allowed.append(provider)
+    return providers_allowed
+
+def get_employees_allowed(user):
+    providers = get_providers_allowed(user)
+    employees = Employee.objects.all()
+    employees_allowed = []
+    for employee in employees:
+        if  employee.provider in providers:
+            employees_allowed.append(employee)
+    return employees_allowed
+
 
 def index(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+        
+
     cal = calendar.Calendar().monthdatescalendar(CURRENT_YEAR,CURRENT_MONTH)
     monthtext = MONTHS.get(str(CURRENT_MONTH))
     for number,monthname in MONTHS.items():
@@ -68,6 +99,9 @@ def index(request):
 
 
 def filtershift(request, date=TODAY):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
     shift_data = Shift.objects.filter(date=date)
     return render(request, 'security/filter.html', {
         "venues": Venue.objects.all(),
@@ -80,6 +114,9 @@ def filtershift(request, date=TODAY):
 
 
 def addshift(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
     if request.method == "POST":
         date = request.POST['date']
         form = ShiftForm(request.POST)
@@ -91,6 +128,9 @@ def addshift(request):
 
 
 def setservice(request, shift_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
     shift = Shift.objects.get(pk=shift_id)
     provider = shift.shift_provider
     employees = Employee.objects.filter(provider=provider)
@@ -124,6 +164,9 @@ def setservice(request, shift_id):
 
 
 def addemployee(request, shift_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
     shift = Shift.objects.get(pk=shift_id)
     if request.method == "POST":
         employee_id = request.POST["employee"]
@@ -133,6 +176,8 @@ def addemployee(request, shift_id):
 
 
 def deleteemployeeshift(request, shift_id, employee_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
     shift = Shift.objects.get(pk=shift_id)
     employee = Employee.objects.get(pk=employee_id)
     shift.employees.remove(employee)
@@ -140,6 +185,11 @@ def deleteemployeeshift(request, shift_id, employee_id):
 
     
 def invoiceGen(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    
     amount = 0
     success = False
     if request.method == "POST":
@@ -178,14 +228,32 @@ def invoiceGen(request):
 
 
 def invoicefilter(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
+    invoices_filtered = []
+    venues_allowed = get_venues_allowed(request.user)
+    providers_allowed = get_providers_allowed(request.user)
+
+
     month = CURRENT_MONTH
     year = CURRENT_YEAR
     if request.method == "POST":
         month = request.POST['month']
         year = request.POST['year']
     invoices = Invoice.objects.filter(year=year, month=month)
+
+    for invoice in invoices:
+        if providers_allowed:
+            if invoice.invoice_provider in providers_allowed:
+                if invoice.invoice_venue in venues_allowed:
+                    invoices_filtered.append(invoice)
+        else:
+            if invoice.invoice_venue in venues_allowed:
+                invoices_filtered.append(invoice)
+
     return render(request, 'security/invoice_filter.html', {
-        "invoices": invoices,
+        "invoices": invoices_filtered,
         "month": month,
         "year": year,
         "months": MONTHS,
@@ -194,6 +262,9 @@ def invoicefilter(request):
 
 
 def invoicedetail(request, invoice_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
     invoice = Invoice.objects.get(pk=invoice_id)
     shifts = invoice.shifts.all()
     total_shifts = 0
@@ -206,9 +277,13 @@ def invoicedetail(request, invoice_id):
 
 
 def wagesfilter(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
     month = CURRENT_MONTH
     year = CURRENT_YEAR
-    providers = Provider.objects.all()
     if request.method == "POST":
         month = request.POST['month']
         year = request.POST['year']
@@ -220,33 +295,38 @@ def wagesfilter(request):
     wages = {}
     total_wages = 0
     for shift in shifts:
-        employees = shift.employees.all()
-        for employee in employees:
-            key = employee.first_name + " " + employee.last_name
-            if key in wages:
-                wages[key] = [wages.get(key)[0] + 1, 0]
-            else:
-                wages[key] = [1,0]
-        salary = shift.service_provided.servicefee.salary
+        if shift.shift_provider in providers_allowed:
+            employees = shift.employees.all()
+            for employee in employees:
+                key = employee.first_name + " " + employee.last_name
+                if key in wages:
+                    wages[key] = [wages.get(key)[0] + 1, 0]
+                else:
+                    wages[key] = [1,0]
+            salary = shift.service_provided.servicefee.salary
     for name,list in wages.items():
         list[1] = int(list[0]) * salary
         wages[name] = list
         total_wages += list[1]
     return render(request, 'security/wages_filter.html', {
-        "shifts": shifts,
         "month": month,
         "year": year,
         "months": MONTHS,
         "year_choice": YEARS_CHOICE,
         "wages": wages,
-        "providers": providers,
+        "providers": providers_allowed,
         "total_wages": total_wages,
     })
 
 def wagesemployee(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
     month = CURRENT_MONTH
     year = CURRENT_YEAR
-    employees = Employee.objects.all()
+    employees = get_employees_allowed(request.user)
     employee = None
     show = False
     if request.method == "POST":

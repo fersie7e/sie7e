@@ -37,6 +37,7 @@ class Service(models.Model):
 
 
 class Provider(models.Model):
+    users = models.ManyToManyField(User, blank=True, related_name="usersprovider")
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
