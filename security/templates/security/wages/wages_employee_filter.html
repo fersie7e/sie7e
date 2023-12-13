@@ -1,0 +1,49 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row h-100">
+        <div class="row text-start mt-2">
+            <p>Wages</p>
+        </div>
+        <div class="row p-3">
+            <h2>Select the date</h2>
+            <div class="col bg-light border text-start">
+                <form action="{% url 'wagesemployeepdf' %}" method="post">
+                    {% csrf_token %}
+                    <div class="row form-group pt-3 pb-3">
+                        <div class="col-sm-6">
+                            <label for="year">Select the year</label>
+                            <select class="form-select mb-3" name="year">
+                                {% for year in year_choice %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="month">Select the month</label>
+                            <select class="form-select mb-3" name="month">
+                                {% for number,month in months.items %}
+                                    <option value="{{ number }}">{{ month }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="wages_employee">Select the employee</label>
+                            <select class="form-select mb-1" name="wages_employee">
+                                {% for employee in employees %}
+                                    <option value="{{ employee.id }}">{{ employee.first_name }} {{employee.last_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" class="btn btn-primary mt-4">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

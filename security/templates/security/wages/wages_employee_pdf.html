@@ -1,0 +1,44 @@
+{% extends 'security/layoutpdf.html' %}
+{% load static %}
+{% block body %}
+    
+
+    <div class="row">
+        <table class="table mt-4 text-end">
+            <thead>
+                <tr>
+                    <th>
+                        <h3 >{{employee}}</h3>
+                        <small>Amount of shifts: {{total_shifts}}</small>
+                        <h2>Total wages: <strong>{{total_wages}} €</strong></h2>
+                    </th>
+                </tr>
+            </thead>
+            
+        </table>
+    </div>
+    <div class="col text-start mt-4">
+        List of shifts on {{month}} / {{year}}
+    </div>
+    <div class="row gx-1">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col" class="text-start">Date</th>
+                <th scope="col"  class="text-start">Venue</th>
+                <th scope="col"  class="text-end">Salary</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for shift in worked_shifts %}
+                <tr>
+                    <td class="text-start"><small>{{shift.date}}</small></td>
+                    <td class="text-start"><small>{{shift.venue}}</small></td>
+                    <td class="text-end"><small>{{shift.service_provided.servicefee.salary}} €</small></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div> 
+
+{% endblock %}

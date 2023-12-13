@@ -17,4 +17,6 @@ urlpatterns = [
     path("wagesfilterpdf/", views.wagesfilterpdf, name="wagesfilterpdf"),
     path("wagespdf/", views.wagespdf, name="wagespdf"),
     path("wagesemployee/", views.wagesemployee, name="wagesemployee"),
+    path("wagesemployeefilter/", views.wagesemployeefilter, name="wagesemployeefilter"),
+    path("wagesemployeepdf/", views.wagesemployeepdf, name="wagesemployeepdf"),
 ]

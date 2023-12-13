@@ -10,12 +10,11 @@ from .models import Venue, Shift, Employee, Provider, Service, Invoice, Fee
 from .forms import ShiftForm
 import calendar
 import datetime
-# Create your views here.
 
+# Constants declaration
 YEARS_CHOICE = []
 for year in range(2023, datetime.datetime.now().year + 2):
     YEARS_CHOICE.append(year)
-
 MONTHS = {	'1':'January',
 		'2':'February',
 		'3':'March',
@@ -28,25 +27,43 @@ MONTHS = {	'1':'January',
 		'10':'October',
 		'11':'November',
 		'12':'December'		}
-
 DAYSLONG = dict(enumerate(calendar.day_name))
 DAYS = []
 for number,day in DAYSLONG.items():
     DAYS.append(day[0:2])
-
 CURRENT_MONTH = datetime.datetime.now().month
 CURRENT_YEAR = datetime.datetime.now().year
 TODAY = datetime.date.today()
+# End of constant declaration
 
-
+# Functions
 def parseDate(date):
+    """Converts a string 'yyyy/mm/dd' into date format
+
+    Args:
+        date (str): date to convert
+
+    Returns:
+        Date: Value with Date format
+    """
+
     year = int(date[0:4])
     month = int(date[5:7])
     day = int(date[8:10])
     date_formated = datetime.date(year, month, day)
     return date_formated
 
+
 def get_venues_allowed(user):
+    """Get the venues that the user who is logged is allowed to manage
+
+    Args:
+        user (User): Instance of the user that logged into the app
+
+    Returns:
+        List: List with all the venues that a specific user can manage
+    """
+
     venues = Venue.objects.all()
     venues_allowed = []
     for venue in venues:
@@ -54,7 +71,17 @@ def get_venues_allowed(user):
             venues_allowed.append(venue)
     return venues_allowed
 
+
 def get_providers_allowed(user):
+    """Get the provides that the user who is logged is allowed to manage
+
+    Args:
+        user (User): Instance of the user that logged into the app
+
+    Returns:
+        List: List with all the providers that a specific user can manage
+    """
+
     providers = Provider.objects.all()
     providers_allowed = []
     for provider in providers:
@@ -62,7 +89,17 @@ def get_providers_allowed(user):
             providers_allowed.append(provider)
     return providers_allowed
 
+
 def get_employees_allowed(user):
+    """Get the employees that the user who is logged can visualize
+
+    Args:
+        user (User): Instance of the user that logged into the app
+
+    Returns:
+        List: List with all the employees that a specific user can visualize
+    """
+
     providers = get_providers_allowed(user)
     employees = Employee.objects.all()
     employees_allowed = []
@@ -71,7 +108,22 @@ def get_employees_allowed(user):
             employees_allowed.append(employee)
     return employees_allowed
 
+
 def calc_wages(shifts, providers):
+    """Calculate how much will cost every employee in every shift of the given list of shifts
+    it filters the shifts only to summarize the ones corresponding to the given list of providers
+
+    Args:
+        shifts (List): List with all the shifts that has to be calculated the total
+        providers (Providers): List with all the providers that shifts has to be 
+                               filtered
+
+    Returns:
+        List: A list containing a dictionary with the employee name as a key, and the number of shifts
+              worked as values, and the second item in the list is the salary that the employee will 
+              charge to the company
+    """
+
     wages = {}
     salary = 0
     result = []
@@ -89,25 +141,59 @@ def calc_wages(shifts, providers):
     result.append(salary)
     return result
 
+
+def calc_total(wages, salary):
+    """Calculate the total amount in euros of all the wages specified using the given salary
+
+    Args:
+        wages (Dict): dictionary with the employee name as a key, and the number of shifts
+                      worked as values
+        salary (_type_): salary that the employee will recieve for every shift
+
+    Returns:
+        Float: Total amount in euros of the cost of all the wages specified
+    """
+
+    total_wages = 0
+    for name,list in wages.items():
+        list[1] = int(list[0]) * salary
+        wages[name] = list
+        total_wages += list[1]
+    return total_wages
+# End of functions
+
+
+# Views
 def index(request):
+    """Index view, main view that will be displayed after login
+       provides a form and a calendar with a default current date and a list
+       of all the shifts that have been created the selected date (month/year)
+
+    Args:
+        request (Request): Request from the client
+
+    Returns:
+        render: Renders the view with the context specified
+    """
+
+    # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
     if not request.user.is_superuser:
         return HttpResponseRedirect(reverse("invoicefilter"))
-
-    cal = calendar.Calendar().monthdatescalendar(CURRENT_YEAR,CURRENT_MONTH)
-    monthtext = MONTHS.get(str(CURRENT_MONTH))
-    for number,monthname in MONTHS.items():
-        if monthname == monthtext:
-            month = int(number)
-    year = CURRENT_YEAR
+    # Get context values
     if request.method == "POST":
         month = int(request.POST["month"])
         monthtext = MONTHS.get(str(month))
         year = int(request.POST["year"])
         cal = calendar.Calendar().monthdatescalendar(year,month)
+    else:
+        cal = calendar.Calendar().monthdatescalendar(CURRENT_YEAR,CURRENT_MONTH)
+        monthtext = MONTHS.get(str(CURRENT_MONTH))
+        month = CURRENT_MONTH
+        year = CURRENT_YEAR
     shift_data = Shift.objects.filter(date__month=month, date__year=year).order_by('date')
-    
+    # Render the view
     return render(request, 'security/index.html', {
         "shifts": shift_data,
         "cal":cal,
@@ -121,11 +207,27 @@ def index(request):
 
 
 def filtershift(request, date=TODAY):
+    """View that filters the date and allow the superuser to create a new shift on that
+       filtered date, provides the superuser a form to choose the venue and the company 
+       that will provide the service and a list of all the shift for that particular date
+       if the shfits shown are not invoiced the superuser can edit them
+
+    Args:
+        request (Request): Request from the client
+        date (Date, optional): Date that will be use as a filter to show the data. Defaults to TODAY.
+
+    Returns:
+        render: Renders the view with the context specified
+    """
+
+    # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
-    
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    # Get context values
     shift_data = Shift.objects.filter(date=date)
-    
+    # Render the view
     return render(request, 'security/filter.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
@@ -137,9 +239,12 @@ def filtershift(request, date=TODAY):
 
 
 def addshift(request):
+    # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
-    
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    # Get context values and saves the values to the db
     if request.method == "POST":
         date = request.POST['date']
         form = ShiftForm(request.POST)
@@ -147,14 +252,17 @@ def addshift(request):
             form.save()
         else:
             form = ShiftForm() 
-    
+    # Redirect the view
     return HttpResponseRedirect(reverse("filtershift", args=(date,)))
 
 
 def setservice(request, shift_id):
+    # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
-    
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    # Get context values and saves the values to the db
     shift = Shift.objects.get(pk=shift_id)
     provider = shift.shift_provider
     employees = Employee.objects.filter(provider=provider)
@@ -177,7 +285,7 @@ def setservice(request, shift_id):
     for emp in employees:
         if emp not in working and emp.provider == provider:
             not_working.append(emp)
-    
+    # Render the view
     return render(request, 'security/set.html', {
         "services": services,
         "editshift": shift,
@@ -189,15 +297,16 @@ def setservice(request, shift_id):
 
 
 def addemployee(request, shift_id):
+    # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
-    
+    # Get context values
     shift = Shift.objects.get(pk=shift_id)
     if request.method == "POST":
         employee_id = request.POST["employee"]
         employee = Employee.objects.get(pk=employee_id)
         shift.employees.add(employee)
-    
+    # Redirect the view
     return HttpResponseRedirect(reverse("setservice", args=(shift_id,)))
 
 
@@ -346,16 +455,9 @@ def wagesfilter(request):
         shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
     else:
         shifts = Shift.objects.filter(date__year=year, date__month=month)
-    
-    total_wages = 0
-
     result = calc_wages(shifts=shifts, providers=providers_allowed)
     wages = result[0]
-
-    for name,list in wages.items():
-        list[1] = int(list[0]) * result[1]
-        wages[name] = list
-        total_wages += list[1]
+    total_wages = calc_total(wages=wages, salary=result[1])
     
     return render(request, 'security/wages/wages_filter.html', {
         "month": month,
@@ -376,7 +478,6 @@ def wagesfilterpdf(request):
     
     month = CURRENT_MONTH
     year = CURRENT_YEAR
-    
     
     return render(request, 'security/wages/wages_filter_pdf.html', {
         "month": month,
@@ -404,16 +505,10 @@ def wagespdf(request):
         shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
     else:
         shifts = Shift.objects.filter(date__year=year, date__month=month)
-  
-    total_wages = 0
     result = calc_wages(shifts=shifts, providers=providers_allowed)
     wages = result[0]
+    total_wages = calc_total(wages=wages, salary=result[1])
 
-    for name,list in wages.items():
-        list[1] = int(list[0]) * result[1]
-        wages[name] = list
-        total_wages += list[1]
-    
     context = {
         "month": month,
         "year": year,
@@ -425,13 +520,10 @@ def wagespdf(request):
         "total_wages": total_wages,
     }
     html = render_to_string("security/wages/wages_pdf.html", context)
-
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = "inline; invoice.pdf"
-
     font_config = FontConfiguration()
     HTML(string=html).write_pdf(response, font_config=font_config)
-
     return response
     
 
@@ -471,4 +563,64 @@ def wagesemployee(request):
         "employee": employee,
         "show":show,
     })
+
+def wagesemployeefilter(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    employees = get_employees_allowed(request.user)
+    
+    return render(request, 'security/wages/wages_employee_filter.html', {
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "employees": employees,
+    })
+
+
+def wagesemployeepdf(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    if request.method == "POST":
+        month = request.POST['month']
+        year = request.POST['year']
+        employee_id = request.POST['wages_employee']
+        employee = Employee.objects.get(pk=employee_id)
+    shifts = Shift.objects.filter(date__year=year, date__month=month)
+    worked_shifts = []
+    total_wages = 0
+    for shift in shifts:
+        if employee in shift.employees.all():
+            worked_shifts.append(shift)
+    for shift in worked_shifts:
+        total_wages += shift.service_provided.servicefee.salary
+        
+    context = {
+        "shifts": shifts,
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "worked_shifts": worked_shifts,
+        "total_shifts": len(worked_shifts),
+        "total_wages": total_wages,
+        "employee": employee,
+    }
+    html = render_to_string("security/wages/wages_employee_pdf.html", context)
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = "inline; Wages.pdf"
+    font_config = FontConfiguration()
+    HTML(string=html).write_pdf(response, font_config=font_config)
+    return response
+    
 

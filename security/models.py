@@ -15,6 +15,7 @@ class Venue(models.Model):
     address = models.CharField(max_length=150)
     phone = models.CharField(max_length=15)
     cif = models.CharField(max_length=10)
+    logo = models.ImageField(upload_to="security/static/images", null=True, blank=True, default="sie7e.png")
 
     def __str__(self):
         return f"{self.commercial_name}"
