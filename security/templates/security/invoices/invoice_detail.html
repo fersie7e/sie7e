@@ -9,17 +9,23 @@
         </div>
 
         <div class="row">
-            <h2>Invoice nº {{invoice.pk}} details ({{invoice.month}}/{{invoice.year}})</h2>
-            <div class="col-6 bg-light border-start border-top border-bottom text-start">
-                <h6 class="mt-2">{{invoice.invoice_venue.commercial_name}}</h6>
-                <p class="lh-1">{{invoice.invoice_venue.business_name}}</p>
-                <p class="lh-1">{{invoice.invoice_venue.address}}</p>
-                <p class="lh-1">{{invoice.invoice_venue.cif}}</p>
+            <h1>Invoice n. {{invoice.pk}}</h1>
+            <i class="fa fa-calendar fa-2x mt-3 mb-2" aria-hidden="true"></i>
+            <h5 class="text-primary mb-4">Month: {{invoice.month}} Year: {{invoice.year}} </h5>
+            
+            <div class="col-6">
+                <div class="col bg-light border text-start rounded shadow-sm mx-2 p-3">
+                    <h6 class="mt-3">{{invoice.invoice_venue.business_name}}({{invoice.invoice_venue.commercial_name}})</h6>
+                    <p class="lh-1">{{invoice.invoice_venue.address}}</p>
+                    <p class="lh-1">{{invoice.invoice_venue.cif}}</p>
+                </div>
             </div>
-            <div class="col-6 bg-light border text-end">
-                <h6 class="mt-2">{{invoice.invoice_provider.name}}</h6>
-                <p class="lh-1">{{invoice.invoice_provider.address}}</p>
-                <p class="lh-1">{{invoice.invoice_venue.cif}}</p>
+            <div class="col-6">
+                <div class="col bg-light border text-end rounded shadow-sm mx-2 p-3">
+                    <h6 class="mt-3">{{invoice.invoice_provider.name}}</h6>
+                    <p class="lh-1">{{invoice.invoice_provider.address}}</p>
+                    <p class="lh-1">{{invoice.invoice_venue.cif}}</p>
+                </div>
             </div>
         </div>
 
@@ -30,25 +36,32 @@
             </div>
         </div>
 
-        <caption>List of shifts</caption>
-            <table class="table">
-                <thead>
+        <table class="table">
+            <tbody>
+            <tr>
+                <td scope="col" class="text-start">Shifts invoiced</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th class="text-start" scope="col">Date</th>
+                <th scope="col">Nº Employees</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for shift in invoice.shifts.all %}
                 <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Nº Employees</th>
-                    <th></th>
+                    <td class="text-start">{{shift.date}}</td>
+                    <td>{{shift.employees.count}}</td>
+                    <td class="text-end"><a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Details</a></td>
                 </tr>
-                </thead>
-                <tbody>
-                {% for shift in invoice.shifts.all %}
-                    <tr>
-                        <td>{{shift.date}}</td>
-                        <td>{{shift.employees.count}}</td>
-                        <td><a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Details</a></td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            {% endfor %}
+            </tbody>
+        </table>
             
     </div>
 {% endblock %}

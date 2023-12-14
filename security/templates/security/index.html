@@ -9,8 +9,11 @@
         </div>
 
         <div class="row p-3">
-            <h2>Choose a date in the calendar</h2>
-            <div class="col bg-light border text-start">
+            <h1>Choose a date</h1>
+            <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+            <h5>Select month and year to update the calendar</h5>
+            <h5 class="text-primary mb-4">...then select the day and get the results </h5>
+            <div class="col bg-light border text-start rounded shadow-sm">
                 <form action="{% url 'index' %}" method="post">
                     {% csrf_token %}
                     <div class="row form-group pt-3 pb-3">
@@ -42,7 +45,7 @@
 
         <div class="d-flex d-inline-block justify-content-center p-3">
             <!-- CREATE CALENDAR -->
-            <div class="border bg-light p-3">
+            <div class="border bg-light p-3 rounded shadow-sm">
                 <div class="text-center">
                         <div class="col"><h5>{{monthtext}} - {{year}}</h5></div>
                 </div>
@@ -55,7 +58,7 @@
                     <div class="d-flex text-end">
                         {% for day in week %}
                             {% if day.month == month %}
-                                <div class="p-1 flex-fill "><a href="{% url 'filtershift' day %}"><h6>{{day.day}}</h6></a></div>
+                                <div class="p-1 flex-fill "><a class="text-decoration-none" href="{% url 'filtershift' day %}"><h6>{{day.day}}</h6></a></div>
                             {% else %}
                                 <div class="p-1 flex-fill">-</div>
                             {% endif %}
@@ -65,9 +68,14 @@
             </div>
         </div>
 
-        <div class="col text-start">
-            List of shifts on {{month}} / {{year}}
-        </div>
+        <table class="table">
+            <tbody>
+            <tr>
+                <td scope="col" class="text-start">List of shifts on {{month}} / {{year}}</td>
+            </tr>
+            </tbody>
+        </table>
+        
         
         <div class="row gx-1">
             <table class="table">

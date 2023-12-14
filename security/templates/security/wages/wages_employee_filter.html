@@ -7,8 +7,11 @@
             <p>Wages</p>
         </div>
         <div class="row p-3">
-            <h2>Select the date</h2>
-            <div class="col bg-light border text-start">
+            <h1>Choose a date</h1>
+            <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+            <h5>Select month, year and employee </h5>
+            <h5 class="text-primary mb-4">a .pdf will be generated</h5>
+            <div class="col bg-light border text-start rounded shadow-sm">
                 <form action="{% url 'wagesemployeepdf' %}" method="post">
                     {% csrf_token %}
                     <div class="row form-group pt-3 pb-3">

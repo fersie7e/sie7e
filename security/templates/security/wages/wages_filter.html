@@ -7,8 +7,11 @@
             <p>Wages</p>
         </div>
         <div class="row p-3">
-            <h2>Select the date</h2>
-            <div class="col bg-light border text-start">
+            <h1>Choose a date</h1>
+            <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+            <h5>Select month, year and provider to update results</h5>
+            <h5 class="text-primary mb-4">check the results in the generated table</h5>
+            <div class="col bg-light border text-start rounded shadow-sm">
                 <form action="{% url 'wagesfilter' %}" method="post">
                     {% csrf_token %}
                     <div class="row form-group pt-3 pb-3">
@@ -47,19 +50,25 @@
         </div>
         <div class="row">
             <div class="col text-end">
-                <h3 >{{total_wages}} €</h3>
+                <h3 >Total wages: {{total_wages}} €</h3>
             </div>
         </div>
-        <div class="col text-start">
-            List of wages on {{month}} / {{year}}
-        </div>
+
+        <table class="table">
+            <tbody>
+            <tr>
+                <td scope="col" class="text-start">Wages on <strong>{{month}} / {{year}}</strong></td>
+            </tr>
+            </tbody>
+        </table>
+    
         <div class="row gx-1">
             <table class="table">
                 <thead>
                 <tr>
                     <th scope="col" class="text-start">Employee</th>
                     <th scope="col">Shifts</th>
-                    <th scope="col">Total</th>
+                    <th class="text-end" scope="col">Total</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -67,7 +76,7 @@
                     <tr>
                         <td class="text-start">{{key}}</td>
                         <td>{{item.0}}</td>
-                        <td>{{item.1}} €</td>
+                        <td class="text-end">{{item.1}} €</td>
                     </tr>
                 {% endfor %}
                 </tbody>

@@ -7,7 +7,10 @@
             <p>Wages</p>
         </div>
         <div class="row p-3">
-            <h2>Select the date</h2>
+            <h1>Choose a date</h1>
+            <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+            <h5>Select month, year and employee to update results</h5>
+            <h5 class="text-primary mb-4">check the results in the generated table</h5>
             <div class="col bg-light border text-start">
                 <form action="{% url 'wagesemployee' %}" method="post">
                     {% csrf_token %}
@@ -46,21 +49,33 @@
             </div>
         </div>
         {% if show %}
-            <div class="row">
-                <div class="col text-end">
-                    <h3 >{{employee}}</h3>
-                    Amount of shifts: {{total_shifts}}
-                </div>
-            </div>
-            <div class="col text-start">
-                List of shifts on {{month}} / {{year}}
-            </div>
+        
+            <table class="table mt-4 text-end">
+                <thead>
+                    <tr>
+                        <th>
+                            <h3 >{{employee}}</h3>
+                            <small>Amount of shifts: {{total_shifts}}</small>
+                            <h2>Total wages: <strong>{{total_wages}} €</strong></h2>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            <table class="table">
+                <tbody>
+                <tr>
+                    <td scope="col" class="text-start">Shifts on <strong>{{month}} / {{year}}</strong></td>
+                </tr>
+                </tbody>
+            </table>
+                
             <div class="row gx-1">
                 <table class="table">
                     <thead>
                     <tr>
                         <th scope="col" class="text-start">Date</th>
-                        <th scope="col"  class="text-start">Venue</th>
+                        <th scope="col" class="text-start">Venue</th>
+                        <th scope="col" class="text-end">Salary</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -68,6 +83,7 @@
                         <tr>
                             <td class="text-start">{{shift.date}}</td>
                             <td class="text-start">{{shift.venue}}</td>
+                            <td class="text-end"><small>{{shift.service_provided.servicefee.salary}} €</small></td>
                         </tr>
                     {% endfor %}
                     </tbody>

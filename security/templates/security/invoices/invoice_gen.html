@@ -9,8 +9,11 @@
         </div>
 
         <div class="row">
-            <h2>Fill the form to generate the invoices</h2>
-            <div class="col bg-light border text-start">
+            <h1>Invoice generator</h1>
+            <i class="fa fa-book fa-2x mt-3 mb-2" aria-hidden="true"></i>
+            <h5>Fill the form</h5>
+            <h5 class="text-primary mb-4">and generate an invoice</h5>
+            <div class="col bg-light border text-start rounded shadow-sm">
                 <form action="{% url 'invoicegen' %}" method="post">
                     {% csrf_token %}
                     <div class="row form-group pt-3 pb-3">

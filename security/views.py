@@ -367,6 +367,10 @@ def invoiceGen(request):
 def invoicefilter(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
+    if not request.user.is_superuser:
+        superuser = False
+    else:
+        superuser = True
     
     invoices_filtered = []
     venues_allowed = get_venues_allowed(request.user)
@@ -395,6 +399,7 @@ def invoicefilter(request):
         "year": year,
         "months": MONTHS,
         "year_choice": YEARS_CHOICE,
+        "superuser": superuser
     })
 
 
@@ -547,9 +552,12 @@ def wagesemployee(request):
         show = True
     shifts = Shift.objects.filter(date__year=year, date__month=month)
     worked_shifts = []
+    total_wages = 0
     for shift in shifts:
         if employee in shift.employees.all():
             worked_shifts.append(shift)
+    for shift in worked_shifts:
+        total_wages += shift.service_provided.servicefee.salary
     
     return render(request, 'security/wages/wages_employee.html', {
         "shifts": shifts,
@@ -562,6 +570,7 @@ def wagesemployee(request):
         "employees": employees,
         "employee": employee,
         "show":show,
+        "total_wages": total_wages,
     })
 
 def wagesemployeefilter(request):

@@ -11,13 +11,15 @@
     </div>
 
     <div class="row">
-        <h4> {{editshift.venue}} - {{editshift.date}}</h4>
+        <h1>Update shift</h1>
+        <h1> {{editshift.venue}} - {{editshift.date}}</h1>
+        <i class="fa fa-id-card-o fa-2x mt-3 mb-2" aria-hidden="true"></i>
         <h5>{{editshift.shift_provider.name}}</h5>
     </div>
 
     <div class="row">
         {% if not service_selected %}
-            <form class="bg-light text-start border" action="{% url 'setservice' editshift.id %}" method="post">
+            <form class="bg-light text-start border rounded shadow-sm" action="{% url 'setservice' editshift.id %}" method="post">
                 {% csrf_token %}
                 <div class="row form-group pt-4 pb-2">
                     <div class="col-10">
@@ -35,8 +37,8 @@
                 </div>
             </form>
         {% else %}
-            <p class="fs-6 lh-1"><span class="fw-bold">Service: </span> {{editshift.service_provided.name}}</p>
-            <p class="fs-6 lh-1"><span class="fw-bold">Fee: </span>{{editshift.service_provided.servicefee.fee}}</p>
+            <p class="fs-6 lh-1 text-primary"><span class="fw-bold">Service: </span> {{editshift.service_provided.name}}</p>
+            <p class="fs-6 lh-1 text-primary"><span class="fw-bold">Fee: </span>{{editshift.service_provided.servicefee.fee}}</p>
         {% endif%}
     </div>
 
@@ -44,10 +46,10 @@
         {% if service_selected %}
             {% if not editshift.invoiced %}
                 <div class="row">
-                    <form class="bg-light border" action="{% url 'addemployee' editshift.id %}" method="post">
+                    <form class="bg-light border rounded shadow-sm" action="{% url 'addemployee' editshift.id %}" method="post">
                         {% csrf_token %}
                         <div class="d-flex flex-row form-group pt-4 pb-2 justify-content-center">
-                            <div class="flex-grow-1 px-2">
+                            <div class="flex-grow-1 px-2 text-start">
                                 <label for="employee">Choose the employee to add to the shift</label>
                                 <select class="form-select mb-3" name="employee">
                                     {% for employee in not_working %}
@@ -66,11 +68,11 @@
                     </form>
                 </div>
             {% endif %}
-            <div class="row">
+            <div class="row mt-4">
                 <table class="table">
                     <thead>
                     <tr>
-                        <th scope="col" class="text-start">Employee</th>
+                        <th scope="col" class="text-start">Employees working</th>
                         <th scope="col"></th>
                     </tr>
                     </thead>
@@ -78,7 +80,7 @@
                     {% for employee in working %}
                         <tr>
                             <td class="text-start">{{employee.first_name}} {{employee.last_name}}</td>
-                            <td>
+                            <td class="text-end">
                                 {% if not editshift.invoiced %}
                                     <a href="{% url 'deleteemployeeshift' editshift.id employee.id %}" class="btn btn-primary">Delete</a>
                                 {% endif %}
