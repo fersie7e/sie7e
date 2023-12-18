@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['51.20.94.43', '127.0.0.1',]
 
@@ -39,8 +39,6 @@ ALLOWED_HOSTS = ['51.20.94.43', '127.0.0.1',]
 # Application definition
 
 INSTALLED_APPS = [
-    'users',
-    'security',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'storages',
+    'users',
+    'security',
+    'portfolio',
 ]
 
 MIDDLEWARE = [
