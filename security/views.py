@@ -162,6 +162,23 @@ def calc_total(wages, salary):
     return total_wages
 # End of functions
 
+def group_list(list, num):
+    grouped_list = []
+    init = 0
+    end = num
+
+    if len(list)%num:
+        iterations = int(len(list)/num) + 1
+    else:
+        iterations = int(len(list))
+    for iteration in range(iterations):
+        grouped_list.append(list[init:end])
+        init = end
+        end += num
+    return grouped_list
+
+    
+
 
 # Views
 def index(request):
@@ -193,9 +210,12 @@ def index(request):
         month = CURRENT_MONTH
         year = CURRENT_YEAR
     shift_data = Shift.objects.filter(date__month=month, date__year=year).order_by('date')
+    grouped_shifts = group_list(list=shift_data, num=2)
+
     # Render the view
     return render(request, 'security/index.html', {
         "shifts": shift_data,
+        "grouped_shifts": grouped_shifts,
         "cal":cal,
         "year_choice": YEARS_CHOICE,
         "year": year,
