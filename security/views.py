@@ -210,7 +210,7 @@ def index(request):
         month = CURRENT_MONTH
         year = CURRENT_YEAR
     shift_data = Shift.objects.filter(date__month=month, date__year=year).order_by('date')
-    grouped_shifts = group_list(list=shift_data, num=2)
+    grouped_shifts = group_list(list=shift_data, num=3)
 
     # Render the view
     return render(request, 'security/index.html', {
@@ -247,11 +247,13 @@ def filtershift(request, date=TODAY):
         return HttpResponseRedirect(reverse("invoicefilter"))
     # Get context values
     shift_data = Shift.objects.filter(date=date)
+    grouped_shifts = group_list(list=shift_data, num=3)
     # Render the view
     return render(request, 'security/filter.html', {
         "venues": Venue.objects.all(),
         "providers": Provider.objects.all(),
         "shifts": shift_data,
+        "grouped_shifts": grouped_shifts,
         "service_selected": False,
         "date": date,
         "date_selected": True,
