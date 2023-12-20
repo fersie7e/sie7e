@@ -3,64 +3,58 @@
 {% block body %}
     
     <div class="row h-100">
-        <div class="row text-start mt-2">
+
+         <!--Nav map-->
+         <div class="text-start mt-2">
             <p>Wages</p>
         </div>
-        <div class="row p-3">
+
+        <!--Header-->
+        <div class="p-4 my-3">
             <h1>Choose a date</h1>
             <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
             <h5>Select month, year and employee to update results</h5>
             <h5 class="text-primary mb-4">check the results in the generated table</h5>
-            <div class="col bg-light border text-start">
-                <form action="{% url 'wagesemployee' %}" method="post">
-                    {% csrf_token %}
-                    <div class="row form-group pt-3 pb-3">
-                        <div class="col-sm-6">
-                            <label for="year">Select the year</label>
-                            <select class="form-select mb-3" name="year">
-                                {% for year in year_choice %}
-                                    <option value="{{ year }}">{{ year }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-sm-6">
-                            <label for="month">Select the month</label>
-                            <select class="form-select mb-3" name="month">
-                                {% for number,month in months.items %}
-                                    <option value="{{ number }}">{{ month }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label for="wages_employee">Select the employee</label>
-                            <select class="form-select mb-1" name="wages_employee">
-                                {% for employee in employees %}
-                                    <option value="{{ employee.id }}">{{ employee.first_name }} {{employee.last_name}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <div class="col-sm-12 text-center">
-                                <button type="submit" class="btn btn-primary mt-4">Search</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
+        </div>
+
+        <div class="d-sm-flex bg-dark text-white text-start justify-content-center p-5">
+            <form action="{% url 'wagesemployee' %}" method="post" style="width: 18rem;">
+                {% csrf_token %}
+                <label for="year">Select the year</label>
+                <select class="form-select mb-3" name="year">
+                    {% for year in year_choice %}
+                        <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+            
+                <label for="month">Select the month</label>
+                <select class="form-select mb-3" name="month">
+                    {% for number,month in months.items %}
+                        <option value="{{ number }}">{{ month }}</option>
+                    {% endfor %}
+                </select>
+            
+                <label for="wages_employee">Select the employee</label>
+                <select class="form-select mb-1" name="wages_employee">
+                    {% for employee in employees %}
+                        <option value="{{ employee.id }}">{{ employee.first_name }} {{employee.last_name}}</option>
+                    {% endfor %}
+                </select>
+            
+                <button type="submit" class="btn btn-primary mt-4">Search</button>       
+            </form>
         </div>
         {% if show %}
         
-            <table class="table mt-4 text-end">
-                <thead>
-                    <tr>
-                        <th>
-                            <h3 >{{employee}}</h3>
-                            <small>Amount of shifts: {{total_shifts}}</small>
-                            <h2>Total wages: <strong>{{total_wages}} €</strong></h2>
-                        </th>
-                    </tr>
-                </thead>
-            </table>
+            <div class="d-flex flex-wrap justify-content-center">
+                <div>
+                    <h3 >{{employee}}</h3>
+                    <small>Amount of shifts: {{total_shifts}}</small>
+                    <h2>Total wages: <strong>{{total_wages}} €</strong></h2>
+                </div>
+            </div>                    
+                           
+
             <table class="table">
                 <tbody>
                 <tr>
@@ -68,9 +62,10 @@
                 </tr>
                 </tbody>
             </table>
+            
                 
-            <div class="row gx-1">
-                <table class="table">
+            <div class="d-flex flex-wrap justify-content-center">
+                <table class="table" style="width: 50rem;">
                     <thead>
                     <tr>
                         <th scope="col" class="text-start">Date</th>

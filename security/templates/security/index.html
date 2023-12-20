@@ -3,11 +3,12 @@
 {% block body %}
     
     <div class="row h-100">
-
+        <!--Nav map-->
         <div class="text-start mt-2">
             <p>Inicio</p>
         </div>
-        
+
+        <!--Header-->
         <div class="p-4 my-3">
             <h1>Choose a date</h1>
             <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
@@ -15,7 +16,7 @@
             <h5 class="text-primary mb-4">...then select the day and get the results </h5>
         </div>
         
-
+        <!--Info section-->
         <div class="d-sm-flex bg-dark text-white text-start justify-content-center p-5">
             <div class="mr-4">
                 <form action="{% url 'index' %}" method="post" style="width: 18rem;">
@@ -38,7 +39,6 @@
                 </form>
             </div>
             
-       
             <!-- CREATE CALENDAR -->
             <div class="mx-4 p-4">
                 <div class="text-center">
@@ -63,6 +63,7 @@
             </div>
         </div>
 
+        <!--Result divider-->
         <table class="table">
             <tbody>
             <tr>
@@ -71,7 +72,8 @@
             </tbody>
         </table>
 
-        <div id="carouselExample" class="carousel slide d-none d-sm-block">
+        <!--Results-->
+        <div id="carouselExample" class="carousel slide">
             <div class="carousel-inner pb-5 ">
                 {% for group in grouped_shifts %}
                     {% if forloop.counter == 1 %}
@@ -79,7 +81,7 @@
                     {% else %}
                         <div class="carousel-item">
                     {% endif %}
-                        <div class="card-wrapper d-flex justify-content-center">
+                        <div class="card-wrapper d-flex flex-wrap justify-content-center">
                             {% for shift in group %}
                                 <div class="card m-2 shadow-lg" style="width: 18rem;">
                                     <!--<img src={% static '' %}{{shift.venue.logo}} class="card-img-top" alt="...">-->
@@ -109,45 +111,7 @@
               <span class="visually-hidden">Next</span>
             </button>
         </div>
-
-        <div id="carouselExamplesm" class="carousel slide d-block d-sm-none">
-            <div class="carousel-inner pb-5 ">
-                {% for shift in shifts %}
-                    {% if forloop.counter == 1 %}
-                        <div class="carousel-item active">
-                    {% else %}
-                        <div class="carousel-item">
-                    {% endif %}
-                        <div class="card-wrapper d-flex justify-content-center">
-                            <div class="card m-2 shadow-lg" style="width: 18rem;">
-                                <!--<img src={% static '' %}{{shift.venue.logo}} class="card-img-top" alt="...">-->
-                                <h2 class="text-primary mt-2">{{shift.venue}}</h2>
-                                <div class="card-body">
-                                    <h5 class="card-title">{{shift.date}}</h5>
-                                    <p class="card-text">{{shift.shift_provider.name}}</p>
-                                    <p class="card-text">Workers: <strong>{{shift.employees.count}}</strong></p>
-                                    {% if shift.invoiced %}
-                                        <h3>INVOICED</h3>
-                                    {% else %}
-                                        <a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Edit</a>
-                                    {% endif%}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExamplesm" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon bg-dark" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExamplesm" data-bs-slide="next">
-              <span class="carousel-control-next-icon bg-dark" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-
-        
+     
     </div>
     
 

@@ -303,6 +303,7 @@ def setservice(request, shift_id):
             service_selected = False
             service = services
     working = shift.employees.filter(provider=provider)
+    num_emp = len(working)
     not_working = []
     for emp in employees:
         if emp not in working and emp.provider == provider:
@@ -312,6 +313,7 @@ def setservice(request, shift_id):
         "services": services,
         "editshift": shift,
         "working": working,
+        "num_emp": num_emp,
         "not_working": not_working,
         "service_selected": service_selected,
         "service": service,
