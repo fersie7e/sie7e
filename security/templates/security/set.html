@@ -19,7 +19,7 @@
         <h5>{{editshift.shift_provider.name}}</h5>
     </div>
 
-    <div class="d-sm-flex bg-dark text-white text-start justify-content-center pt-3">
+    <div class="d-flex bg-dark text-white text-start justify-content-center pt-3">
         {% if not service_selected %}
             <form action="{% url 'setservice' editshift.id %}" method="post" style="width: 18rem;">
                 {% csrf_token %}
@@ -50,7 +50,7 @@
         {% if service_selected %}
             {% if not editshift.invoiced %}
                 <!--Info section-->
-                <div class="d-sm-flex bg-dark text-white text-start justify-content-center pb-5">
+                <div class="d-flex bg-dark text-white text-start justify-content-center pb-5">
                     <div class="mr-4">
                         <form action="{% url 'addemployee' editshift.id %}" method="post" style="width: 18rem;">
                             {% csrf_token %}
