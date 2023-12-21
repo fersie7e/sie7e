@@ -63,27 +63,29 @@
                 </tbody>
             </table>
             
-                
-            <div class="d-flex flex-wrap justify-content-center">
-                <table class="table-responsive" style="width: 50rem;">
-                    <thead>
-                    <tr>
-                        <th scope="col" class="text-start">Date</th>
-                        <th scope="col" class="text-start">Venue</th>
-                        <th scope="col" class="text-end">Salary</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for shift in worked_shifts %}
+            <div class="row">
+                <div class="col-sm-8 offset-sm-2 table-responsive">
+                    <table class="table">
+                        <thead>
                         <tr>
-                            <td class="text-start">{{shift.date}}</td>
-                            <td class="text-start">{{shift.venue}}</td>
-                            <td class="text-end"><small>{{shift.service_provided.servicefee.salary}} €</small></td>
+                            <th scope="col" class="text-start">Date</th>
+                            <th scope="col" class="text-start">Venue</th>
+                            <th scope="col" class="text-end">Salary</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                        {% for shift in worked_shifts %}
+                            <tr>
+                                <td class="text-start">{{shift.date}}</td>
+                                <td class="text-start">{{shift.venue}}</td>
+                                <td class="text-end"><small>{{shift.service_provided.servicefee.salary}} €</small></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>    
+            
         {% endif %} 
     </div>
 {% endblock %}
