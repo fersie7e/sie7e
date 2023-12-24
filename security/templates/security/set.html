@@ -13,7 +13,7 @@
 
     <!--Header-->
     <div class="p-4 my-3">
-        <h1>Update shift</h1>
+        <h1 class="display-4 fw-bold text-body-emphasis">Update shift</h1>
         <h1> {{editshift.venue}} - {{editshift.date}}</h1>
         <i class="fa fa-id-card-o fa-2x mt-3 mb-2" aria-hidden="true"></i>
         <h5>{{editshift.shift_provider.name}}</h5>
@@ -82,8 +82,8 @@
             <!--Results-->
             <div class="d-flex flex-wrap justify-content-center">
                 {% for employee in working %}
-                <div class="card m-2 shadow-lg" style="width: 18rem;">
-                    <div class="card-body">
+                <div class="border-start border-2 p-3 m-2" style="width: 18rem;">
+                    <div class="card-body text-start">
                         <h5 class="card-title">{{employee.first_name}} {{employee.last_name}}</h5>
                         {% if shift.invoiced %}
                             <h3>INVOICED</h3>

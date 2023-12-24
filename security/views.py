@@ -163,6 +163,15 @@ def calc_total(wages, salary):
 # End of functions
 
 def group_list(list, num):
+    """transform a list in a list of list of as much item as specified
+
+    Args:
+        list (list): list that is going to be procesed
+        num (int): number of items per group
+
+    Returns:
+        list: list of lists grouped in groups on num
+    """
     grouped_list = []
     init = 0
     end = num

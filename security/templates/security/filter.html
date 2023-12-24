@@ -11,7 +11,7 @@
             {% if date_selected == True %}
                 <!-- CREATE SHIFT SECTION -->
                 <div class="p-4 my-3">
-                    <h1>Create a new shift</h1>
+                    <h1 class="display-4 fw-bold text-body-emphasis">Create a new shift</h1>
                     <i class="fa fa-id-card-o fa-2x mt-3 mb-2" aria-hidden="true"></i>
                     <h5>Select venue and provider</h5>
                     <h5 class="text-primary mb-4">Date selected: {{date}} </h5>
@@ -42,7 +42,7 @@
                     </div>
                 </div>
 
-                <h1 class="mt-4">Edit an existing shift</h1>
+                <h1 class="display-4 fw-bold text-body-emphasis my-5">Edit an existing shift</h1>
                 <table class="table">
                     <tbody>
                     <tr>
@@ -62,10 +62,10 @@
                             {% endif %}
                                 <div class="card-wrapper d-flex flex-wrap justify-content-center">
                                     {% for shift in group %}
-                                        <div class="card m-2 shadow-lg" style="width: 18rem;">
+                                        <div class="border-start border-2 p-3 m-2" style="width: 18rem;">
                                             <!--<img src={% static '' %}{{shift.venue.logo}} class="card-img-top" alt="...">-->
-                                            <h2 class="text-primary mt-2">{{shift.venue}}</h2>
-                                            <div class="card-body">
+                                            <h2 class="text-start text-primary mt-2">{{shift.venue}}</h2>
+                                            <div class="card-body text-start">
                                                 <h5 class="card-title">{{shift.date}}</h5>
                                                 <p class="card-text">{{shift.shift_provider.name}}</p>
                                                 <p class="card-text">Workers: <strong>{{shift.employees.count}}</strong></p>

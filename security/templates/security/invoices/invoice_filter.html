@@ -48,13 +48,13 @@
         
         <div class="d-flex flex-wrap justify-content-center">
             {% for invoice in invoices %}
-                <div class="card m-2 shadow-lg" style="width: 18rem;">
+                <div class="border-start border-2 p-3 m-2" style="width: 18rem;">
                     <!--<img src={% static '' %}{{shift.venue.logo}} class="card-img-top" alt="...">-->
-                    <h4 class="text-primary mt-2">{{invoice.month}}/{{invoice.year}} - {{invoice.invoice_venue}}</h4>
-                    <div class="card-body">
+                    <h4 class="text-primary text-start mt-2">{{invoice.month}}/{{invoice.year}} - {{invoice.invoice_venue}}</h4>
+                    <div class="card-body text-start">
                         <h6 class="card-title">{{invoice.invoice_provider}}</h6>
-                        <p class="card-text text-center m-0 p-0"><small class="text-body-secondary">TOTAL</small></p>
-                        <h4 class="card-title text-center">{{invoice.amount}} €</h4>
+                        <p class="card-text  m-0 p-0"><small class="text-body-secondary">TOTAL</small></p>
+                        <h4 class="card-title mb-3">{{invoice.amount}} €</h4>
                         {% if superuser %}
                             <a href="{% url 'invoicedetail' invoice.id %}" class="btn btn-outline-primary">Details</a>
                         {% endif %}
