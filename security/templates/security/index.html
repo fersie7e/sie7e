@@ -9,11 +9,13 @@
         </div>
 
         <!--Header-->
-        <div class="p-4 my-3">
-            <h1 class="display-4 fw-bold text-body-emphasis">Choose a date</h1>
-            <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
-            <h5>Select month and year to update the calendar</h5>
-            <h5 class="text-primary mb-4">...then select the day and get the results </h5>
+        <div class="masthead p-4 my-3">
+            <div class="d-flex flex-column header">
+                <h1 class="display-4 fw-bold text-body-emphasis">Choose a date</h1>
+                <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+                <h5>Select month and year to update the calendar</h5>
+                <h5 class="text-primary mb-4">...then select the day and get the results </h5>
+            </div>
         </div>
         
         <!--Info section-->
@@ -41,19 +43,20 @@
             
             <!-- CREATE CALENDAR -->
             <div class="mx-4 p-4">
-                <div class="text-center">
-                        <div class="col"><h5>{{monthtext}} - {{year}}</h5></div>
+                <div class="d-flex align-items-end justify-content-between">
+                            <h4>{{monthtext}}</h4> 
+                            <h5><small>{{year}}</small></h5>
                 </div>
                 <div class="d-flex text-end">
                     {% for day in days %}
-                        <div class="p-1 flex-fill"><h6>{{day}}</h6></div>
+                        <div class="p-1 flex-fill text-primary"><h6>{{day}}</h6></div>
                     {% endfor %}
                 </div>
                 {% for week in cal %}
                     <div class="d-flex text-end">
                         {% for day in week %}
                             {% if day.month == month %}
-                                <div class="p-1 flex-fill "><a class="text-decoration-none" href="{% url 'filtershift' day %}"><h6>{{day.day}}</h6></a></div>
+                                <div class="p-1 flex-fill "><a class="text-decoration-none text-white" href="{% url 'filtershift' day %}"><h6>{{day.day}}</h6></a></div>
                             {% else %}
                                 <div class="p-1 flex-fill">-</div>
                             {% endif %}
