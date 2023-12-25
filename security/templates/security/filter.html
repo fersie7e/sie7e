@@ -7,90 +7,95 @@
             <p><a href="{% url 'index' %}">Inicio</a> > filter</p>
         </div>
 
-        <div class="row p-3 ">
-            {% if date_selected == True %}
-                <!-- CREATE SHIFT SECTION -->
-                <div class="p-4 my-3">
+        
+        {% if date_selected == True %}
+            <!-- CREATE SHIFT SECTION -->
+            <!--Header-->
+            <div class="masthead p-4 my-3">
+                <div class="d-flex flex-column header">
+                    <figcaption class="figure-caption">
+                        <a class="text-decoration-none text-body-secondary" href="https://www.freepik.es/vector-gratis/calendario-escritorio-fechas-marcadas-icono-estilo-dibujos-animados-3d-tiempo-planificacion-reunion-programacion-ilustracion-vectorial-plana-cita-fecha-limite-agenda-recordatorio-hora-concepto-gestion_29119114.htm#fromView=search&term=calendar&track=sph&regularType=vector&page=1&position=23&uuid=c47a0f3b-de5b-4a48-9bec-7e0a2707a33b?log-in=google">Imagen de pch.vector</a> en Freepik
+                    </figcaption>
                     <h1 class="display-4 fw-bold text-body-emphasis">Create a new shift</h1>
                     <i class="fa fa-id-card-o fa-2x mt-3 mb-2" aria-hidden="true"></i>
                     <h5>Select venue and provider</h5>
                     <h5 class="text-primary mb-4">Date selected: {{date}} </h5>
                 </div>
+            </div>
 
-                <div class="d-sm-flex bg-dark text-white text-start justify-content-center p-5">
-                    <div class="mr-4">
-                        <form action="{% url 'addshift' %}" method="post" style="width: 18rem;">
-                            {% csrf_token %}
-                            <input type="text" class="form-control" name="date" hidden="True" value="{{date}}">
+            <div class="d-sm-flex bg-dark text-white text-start justify-content-center p-5">
+                <div class="mr-4">
+                    <form action="{% url 'addshift' %}" method="post" style="width: 18rem;">
+                        {% csrf_token %}
+                        <input type="text" class="form-control" name="date" hidden="True" value="{{date}}">
 
-                            <label for="venue">Select the venue</label>
-                            <select class="form-select mb-3" name="venue">
-                                {% for venue in venues %}
-                                    <option value="{{ venue.id }}">{{ venue }}</option>
-                                {% endfor %}
-                            </select>
-                        
-                            <label for="shift_provider">Select the provider</label>
-                            <select class="form-select mb-1" name="shift_provider">
-                                {% for provider in providers %}
-                                    <option value="{{ provider.id }}">{{ provider.name }}</option>
-                                {% endfor %}
-                            </select>
+                        <label for="venue">Select the venue</label>
+                        <select class="form-select mb-3" name="venue">
+                            {% for venue in venues %}
+                                <option value="{{ venue.id }}">{{ venue }}</option>
+                            {% endfor %}
+                        </select>
+                    
+                        <label for="shift_provider">Select the provider</label>
+                        <select class="form-select mb-1" name="shift_provider">
+                            {% for provider in providers %}
+                                <option value="{{ provider.id }}">{{ provider.name }}</option>
+                            {% endfor %}
+                        </select>
 
-                            <button type="submit" class="btn btn-primary mt-4">Create</button>
-                        </form>
-                    </div>
+                        <button type="submit" class="btn btn-primary mt-4">Create</button>
+                    </form>
                 </div>
+            </div>
 
-                <h1 class="display-4 fw-bold text-body-emphasis my-5">Edit an existing shift</h1>
-                <table class="table">
-                    <tbody>
-                    <tr>
-                        <td scope="col" class="text-start">List of shifts on {{date}}</td>
-                    </tr>
-                    </tbody>
-                </table>
+            <h1 class="display-4 fw-bold text-body-emphasis my-5">Edit an existing shift</h1>
+            <table class="table">
+                <tbody>
+                <tr>
+                    <td scope="col" class="text-start">List of shifts on {{date}}</td>
+                </tr>
+                </tbody>
+            </table>
 
 
-                <div id="carouselExample" class="carousel slide">
-                    <div class="carousel-inner pb-5 ">
-                        {% for group in grouped_shifts %}
-                            {% if forloop.counter == 1 %}
-                                <div class="carousel-item active">
-                            {% else %}
-                                <div class="carousel-item">
-                            {% endif %}
-                                <div class="card-wrapper d-flex flex-wrap justify-content-center">
-                                    {% for shift in group %}
-                                        <div class="border-start border-2 p-3 m-2" style="width: 18rem;">
-                                            <!--<img src={% static '' %}{{shift.venue.logo}} class="card-img-top" alt="...">-->
-                                            <h2 class="text-start text-primary mt-2">{{shift.venue}}</h2>
-                                            <div class="card-body text-start">
-                                                <h5 class="card-title">{{shift.date}}</h5>
-                                                <p class="card-text">{{shift.shift_provider.name}}</p>
-                                                <p class="card-text">Workers: <strong>{{shift.employees.count}}</strong></p>
-                                                {% if shift.invoiced %}
-                                                    <h3>INVOICED</h3>
-                                                {% else %}
-                                                    <a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Edit</a>
-                                                {% endif%}
-                                            </div>
+            <div id="carouselExample" class="carousel slide">
+                <div class="carousel-inner pb-5 ">
+                    {% for group in grouped_shifts %}
+                        {% if forloop.counter == 1 %}
+                            <div class="carousel-item active">
+                        {% else %}
+                            <div class="carousel-item">
+                        {% endif %}
+                            <div class="card-wrapper d-flex flex-wrap justify-content-center">
+                                {% for shift in group %}
+                                    <div class="border-start border-2 p-3 m-2" style="width: 18rem;">
+                                        <!--<img src={% static '' %}{{shift.venue.logo}} class="card-img-top" alt="...">-->
+                                        <h2 class="text-start text-primary mt-2">{{shift.venue}}</h2>
+                                        <div class="card-body text-start">
+                                            <h5 class="card-title">{{shift.date}}</h5>
+                                            <p class="card-text">{{shift.shift_provider.name}}</p>
+                                            <p class="card-text">Workers: <strong>{{shift.employees.count}}</strong></p>
+                                            {% if shift.invoiced %}
+                                                <h3>INVOICED</h3>
+                                            {% else %}
+                                                <a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Edit</a>
+                                            {% endif%}
                                         </div>
-                                    {% endfor %}
-                                </div>
+                                    </div>
+                                {% endfor %}
                             </div>
-                        {% endfor %}
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-                      <span class="carousel-control-prev-icon bg-dark" aria-hidden="true"></span>
-                      <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-                      <span class="carousel-control-next-icon bg-dark" aria-hidden="true"></span>
-                      <span class="visually-hidden">Next</span>
-                    </button>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endif %}  
-        </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon bg-dark" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                    <span class="carousel-control-next-icon bg-dark" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        {% endif %}  
     </div>
 {% endblock %}
