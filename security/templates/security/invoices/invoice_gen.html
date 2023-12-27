@@ -44,13 +44,13 @@
         
                     </div>
                 </div>
-                <label for="invoice_venue">Select the venue</label>
+                <label for="invoice_venue">Venue</label>
                 <select class="form-select mb-3" name="invoice_venue">
                     {% for venue in venues %}
                         <option value="{{ venue.id }}">{{ venue }}</option>
                     {% endfor %}
                 </select>
-                <label for="invoice_provider">Select the provider</label>
+                <label for="invoice_provider">Provider</label>
                     <select class="form-select mb-1" name="invoice_provider">
                         {% for provider in providers %}
                             <option value="{{ provider.id }}">{{ provider.name }}</option>

@@ -82,11 +82,11 @@
                 </table>
 
                 <!--Results-->
-                <div class="d-flex flex-wrap justify-content-center">
+                <div class="d-flex flex-wrap justify-content-center py-5 my-5">
                     {% for employee in working %}
                     <div class="border-start border-2 p-3 m-2" style="width: 18rem;">
                         <div class="card-body text-start">
-                            <h5 class="card-title">{{employee.first_name}} {{employee.last_name}}</h5>
+                            <h5 class="card-title my-3">{{employee.first_name}} {{employee.last_name}}</h5>
                             {% if shift.invoiced %}
                                 <h3>INVOICED</h3>
                             {% else %}
