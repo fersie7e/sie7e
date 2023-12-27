@@ -11,9 +11,6 @@
         <!--Header-->
         <div class="masthead p-4 my-3">
             <div class="d-flex flex-column header">
-                <figcaption class="figure-caption">
-                    <a class="text-decoration-none text-body-secondary" href="https://www.freepik.es/vector-gratis/calendario-escritorio-fechas-marcadas-icono-estilo-dibujos-animados-3d-tiempo-planificacion-reunion-programacion-ilustracion-vectorial-plana-cita-fecha-limite-agenda-recordatorio-hora-concepto-gestion_29119114.htm#fromView=search&term=calendar&track=sph&regularType=vector&page=1&position=23&uuid=c47a0f3b-de5b-4a48-9bec-7e0a2707a33b?log-in=google">Imagen de pch.vector</a> en Freepik
-                </figcaption>
                 <h1 class="display-4 fw-bold text-body-emphasis">Choose a date</h1>
                 <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
                 <h5>Select month and year to update the calendar</h5>
@@ -22,18 +19,18 @@
         </div>
         
         <!--Info section-->
-        <div class="d-sm-flex bg-dark text-white text-start justify-content-center p-5">
+        <div class="info d-sm-flex bg-black text-white text-start justify-content-center p-5">
             <div class="mr-4">
                 <form action="{% url 'index' %}" method="post" style="width: 18rem;">
                     {% csrf_token %}
-                    <label for="year">Select the year</label>
+                    <label for="year">Select year</label>
                     <select class="form-select mb-3" name="year">
                         {% for year in year_choice %}
                             <option value="{{ year }}">{{ year }}</option>
                         {% endfor %}
                     </select>
                 
-                    <label for="month">Select the provider</label>
+                    <label for="month">Select month</label>
                     <select class="form-select mb-3" name="month">
                         {% for number,month in months.items %}
                             <option value="{{ number }}">{{ month }}</option>
@@ -45,7 +42,7 @@
             </div>
             
             <!-- CREATE CALENDAR -->
-            <div class="mx-4 p-4">
+            <div class="mx-4 ">
                 <div class="d-flex align-items-end justify-content-between">
                             <h4>{{monthtext}}</h4> 
                             <h5><small>{{year}}</small></h5>
