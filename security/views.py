@@ -126,24 +126,25 @@ def calc_wages(shifts, providers):
 
     wages = {}
     salary = 0
-    result = []
     for shift in shifts:
         if shift.shift_provider in providers:
             employees = shift.employees.all()
             for employee in employees:
+                if shift.service_provided:
+                    salary = shift.service_provided.servicefee.salary
+                else:
+                    salary = 0
                 key = employee.first_name + " " + employee.last_name
                 if key in wages:
-                    wages[key] = [wages.get(key)[0] + 1, 0]
+                    wages[key] = [wages.get(key)[0] + 1, salary]
                 else:
-                    wages[key] = [1,0]
-        salary = shift.service_provided.servicefee.salary
-    result.append(wages)
-    result.append(salary)
-    return result
+                    wages[key] = [1,salary]
+
+    return wages
 
 
-def calc_total(wages, salary):
-    """Calculate the total amount in euros of all the wages specified using the given salary
+def calc_total(wages):
+    """ Calculate the total amount in euros of all the wages specified
 
     Args:
         wages (Dict): dictionary with the employee name as a key, and the number of shifts
@@ -156,7 +157,7 @@ def calc_total(wages, salary):
 
     total_wages = 0
     for name,list in wages.items():
-        list[1] = int(list[0]) * salary
+        list[1] = int(list[0]) * int(list[1])
         wages[name] = list
         total_wages += list[1]
     return total_wages
@@ -492,10 +493,9 @@ def wagesfilter(request):
         provider = Provider.objects.get(pk=provider_id)
         shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
     else:
-        shifts = Shift.objects.filter(date__year=year, date__month=month)
-    result = calc_wages(shifts=shifts, providers=providers_allowed)
-    wages = result[0]
-    total_wages = calc_total(wages=wages, salary=result[1])
+        shifts = []
+    wages = calc_wages(shifts=shifts, providers=providers_allowed)
+    total_wages = calc_total(wages=wages)
     
     return render(request, 'security/wages/wages_filter.html', {
         "month": month,

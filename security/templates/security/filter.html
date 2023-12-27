@@ -13,9 +13,7 @@
             <!--Header-->
             <div class="masthead p-4 my-3">
                 <div class="d-flex flex-column header">
-                    <figcaption class="figure-caption">
-                        <a class="text-decoration-none text-body-secondary" href="https://www.freepik.es/vector-gratis/calendario-escritorio-fechas-marcadas-icono-estilo-dibujos-animados-3d-tiempo-planificacion-reunion-programacion-ilustracion-vectorial-plana-cita-fecha-limite-agenda-recordatorio-hora-concepto-gestion_29119114.htm#fromView=search&term=calendar&track=sph&regularType=vector&page=1&position=23&uuid=c47a0f3b-de5b-4a48-9bec-7e0a2707a33b?log-in=google">Imagen de pch.vector</a> en Freepik
-                    </figcaption>
+                    
                     <h1 class="display-4 fw-bold text-body-emphasis">Create a new shift</h1>
                     <i class="fa fa-id-card-o fa-2x mt-3 mb-2" aria-hidden="true"></i>
                     <h5>Select venue and provider</h5>
@@ -23,7 +21,8 @@
                 </div>
             </div>
 
-            <div class="d-sm-flex bg-dark text-white text-start justify-content-center p-5">
+            <!--Info section-->
+            <div class="info d-sm-flex bg-black text-white text-start justify-content-center p-5">
                 <div class="mr-4">
                     <form action="{% url 'addshift' %}" method="post" style="width: 18rem;">
                         {% csrf_token %}

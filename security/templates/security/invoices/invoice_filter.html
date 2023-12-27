@@ -10,30 +10,33 @@
         </div>
 
         <!--Header-->
-        <div class="p-4 my-3">      
-            <h1>Choose a date</h1>
-            <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
-            <h5>Select month and year to update results</h5>
-            <h5 class="text-primary mb-4">...then choose an invoice from the list </h5>
+        <div class="masthead p-4 my-3">
+            <div class="d-flex flex-column header">      
+                <h1 class="display-4 fw-bold text-body-emphasis">Choose a date</h1>
+                <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+                <h5>Select month and year to update results</h5>
+                <h5 class="text-primary mb-4">...then choose an invoice from the list </h5>
+            </div>
         </div>
 
-        <div class="d-sm-flex bg-dark text-white text-start justify-content-center p-5">
+        <!--Info section-->
+        <div class="info d-sm-flex bg-black text-white text-start justify-content-center p-5">
             <form action="{% url 'invoicefilter' %}" method="post" style="width: 18rem;">
                 {% csrf_token %}
-                <label for="year">Select the year</label>
+                <label for="year">Year</label>
                 <select class="form-select mb-3" name="year">
                     {% for year in year_choice %}
                         <option value="{{ year }}">{{ year }}</option>
                     {% endfor %}
                 </select>
             
-                <label for="month">Select the provider</label>
+                <label for="month">Month</label>
                 <select class="form-select mb-3" name="month">
                     {% for number,month in months.items %}
                         <option value="{{ number }}">{{ month }}</option>
                     {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-primary mt-4">Search</button>
+                <button type="submit" class="btn btn-primary mt-2">Search</button>
             </form>
         </div>
         
