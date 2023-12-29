@@ -84,13 +84,26 @@ WSGI_APPLICATION = 'sie7e.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sie7e_shifts',
+        'USER': 'sie7e',
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': 'database-1.cz4qkg6igu7b.eu-north-1.rds.amazonaws.com',
+        'PORT': '5432',
+    }
+}
+
+
 
 
 # Password validation
