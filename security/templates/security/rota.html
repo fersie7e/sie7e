@@ -1,0 +1,56 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row h-100">
+        <!--Nav map-->
+        <div class="text-start mt-2">
+            <p>Inicio</p>
+        </div>
+
+        <!--Header-->
+        <div class="masthead p-4 my-3">
+            <div class="d-flex flex-column header">
+                <h1 class="display-4 fw-bold text-body-emphasis">{{employee}}</h1>
+                <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+                <h5>{{monthtext}}, {{year}}</h5>
+            </div>
+        </div>
+       
+        <!-- CREATE CALENDAR -->
+        <table class="table table-responsive align-middle p-4">
+            <tbody>
+                {% for week in cal %}
+                    <tr>
+                        {% for day in week %}
+                                {% if day in filtered_days %}
+                                    <td>
+                                        <div>
+                                            {% for shift in filtered_shifts %}
+                                                {% for date,venue in shift.items %}
+                                                    {% if date == day %}
+                                                        <a class="text-decoration-none text-white "><h5 class="bg-primary rounded-5 py-1">{{day.day}}</h5></a>
+                                                        <p>{{venue}}</p>
+                                                    {% endif%}
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                {% else %}
+                                    <td class="">
+                                        {% if day.month == month %}
+                                            <a class="text-decoration-none text-black "><h1>{{day.day}}</h1></a>
+                                        {% else %}
+                                            <h1>-</h1>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+
+{% endblock %}

@@ -221,10 +221,16 @@ def index(request):
         year = CURRENT_YEAR
     shift_data = Shift.objects.filter(date__month=month, date__year=year).order_by('date')
     grouped_shifts = group_list(list=shift_data, num=3)
+    providers = Provider.objects.all()
+    venues = Venue.objects.all()
+    employees = Employee.objects.all()
 
     # Render the view
     return render(request, 'security/index.html', {
         "shifts": shift_data,
+        "providers": providers,
+        "venues": venues,
+        "employees": employees,
         "grouped_shifts": grouped_shifts,
         "cal":cal,
         "year_choice": YEARS_CHOICE,
@@ -401,6 +407,8 @@ def invoiceGen(request):
 def invoicefilter(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
+    if request.user.is_staff:
+        return HttpResponseRedirect(reverse("rota"))
     if not request.user.is_superuser:
         superuser = False
     else:
@@ -665,4 +673,69 @@ def wagesemployeepdf(request):
     HTML(string=html).write_pdf(response, font_config=font_config)
     return response
     
+
+def setfullmonth(request):
+    if request.method == "POST":
+        month = int(request.POST["month"])
+        year = int(request.POST["year"])
+        venue = Venue.objects.get(pk=int(request.POST["venue"]))
+        provider = Provider.objects.get(pk=int(request.POST["provider"]))
+        dias = calendar.monthrange(year,month)[1]
+        for dia in range(dias):
+            dia += 1
+            date = datetime.datetime(year,month,dia)
+            shift = Shift(venue=venue, date=date, shift_provider=provider)
+            shift.save()
+    return HttpResponseRedirect(reverse("index"))
+
+def rota(request):
+    # Permissions for the View
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
+    # Get context values
+    empleado = None
+    employees = Employee.objects.all()
+    for employee in employees:
+        if employee.user == request.user:
+            empleado = employee
+    
+    monthtext = MONTHS.get(str(CURRENT_MONTH))
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    if request.method == "POST":
+        empleado = Employee.objects.get(pk=request.POST["employee"])
+        month = int(request.POST["month"])
+        year = int(request.POST["year"])
+        monthtext = MONTHS.get(str(month))
+        
+        
+    cal = calendar.Calendar().monthdatescalendar(year,month)
+    shift_data = Shift.objects.filter(date__month=month, date__year=year).order_by('date')
+    filtered_days = [shift.date for shift in shift_data if empleado in shift.employees.all()]
+    filtered_shifts = [{shift.date:shift.venue} for shift in shift_data if empleado in shift.employees.all()]
+    grouped_shifts = group_list(list=shift_data, num=3)
+    providers = Provider.objects.all()
+    venues = Venue.objects.all()
+   
+
+    # Render the view
+    return render(request, 'security/rota.html', {
+        "shifts": shift_data,
+        "filtered_shifts": filtered_shifts,
+        "filtered_days": filtered_days,
+        "providers": providers,
+        "venues": venues,
+        "employee": empleado,
+        "grouped_shifts": grouped_shifts,
+        "cal":cal,
+        "year_choice": YEARS_CHOICE,
+        "year": year,
+        "months": MONTHS,
+        "monthtext": monthtext,
+        "month": month,
+        "days": DAYS,
+    })
+
+
 

@@ -19,4 +19,6 @@ urlpatterns = [
     path("wagesemployee/", views.wagesemployee, name="wagesemployee"),
     path("wagesemployeefilter/", views.wagesemployeefilter, name="wagesemployeefilter"),
     path("wagesemployeepdf/", views.wagesemployeepdf, name="wagesemployeepdf"),
+    path("setfullmonth/", views.setfullmonth, name="setfullmonth"),
+    path("rota/", views.rota, name="rota"),
 ]
