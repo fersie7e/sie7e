@@ -21,4 +21,5 @@ urlpatterns = [
     path("wagesemployeepdf/", views.wagesemployeepdf, name="wagesemployeepdf"),
     path("setfullmonth/", views.setfullmonth, name="setfullmonth"),
     path("rota/", views.rota, name="rota"),
+    path("rotavenue/", views.rotavenue, name="rotavenue"),
 ]

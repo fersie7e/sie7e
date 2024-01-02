@@ -57,6 +57,7 @@ class Employee(models.Model):
     ccc = models.CharField(max_length=50)
     provider = models.ForeignKey(Provider, on_delete=models.SET_NULL, null=True, related_name="provider")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="user_employee")
+    phone = models.CharField(max_length=15, default="-")
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

@@ -284,14 +284,13 @@ def addshift(request):
         return HttpResponseRedirect(reverse("invoicefilter"))
     # Get context values and saves the values to the db
     if request.method == "POST":
-        date = request.POST['date']
         form = ShiftForm(request.POST)
         if form.is_valid():
-            form.save()
+            shift = form.save()
         else:
             form = ShiftForm() 
     # Redirect the view
-    return HttpResponseRedirect(reverse("filtershift", args=(date,)))
+    return HttpResponseRedirect(reverse("setservice", args={shift.pk}))
 
 
 def setservice(request, shift_id):
@@ -737,5 +736,43 @@ def rota(request):
         "days": DAYS,
     })
 
+def rotavenue(request):
+    # Permissions for the View
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    
+    # Get context values
+    
+    monthtext = MONTHS.get(str(CURRENT_MONTH))
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    if request.method == "POST":
+        venue = Venue.objects.get(pk=request.POST["venue"])
+        month = int(request.POST["month"])
+        year = int(request.POST["year"])
+        monthtext = MONTHS.get(str(month))
+        
+        
+    cal = calendar.Calendar().monthdatescalendar(year,month)
+    shift_data = Shift.objects.filter(date__month=month, date__year=year).order_by('date')
+    filtered_days = [shift.date for shift in shift_data if shift.venue == venue]
+    
+    venues = Venue.objects.all()
+   
+
+    # Render the view
+    return render(request, 'security/rotavenue.html', {
+        "shifts": shift_data,
+        "filtered_days": filtered_days,
+        "venues": venues,
+        "venue": venue,
+        "cal":cal,
+        "year_choice": YEARS_CHOICE,
+        "year": year,
+        "months": MONTHS,
+        "monthtext": monthtext,
+        "month": month,
+        "days": DAYS,
+    })
 
 
