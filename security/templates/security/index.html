@@ -70,9 +70,9 @@
 
         <!-- CREATE SHIFTS FOR THE WHOLE MONTH -->
         <div class="d-sm-flex bg-white text-start justify-content-between p-0">
-            <div class="flex-fill bg-black text-white">
-                <h2 class="display-5 fw-bold my-5 text-center">Set a month</h2>
-                <div class="d-flex justify-content-center mb-5">
+            <div class="flex-fill">
+                <h2 class="display-5 fw-bold text-body-emphasis my-5 text-center">Set a month</h2>
+                <div class="d-flex justify-content-center pb-5">
                     <form action="{% url 'setfullmonth' %}" method="post" style="width: 18rem;">
                         {% csrf_token %}
                         <div class="d-flex justify-content-between">
@@ -112,9 +112,9 @@
                     </form>
                 </div>
             </div>
-            <div class="flex-fill">
-                <h2 class="display-5 fw-bold text-body-emphasis my-5 text-center">Rota Employee</h2>
-                <div class="d-flex justify-content-center mb-5">
+            <div class="flex-fill bg-black text-white">
+                <h2 class="display-5 fw-bold py-5 text-center">Rota Employee</h2>
+                <div class="d-flex justify-content-center pb-5">
                     <form action="{% url 'rota' %}" method="post" style="width: 18rem;">
                         {% csrf_token %}
                         <div class="d-flex justify-content-between">
@@ -151,9 +151,9 @@
 
         <div class="d-sm-flex bg-white text-start justify-content-between p-0">
             
-            <div class="flex-fill">
-                <h2 class="display-5 fw-bold text-body-emphasis my-5 text-center">Rota Venue</h2>
-                <div class="d-flex justify-content-center mb-5">
+            <div class="flex-fill bg-black text-white">
+                <h2 class="display-5 fw-bold py-5 text-center">Rota Venue</h2>
+                <div class="d-flex justify-content-center pb-5">
                     <form action="{% url 'rotavenue' %}" method="post" style="width: 18rem;">
                         {% csrf_token %}
                         <div class="d-flex justify-content-between">
@@ -187,9 +187,9 @@
                 </div>
             </div>
             
-            <div class="flex-fill bg-black text-white">
+            <div class="flex-fill">
                 <h2 class="display-5 fw-bold my-5 text-center">Search...</h2>
-                <div class="d-flex justify-content-center mb-5">
+                <div class="d-flex justify-content-center pb-5">
                     <form action="{% url 'index' %}" method="post" style="width: 18rem;">
                         {% csrf_token %}
                         <div class="d-flex justify-content-between">
