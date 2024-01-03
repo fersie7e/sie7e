@@ -51,7 +51,7 @@
                 </div>
             </div>
         </div>
-        
+
         {% if set %}
             <div>
                 <div class="d-flex flex-column mt-5">
@@ -75,6 +75,7 @@
                                             {% for shift in shifts %}
                                                 {% if shift.date == day %}
                                                     <p>Workers: <strong>{{shift.employees.count}}</strong></p>
+                                                    <a href="{% url 'setservice' 'rota' shift.id %}" class="btn btn-primary">Details</a>
                                                 {% endif%}
                                             {% endfor %}
                                         </div>

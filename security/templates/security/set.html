@@ -5,8 +5,10 @@
     <div class="row h-100">
         <!--Nav map-->  
         <div class="row text-start mt-2">
-            {% if editshift.invoiced %}
+            {% if reverse == "invoice" %}
                 <p><a href="{% url 'invoicefilter' %}">Invoices</a> > <a href="{% url 'invoicedetail' editshift.invoice_num %}">filter</a> > details</p>
+            {% elif reverse == "rota" %}
+                <p><a href="{% url 'rotavenue' %}">Rota</a> > details</p>
             {% else %}
                 <p><a href="{% url 'index' %}">Inicio</a> > set</p>
             {% endif %}
@@ -84,7 +86,7 @@
                         <h4 class="card-title fw-bold my-4">Working</h4>
                         <h5 class="card-title my-2">{{employee.first_name}} {{employee.last_name}}</h5>
                         <h5 class="card-title ">tel. {{employee.phone}}</h5>
-                        {% if shift.invoiced %}
+                        {% if editshift.invoiced %}
                             <h3>INVOICED</h3>
                         {% else %}
                             <a href="{% url 'deleteemployeeshift' editshift.id employee.id %}" class="btn btn-primary my-4">Delete</a>

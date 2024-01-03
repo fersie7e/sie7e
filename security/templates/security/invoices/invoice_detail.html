@@ -57,7 +57,7 @@
                         <tr>
                             <td class="text-start">{{shift.date}}</td>
                             <td>{{shift.employees.count}}</td>
-                            <td class="text-end"><a href="{% url 'setservice' shift.id %}" class="btn btn-primary">Details</a></td>
+                            <td class="text-end"><a href="{% url 'setservice' 'invoice' shift.id %}" class="btn btn-primary">Details</a></td>
                         </tr>
                     {% endfor %}
                     </tbody>

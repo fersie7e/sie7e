@@ -306,7 +306,7 @@ def addshift(request):
     return HttpResponseRedirect(reverse("setservice", args={shift.pk}))
 
 
-def setservice(request, shift_id):
+def setservice(request, reverse, shift_id):
     # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
@@ -345,6 +345,7 @@ def setservice(request, shift_id):
         "not_working": not_working,
         "service_selected": service_selected,
         "service": service,
+        "reverse": reverse,
     })
 
 
