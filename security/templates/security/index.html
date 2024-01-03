@@ -71,7 +71,7 @@
         <!-- CREATE SHIFTS FOR THE WHOLE MONTH -->
         <div class="d-sm-flex bg-white text-start justify-content-between p-0">
             <div class="flex-fill">
-                <h2 class="display-5 fw-bold text-body-emphasis my-5 text-center">Set a month</h2>
+                <h2 class="display-5 fw-bold text-body-emphasis py-5 text-center">Set a month</h2>
                 <div class="d-flex justify-content-center pb-5">
                     <form action="{% url 'setfullmonth' %}" method="post" style="width: 18rem;">
                         {% csrf_token %}
@@ -211,7 +211,7 @@
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Show in calendar</button>
+                        <button type="submit" class="btn btn-primary">Show results</button>
                     </form>
                 </div>
             </div>

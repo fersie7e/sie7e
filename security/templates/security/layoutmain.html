@@ -57,39 +57,64 @@
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">SIE7E</a>
+        <a class="navbar-brand" href="#">SIE7E </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Home</a>
-            </li>
+            {% if request.user.is_superuser %}
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Home</a>
+              </li>
+            {% endif %}
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Invoices
+                Rotas
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'invoicegen' %}">Generate</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'invoicefilter' %}">Details</a></li>
+                {% if request.user.is_staff %}
+                  <li><a class="dropdown-item" href="{% url 'rota' %}">Employee</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                {% endif %}
+                {% if request.user.is_superuser or not request.user.is_staff %}
+                  
+                  <li><a class="dropdown-item" href="{% url 'rotavenue' %}">Venue</a></li>
+                {% endif %}
               </ul>
             </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Wages
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'wagesfilter' %}">Provider</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'wagesfilterpdf' %}">Pdf Provider</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'wagesemployee' %}">Employee</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'wagesemployeefilter' %}">Pdf employee</a></li>
-              </ul>
-            </li>
+            {% if request.user.is_superuser or not request.user.is_staff %}
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Invoices
+                </a>
+                <ul class="dropdown-menu">
+                  {% if request.user.is_superuser%}
+                    <li><a class="dropdown-item" href="{% url 'invoicegen' %}">Generate</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                  {% endif %}
+                  <li><a class="dropdown-item" href="{% url 'invoicefilter' %}">Details</a></li>
+                </ul>
+              </li>
+              {% for group in request.user.groups.all %}
+                {% if group.name == "providers" %}
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Wages
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="{% url 'wagesfilter' %}">Provider</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="{% url 'wagesfilterpdf' %}">Pdf Provider</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="{% url 'wagesemployee' %}">Employee</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="{% url 'wagesemployeefilter' %}">Pdf employee</a></li>
+                    </ul>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
           </ul>
           
         </div>

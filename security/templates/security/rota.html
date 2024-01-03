@@ -7,45 +7,94 @@
         <!--Header-->
         <div class="masthead p-4 my-3">
             <div class="d-flex flex-column header">
-                <h1 class="display-4 fw-bold text-body-emphasis">{{employee}}</h1>
+                <h1 class="display-4 fw-bold text-body-emphasis">Employee Rota</h1>
                 <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
-                <h5>{{monthtext}}, {{year}}</h5>
+                <h5>fill the form to get the info</h5>
             </div>
         </div>
-       
-        <!-- CREATE CALENDAR -->
-        <table class="table table-responsive align-middle p-4">
-            <tbody>
-                {% for week in cal %}
-                    <tr>
-                        {% for day in week %}
-                                {% if day in filtered_days %}
-                                    <td>
-                                        <div>
-                                            {% for shift in filtered_shifts %}
-                                                {% for date,venue in shift.items %}
-                                                    {% if date == day %}
-                                                        <a class="text-decoration-none text-white "><h5 class="bg-primary rounded-5 py-1">{{day.day}}</h5></a>
-                                                        <p>{{venue}}</p>
-                                                    {% endif%}
+
+        <!--Info section-->
+        <div class="info d-sm-flex bg-black text-white text-start justify-content-center">
+            <div>
+                <h2 class="display-5 fw-bold py-5 text-center">Rota Employee</h2>
+                <div class="d-flex justify-content-center pb-5">
+                    <form action="{% url 'rota' %}" method="post" style="width: 18rem;">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <div class="flex-grow-1 me-2">
+                                <label for="month">Month</label>
+                                <select class="form-select mb-3" name="month">
+                                    {% for number,month in months.items %}
+                                        <option value="{{ number }}">{{ month }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        
+                            <div class="">
+                                <label for="year">Year</label>
+                                <select class="form-select mb-3" name="year">
+                                    {% for year in year_choice %}
+                                        <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+            
+                        <label for="employee">Employee</label>
+                        <select class="form-select mb-3" name="employee">
+                            {% for employee in employees %}
+                                <option value="{{ employee.id }}">{{ employee }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary my-4">Show</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% if set %}
+            <div>
+                <div class="d-flex flex-column mt-5">
+                    <h1 class="display-4 fw-bold text-body-emphasis">{{ employee }}</h1>
+                    <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+                    <h5>{{monthtext}}, {{year}}</h5>
+                    <h3 class="display-6 fw-bold text-body-emphasis"> Total shifts: {{total_shifts}}</h3>
+                </div>
+            </div>
+        
+            <!-- CREATE CALENDAR -->
+            <table class="table table-responsive align-middle p-4">
+                <tbody>
+                    {% for week in cal %}
+                        <tr>
+                            {% for day in week %}
+                                    {% if day in filtered_days %}
+                                        <td>
+                                            <div>
+                                                {% for shift in filtered_shifts %}
+                                                    {% for date,venue in shift.items %}
+                                                        {% if date == day %}
+                                                            <a class="text-decoration-none text-white "><h5 class="bg-primary rounded-5 py-1">{{day.day}}</h5></a>
+                                                            <p>{{venue}}</p>
+                                                        {% endif%}
+                                                    {% endfor %}
                                                 {% endfor %}
-                                            {% endfor %}
-                                        </div>
-                                    </td>
-                                {% else %}
-                                    <td class="">
-                                        {% if day.month == month %}
-                                            <a class="text-decoration-none text-black "><h1>{{day.day}}</h1></a>
-                                        {% else %}
-                                            <h1>-</h1>
-                                        {% endif %}
-                                    </td>
-                                {% endif %}
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                                            </div>
+                                        </td>
+                                    {% else %}
+                                        <td class="">
+                                            {% if day.month == month %}
+                                                <a class="text-decoration-none text-black "><h1>{{day.day}}</h1></a>
+                                            {% else %}
+                                                <h1>-</h1>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
     
 
