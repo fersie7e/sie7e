@@ -63,31 +63,60 @@
             </div>
 
             <!-- CREATE CALENDAR -->
-            
-                <table class="table table-responsive table-bordered align-middle my-5">
+            <div class="col-md-10 offset-md-1">
+                <table class="table align-middle mx-0 my-5">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th>Sat</th>
+                            <th>Sun</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {% for week in cal %}
                             <tr>
                                 {% for day in week %}
                                     {% if day in filtered_days %}
-                                        <td class="bg-primary" style="--bs-bg-opacity: .1;">
-                                            <h5 class="">{{day.day}}</h5>
+                                        <td class="bg-primary border" style="--bs-bg-opacity: .1;">
+                                            <h5 class="p-0 m-0">{{day.day}}</h5>
                                             {% for shift in shifts %}
                                                 {% if shift.date == day %}
                                                     {% if shift.invoiced and not request.user.is_superuser %}
-                                                        <a href="{% url 'setservice' 'rota' shift.id %}" class="btn btn-primary w-100" style="--bs-btn-padding-y: .15rem; --bs-btn-padding-x: .05rem; --bs-btn-font-size: .75rem;">Workers: <strong>{{shift.employees.count}}</strong></a>
+                                                        <a href="{% url 'setservice' 'rota' shift.id %}" class="btn btn-primary w-100" style="--bs-btn-padding-y: .1rem; --bs-btn-padding-x: .05rem; --bs-btn-font-size: .65rem;">
+                                                            - <strong>{{shift.employees.count}}</strong> -
+                                                        </a>
                                                     {% elif request.user.is_superuser %}
-                                                        <a href="{% url 'setservice' 'rota' shift.id %}" class="btn btn-primary w-100" style="--bs-btn-padding-y: .15rem; --bs-btn-padding-x: .05rem; --bs-btn-font-size: .75rem;">Workers: <strong>{{shift.employees.count}}</strong></a>
+                                                        <div class="row">
+                                                            <div class="d-sm-block d-md-none">
+                                                                <a href="{% url 'setservice' 'rota' shift.id %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                    <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 30px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="d-none d-md-block d-lg-none">
+                                                                <a href="{% url 'setservice' 'rota' shift.id %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                    <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 60px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="d-none d-lg-block">
+                                                                <a href="{% url 'setservice' 'rota' shift.id %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                    <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 100px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
+                                                                </a>
+                                                            </div>   
+                                                        </div>
                                                     {% endif %}
                                                 {% endif%}
                                             {% endfor %}
                                         </td>
                                     {% else %}
-                                        <td class="">
+                                        <td class="border">
                                             {% if day.month == month %}
-                                                <h4>{{day.day}}</h4>
+                                                <h5>{{day.day}}</h5>
                                             {% else %}
-                                                <h4>-</h4>
+                                                <h5>-</h5>
                                             {% endif %}
                                         </td>
                                     {% endif %}
@@ -96,6 +125,9 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+
+                
             
             
         {% endif %}

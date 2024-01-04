@@ -303,7 +303,7 @@ def addshift(request):
         else:
             form = ShiftForm() 
     # Redirect the view
-    return HttpResponseRedirect(reverse("setservice",  args={"admin",shift.pk}))
+    return HttpResponseRedirect(reverse("setservice", args=("admin",shift.pk,)))
 
 
 def setservice(request, reverse, shift_id):
