@@ -86,9 +86,23 @@
                                             {% for shift in shifts %}
                                                 {% if shift.date == day %}
                                                     {% if shift.invoiced and not request.user.is_superuser %}
-                                                        <a href="{% url 'setservice' 'rota' shift.id %}" class="btn btn-primary w-100" style="--bs-btn-padding-y: .1rem; --bs-btn-padding-x: .05rem; --bs-btn-font-size: .65rem;">
-                                                            - <strong>{{shift.employees.count}}</strong> -
-                                                        </a>
+                                                        <div class="row">
+                                                            <div class="d-sm-block d-md-none">
+                                                                <a href="{% url 'setservice' 'rota' shift.id %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                    <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 30px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="d-none d-md-block d-lg-none">
+                                                                <a href="{% url 'setservice' 'rota' shift.id %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                    <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 60px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
+                                                                </a>
+                                                            </div>
+                                                            <div class="d-none d-lg-block">
+                                                                <a href="{% url 'setservice' 'rota' shift.id %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                    <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 100px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
+                                                                </a>
+                                                            </div>   
+                                                        </div>
                                                     {% elif request.user.is_superuser %}
                                                         <div class="row">
                                                             <div class="d-sm-block d-md-none">
@@ -126,12 +140,6 @@
                     </tbody>
                 </table>
             </div>
-
-                
-            
-            
         {% endif %}
     </div>
-    
-
 {% endblock %}
