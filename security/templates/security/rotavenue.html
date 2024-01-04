@@ -63,37 +63,41 @@
             </div>
 
             <!-- CREATE CALENDAR -->
-            <table class="table table-responsive align-middle my-5 p-4">
-                <tbody>
-                    {% for week in cal %}
-                        <tr>
-                            {% for day in week %}
-                                {% if day in filtered_days %}
-                                    <td>
-                                        <div>
-                                            <a class="text-decoration-none text-white "><h5 class="bg-primary rounded-5 py-1">{{day.day}}</h5></a>
+            
+                <table class="table table-responsive table-bordered align-middle my-5">
+                    <tbody>
+                        {% for week in cal %}
+                            <tr>
+                                {% for day in week %}
+                                    {% if day in filtered_days %}
+                                        <td class="bg-primary" style="--bs-bg-opacity: .1;">
+                                            <h5 class="">{{day.day}}</h5>
                                             {% for shift in shifts %}
                                                 {% if shift.date == day %}
-                                                    <p>Workers: <strong>{{shift.employees.count}}</strong></p>
-                                                    <a href="{% url 'setservice' 'rota' shift.id %}" class="btn btn-primary">Details</a>
+                                                    {% if shift.invoiced and not request.user.is_superuser %}
+                                                        <a href="{% url 'setservice' 'rota' shift.id %}" class="btn btn-primary w-100" style="--bs-btn-padding-y: .15rem; --bs-btn-padding-x: .05rem; --bs-btn-font-size: .75rem;">Workers: <strong>{{shift.employees.count}}</strong></a>
+                                                    {% elif request.user.is_superuser %}
+                                                        <a href="{% url 'setservice' 'rota' shift.id %}" class="btn btn-primary w-100" style="--bs-btn-padding-y: .15rem; --bs-btn-padding-x: .05rem; --bs-btn-font-size: .75rem;">Workers: <strong>{{shift.employees.count}}</strong></a>
+                                                    {% endif %}
                                                 {% endif%}
                                             {% endfor %}
-                                        </div>
-                                    </td>
-                                {% else %}
-                                    <td class="">
-                                        {% if day.month == month %}
-                                            <a class="text-decoration-none text-black "><h1>{{day.day}}</h1></a>
-                                        {% else %}
-                                            <h1>-</h1>
-                                        {% endif %}
-                                    </td>
-                                {% endif %}
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                                        </td>
+                                    {% else %}
+                                        <td class="">
+                                            {% if day.month == month %}
+                                                <h4>{{day.day}}</h4>
+                                            {% else %}
+                                                <h4>-</h4>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            
+            
         {% endif %}
     </div>
     

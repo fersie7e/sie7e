@@ -27,7 +27,7 @@
         
         {% if not service_selected %}
             <div class="d-flex text-start justify-content-center">
-                <form action="{% url 'setservice' editshift.id %}" method="post" style="width: 18rem;">
+                <form action="{% url 'setservice' 'admin' editshift.id %}" method="post" style="width: 18rem;">
                     {% csrf_token %}
                     <label for="service">Choose the service to provide</label>
                     <select class="form-select mb-3" name="service">

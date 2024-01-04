@@ -303,15 +303,14 @@ def addshift(request):
         else:
             form = ShiftForm() 
     # Redirect the view
-    return HttpResponseRedirect(reverse("setservice", args={shift.pk}))
+    return HttpResponseRedirect(reverse("setservice",  args={"admin",shift.pk}))
 
 
 def setservice(request, reverse, shift_id):
     # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
-    if not request.user.is_superuser:
-        return HttpResponseRedirect(reverse("invoicefilter"))
+    
     # Get context values and saves the values to the db
     shift = Shift.objects.get(pk=shift_id)
     provider = shift.shift_provider
@@ -360,7 +359,7 @@ def addemployee(request, shift_id):
         employee = Employee.objects.get(pk=employee_id)
         shift.employees.add(employee)
     # Redirect the view
-    return HttpResponseRedirect(reverse("setservice", args=(shift_id,)))
+    return HttpResponseRedirect(reverse("setservice", args=("admin",shift_id,)))
 
 
 def deleteemployeeshift(request, shift_id, employee_id):
@@ -370,7 +369,7 @@ def deleteemployeeshift(request, shift_id, employee_id):
     employee = Employee.objects.get(pk=employee_id)
     shift.employees.remove(employee)
     
-    return HttpResponseRedirect(reverse("setservice", args=(shift_id,)))
+    return HttpResponseRedirect(reverse("setservice", args=("admin", shift_id,)))
 
     
 def invoiceGen(request):
