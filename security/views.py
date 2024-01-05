@@ -711,6 +711,8 @@ def rota(request):
     # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
+    if not request.user.is_staff:
+            return HttpResponseRedirect(reverse("invoicefilter"))
     set = False
     # Get context values
     empleado = None
