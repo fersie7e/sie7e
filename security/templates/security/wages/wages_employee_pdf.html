@@ -30,7 +30,11 @@
             </thead>
             <tbody>
             {% for shift in worked_shifts %}
-                <tr>
+            {% if forloop.counter == 25 %} 
+                    <tr  style="break-before: page;">
+                {% else %}
+                    <tr>
+                {% endif %}
                     <td class="text-start"><small>{{shift.date}}</small></td>
                     <td class="text-start"><small>{{shift.venue}}</small></td>
                     <td class="text-end"><small>{{shift.service_provided.servicefee.salary}} €</small></td>

@@ -99,13 +99,15 @@ def get_employees_allowed(user):
     Returns:
         List: List with all the employees that a specific user can visualize
     """
-
+    employees_allowed = []
+    
     providers = get_providers_allowed(user)
     employees = Employee.objects.all()
-    employees_allowed = []
+    
     for employee in employees:
-        if  employee.provider in providers:
+        if  employee.provider in providers or employee.user == user:
             employees_allowed.append(employee)
+
     return employees_allowed
 
 def total_month_shifts(shifts):
@@ -566,8 +568,8 @@ def wagespdf(request):
     else:
         shifts = Shift.objects.filter(date__year=year, date__month=month)
     result = calc_wages(shifts=shifts, providers=providers_allowed)
-    wages = result[0]
-    total_wages = calc_total(wages=wages, salary=result[1])
+    wages = result
+    total_wages = calc_total(wages=wages)
 
     context = {
         "month": month,
@@ -592,7 +594,8 @@ def wagesemployee(request):
         return HttpResponseRedirect(reverse("login"))
     providers_allowed = get_providers_allowed(request.user)
     if not providers_allowed:
-        return HttpResponseRedirect(reverse("invoicefilter"))
+        if not request.user.is_staff:
+            return HttpResponseRedirect(reverse("invoicefilter"))
     
     month = CURRENT_MONTH
     year = CURRENT_YEAR
@@ -633,7 +636,8 @@ def wagesemployeefilter(request):
         return HttpResponseRedirect(reverse("login"))
     providers_allowed = get_providers_allowed(request.user)
     if not providers_allowed:
-        return HttpResponseRedirect(reverse("invoicefilter"))
+        if not request.user.is_staff:
+            return HttpResponseRedirect(reverse("invoicefilter"))
     
     month = CURRENT_MONTH
     year = CURRENT_YEAR
@@ -653,7 +657,8 @@ def wagesemployeepdf(request):
         return HttpResponseRedirect(reverse("login"))
     providers_allowed = get_providers_allowed(request.user)
     if not providers_allowed:
-        return HttpResponseRedirect(reverse("invoicefilter"))
+        if not request.user.is_staff:
+            return HttpResponseRedirect(reverse("invoicefilter"))
     
     if request.method == "POST":
         month = request.POST['month']
@@ -783,6 +788,7 @@ def rotavenue(request):
     filtered_days = [shift.date for shift in shift_data if shift.venue == venue]
     total_shifts = total_month_shifts([shift for shift in shift_data if shift.venue == venue])
     venues_allowed = get_venues_allowed(request.user)
+    providers_allowed = get_providers_allowed(request.user)
    
 
     # Render the view
@@ -791,6 +797,7 @@ def rotavenue(request):
         "total_shifts": total_shifts,
         "filtered_days": filtered_days,
         "venues": venues_allowed,
+        "providers": providers_allowed,
         "venue": venue,
         "cal":cal,
         "year_choice": YEARS_CHOICE,

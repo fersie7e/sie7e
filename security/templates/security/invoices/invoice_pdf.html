@@ -42,7 +42,7 @@
             </thead>
             <tbody>
             {% for shift in invoice.shifts.all %}
-                {% if forloop.counter == 20 %} 
+                {% if forloop.counter == 19 %} 
                     <tr  style="break-before: page;">
                 {% else %}
                     <tr>
@@ -57,7 +57,7 @@
     </div>
 
     <div class="row">
-        <table class="table mt-4 text-end">
+        <table class="table text-end">
             <thead>
                 <tr>
                     <th>
