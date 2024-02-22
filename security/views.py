@@ -254,6 +254,72 @@ def index(request):
     })
 
 
+def indexcal(request, date):
+    """Index view, main view that will be displayed after login
+       provides a form and a calendar with a default current date and a list
+       of all the shifts that have been created the selected date (month/year)
+
+    Args:
+        request (Request): Request from the client
+
+    Returns:
+        render: Renders the view with the context specified
+    """
+
+    # Permissions for the View
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    if not request.user.is_superuser:
+        if request.user.is_staff:
+            return HttpResponseRedirect(reverse("rota"))
+        else:
+            return HttpResponseRedirect(reverse("invoicefilter"))
+        
+    # Get context values
+    
+    if request.method == "POST":
+        month = int(request.POST["month"])
+        monthtext = MONTHS.get(str(month))
+        year = int(request.POST["year"])
+        cal = calendar.Calendar().monthdatescalendar(year,month)
+        date = str(year) + "-" + str(month).zfill(2) + "-" + "01"
+        dateref = parseDate(date)
+    else:
+        dateref = parseDate(date)
+        cal = calendar.Calendar().monthdatescalendar(dateref.year, dateref.month)
+        monthtext = MONTHS.get(str(dateref.month))
+        month = dateref.month
+        year = dateref.year
+
+    for week in cal:
+        if dateref in week:
+            for day in week:
+                if dateref == day:
+                    shift_data = Shift.objects.filter(date__range=[week[0],week[6]]).order_by('date')
+
+    
+    providers = Provider.objects.all()
+    venues = Venue.objects.all()
+    employees = Employee.objects.all()
+
+    
+
+    # Render the view
+    return render(request, 'security/indexcal.html', {
+        "shifts": shift_data,
+        "providers": providers,
+        "venues": venues,
+        "employees": employees,
+        "cal":cal,
+        "date": date,
+        "year_choice": YEARS_CHOICE,
+        "year": year,
+        "months": MONTHS,
+        "monthtext": monthtext,
+        "month": month,
+        "days": DAYS,
+    })
+
 def filtershift(request, date=TODAY):
     """View that filters the date and allow the superuser to create a new shift on that
        filtered date, provides the superuser a form to choose the venue and the company 
@@ -308,7 +374,7 @@ def addshift(request):
     return HttpResponseRedirect(reverse("setservice", args=("admin",shift.pk,)))
 
 
-def setservice(request, reverse, shift_id):
+def setservice(request, shift_id):
     # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
@@ -337,17 +403,19 @@ def setservice(request, reverse, shift_id):
     for emp in employees:
         if emp not in working and emp.provider == provider:
             not_working.append(emp)
+    # Redirect the view
+    return HttpResponseRedirect(reverse("indexcal", args=(shift.date,)))
     # Render the view
-    return render(request, 'security/set.html', {
-        "services": services,
-        "editshift": shift,
-        "working": working,
-        "num_emp": num_emp,
-        "not_working": not_working,
-        "service_selected": service_selected,
-        "service": service,
-        "reverse": reverse,
-    })
+    #return render(request, 'security/set.html', {
+    #    "services": services,
+    #    "editshift": shift,
+    #    "working": working,
+    #    "num_emp": num_emp,
+    #    "not_working": not_working,
+    #    "service_selected": service_selected,
+    #    "service": service,
+    #    "reverse": reverse,
+    #})
 
 
 def addemployee(request, shift_id):
@@ -361,7 +429,8 @@ def addemployee(request, shift_id):
         employee = Employee.objects.get(pk=employee_id)
         shift.employees.add(employee)
     # Redirect the view
-    return HttpResponseRedirect(reverse("setservice", args=("admin",shift_id,)))
+    return HttpResponseRedirect(reverse("indexcal", args=(shift.date,)))
+    #return HttpResponseRedirect(reverse("setservice", args=("admin",shift_id,)))
 
 
 def deleteemployeeshift(request, shift_id, employee_id):
@@ -370,8 +439,9 @@ def deleteemployeeshift(request, shift_id, employee_id):
     shift = Shift.objects.get(pk=shift_id)
     employee = Employee.objects.get(pk=employee_id)
     shift.employees.remove(employee)
-    
-    return HttpResponseRedirect(reverse("setservice", args=("admin", shift_id,)))
+
+    return HttpResponseRedirect(reverse("indexcal", args=(shift.date,)))
+    # return HttpResponseRedirect(reverse("setservice", args=("admin", shift_id,)))
 
     
 def invoiceGen(request):

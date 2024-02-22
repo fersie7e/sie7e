@@ -8,7 +8,7 @@ urlpatterns = [
     path("addshift/",views.addshift,name="addshift"),
     path("add/<int:shift_id>/", views.addemployee, name="addemployee"),
     path("delete/<int:shift_id>/<int:employee_id>", views.deleteemployeeshift, name="deleteemployeeshift"),
-    path("set/<str:reverse>/<int:shift_id>", views.setservice, name="setservice"),
+    path("set/<int:shift_id>", views.setservice, name="setservice"),
     path("invoice", views.invoiceGen, name="invoicegen"),
     path("invoicefilter/", views.invoicefilter, name="invoicefilter"),
     path("invoicedetail/<int:invoice_id>", views.invoicedetail, name="invoicedetail"),
@@ -22,4 +22,5 @@ urlpatterns = [
     path("setfullmonth/", views.setfullmonth, name="setfullmonth"),
     path("rota/", views.rota, name="rota"),
     path("rotavenue/", views.rotavenue, name="rotavenue"),
+    path("indexcal/<str:date>", views.indexcal, name="indexcal"),
 ]
