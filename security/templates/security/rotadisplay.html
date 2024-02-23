@@ -1,0 +1,88 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row h-100">
+
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'rota' %}">Rota</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Rota display</li>
+            </ol>
+        </nav>
+        
+        <div>
+            <div class="d-flex flex-column mt-5">
+                <h1 class="display-4 fw-bold text-body-emphasis">{{ employee }}</h1>
+                <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+                <h5>{{monthtext}}, {{year}}</h5>
+                <h3 class="display-6 fw-bold text-body-emphasis"> Total shifts: {{total_shifts}}</h3>
+            </div>
+        </div>
+    
+        <!-- CREATE CALENDAR -->
+        <div class="col-md-10 offset-md-1">
+            <table class="table align-middle mx-0 my-5">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                        <th>Sun</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week in cal %}
+                        <tr>
+                            {% for day in week %}
+                                {% if day in filtered_days %}
+                                    <td class="bg-primary border" style="--bs-bg-opacity: .1;">
+                                        <h5 class="p-0 m-0">{{day.day}}</h5>
+                                        {% for shift in filtered_shifts %}
+                                            {% for date,venue in shift.items %}
+                                                {% if date == day %}
+                                            
+                                                    <div class="row">
+                                                        <div class="d-sm-block d-md-none">
+                                                            <a data-bs-toggle="tooltip" data-bs-title="{{venue}}">
+                                                                <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 30px;">{{venue}}</span>
+                                                            </a>
+                                                        </div>
+                                                        <div class="d-none d-md-block d-lg-none">
+                                                            <a data-bs-toggle="tooltip" data-bs-title="{{venue}}">
+                                                                <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 60px;">{{venue}}</span>
+                                                            </a>
+                                                        </div>
+                                                        <div class="d-none d-lg-block">
+                                                            <a data-bs-toggle="tooltip" data-bs-title="{{venue}}">
+                                                                <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 90px;">{{venue}}</span>
+                                                            </a>
+                                                        </div>   
+                                                    </div>
+
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </td>
+                                {% else %}
+                                    <td class="border">
+                                        {% if day.month == month %}
+                                            <h5>{{day.day}}</h5>
+                                        {% else %}
+                                            <h5>-</h5>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+{% endblock %}

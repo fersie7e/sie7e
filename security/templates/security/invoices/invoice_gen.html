@@ -4,63 +4,67 @@
     
     <div class="row h-100">
 
-        <!--Nav map-->
-        <div class="row text-start mt-2">
-            <p>Invoices</p>
-        </div>
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Invoices</li>
+            </ol>
+        </nav>
 
 
         <!--Header-->
-        <div class="masthead1 p-4 my-3">
+        <div class="masthead1">
             <div class="d-flex flex-column header">
                 <h1 class="display-4 fw-bold text-body-emphasis">Invoice generator</h1>
-                <i class="fa fa-book fa-2x mt-3 mb-2" aria-hidden="true"></i>
-                <h5>Fill the form</h5>
-                <h5 class="text-primary mb-4">and generate an invoice</h5>
+                <h1 class="display-4"><i class="bi bi-cash-coin"></i></h1>
+                <h5>Fill the form and generate invoice</h5>
             </div>
         </div>
 
         <!--Info section-->
-        <div class="info d-sm-flex bg-black text-white text-start justify-content-center p-5">
-            <form action="{% url 'invoicegen' %}" method="post" onsubmit="this.submit_button.disabled = true;" style="width: 18rem;">
-                {% csrf_token %}
-                <div class="row">
-                    <div class="col-sm-6">
-                        <label for="year">Year</label>
-                        <select class="form-select mb-3" name="year">
-                            {% for year in year_choice %}
-                                <option value="{{ year }}">{{ year }}</option>
-                            {% endfor %}
-                        </select>        
-                    </div>
-                    <div class="col-sm-6">
-
-                        <label for="month">Month</label>
-                        <select class="form-select mb-3" name="month">
-                            {% for number,month in months.items %}
-                                <option value="{{ number }}">{{ month }}</option>
+        <div class="d-sm-flex text-start justify-content-evenly">
+            <div>
+                <div class="d-flex justify-content-center pb-5 ">
+                    <form action="{% url 'invoicegen' %}" method="post" onsubmit="this.submit_button.disabled = true;">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label for="year">Year</label>
+                                <select class="form-select mb-3" name="year">
+                                    {% for year in year_choice %}
+                                        <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>        
+                            </div>
+                            <div class="col-sm-6">
+        
+                                <label for="month">Month</label>
+                                <select class="form-select mb-3" name="month">
+                                    {% for number,month in months.items %}
+                                        <option value="{{ number }}">{{ month }}</option>
+                                    {% endfor %}
+                                </select>
+                
+                            </div>
+                        </div>
+                        <label for="invoice_venue">Venue</label>
+                        <select class="form-select mb-3" name="invoice_venue">
+                            {% for venue in venues %}
+                                <option value="{{ venue.id }}">{{ venue }}</option>
                             {% endfor %}
                         </select>
-        
-                    </div>
+                        <label for="invoice_provider">Provider</label>
+                            <select class="form-select mb-1" name="invoice_provider">
+                                {% for provider in providers %}
+                                    <option value="{{ provider.id }}">{{ provider.name }}</option>
+                                {% endfor %}
+                            </select>
+                        <button name="submit_button" type="submit" class="btn btn-primary mt-3 w-100">Generate</button>
+                    </form>
                 </div>
-                <label for="invoice_venue">Venue</label>
-                <select class="form-select mb-3" name="invoice_venue">
-                    {% for venue in venues %}
-                        <option value="{{ venue.id }}">{{ venue }}</option>
-                    {% endfor %}
-                </select>
-                <label for="invoice_provider">Provider</label>
-                    <select class="form-select mb-1" name="invoice_provider">
-                        {% for provider in providers %}
-                            <option value="{{ provider.id }}">{{ provider.name }}</option>
-                        {% endfor %}
-                    </select>
-                <button name="submit_button" type="submit" class="btn btn-primary mt-3">Generate</button>
-            </form>
+            </div>
         </div>
-        
-        
+
         {% if success %}
             <div class="alert alert-success">
                 Invoiced generated successfully

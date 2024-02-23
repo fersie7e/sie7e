@@ -4,67 +4,47 @@
     
     <div class="row h-100">
 
-        <!--Nav map-->
-        <div class="text-start mt-2">
-            <p>Invoices</p>
-        </div>
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Invoices</li>
+            </ol>
+        </nav>
 
         <!--Header-->
-        <div class="masthead p-4 my-3">
-            <div class="d-flex flex-column header">      
+
+        <div class="masthead">
+            <div class="d-flex flex-column header">
                 <h1 class="display-4 fw-bold text-body-emphasis">Invoices</h1>
                 <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
-                <h5>Select month and year to update results</h5>
-                <h5 class="text-primary mb-4">...then choose an invoice from the list </h5>
+                <h5>Select month and year to show results</h5>
             </div>
         </div>
 
         <!--Info section-->
-        <div class="info d-sm-flex bg-black text-white text-start justify-content-center p-5">
-            <form action="{% url 'invoicefilter' %}" method="post" style="width: 18rem;">
-                {% csrf_token %}
-                <label for="year">Year</label>
-                <select class="form-select mb-3" name="year">
-                    {% for year in year_choice %}
-                        <option value="{{ year }}">{{ year }}</option>
-                    {% endfor %}
-                </select>
-            
-                <label for="month">Month</label>
-                <select class="form-select mb-3" name="month">
-                    {% for number,month in months.items %}
-                        <option value="{{ number }}">{{ month }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="btn btn-primary mt-2">Search</button>
-            </form>
+        <div class="d-sm-flex text-start justify-content-evenly">
+            <div>
+                <div class="d-flex justify-content-center pb-5 ">
+                    <form action="{% url 'invoicefreport' %}" method="post" style="width: 18rem;">
+                        {% csrf_token %}
+                        <label for="year">Year</label>
+                        <select class="form-select mb-3" name="year">
+                            {% for year in year_choice %}
+                                <option value="{{ year }}">{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    
+                        <label for="month">Month</label>
+                        <select class="form-select mb-3" name="month">
+                            {% for number,month in months.items %}
+                                <option value="{{ number }}">{{ month }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary mt-3 w-100">Search</button>
+                    </form>
+                </div>
+            </div>
         </div>
         
-
-        <table class="table">
-            <tbody>
-            <tr>
-                <td scope="col" class="text-start">List of invoices on {{month}} / {{year}}</td>
-            </tr>
-            </tbody>
-        </table>
-        
-        <div class="d-flex flex-wrap justify-content-center my-5 py-5">
-            {% for invoice in invoices %}
-                <div class="border-start border-2 p-3 m-2" style="width: 18rem;">
-                    <!--<img src={% static '' %}{{shift.venue.logo}} class="card-img-top" alt="...">-->
-                    <h4 class="text-primary text-start mt-2">{{invoice.month}}/{{invoice.year}} - {{invoice.invoice_venue}}</h4>
-                    <div class="card-body text-start">
-                        <h6 class="card-title">{{invoice.invoice_provider}}</h6>
-                        <p class="card-text  m-0 p-0"><small class="text-body-secondary">TOTAL</small></p>
-                        <h4 class="card-title mb-3">{{invoice.amount}} €</h4>
-                        {% if superuser %}
-                            <a href="{% url 'invoicedetail' invoice.id %}" class="btn btn-outline-primary">Details</a>
-                        {% endif %}
-                            <a href="{% url 'invoicepdf' invoice.id %}" class="btn btn-outline-dark">PDF</a>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>  
     </div>
 {% endblock %}

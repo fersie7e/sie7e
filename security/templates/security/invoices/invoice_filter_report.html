@@ -1,0 +1,42 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row h-100">
+
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'index' %}">Invoices</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Invoices list</li>
+            </ol>
+        </nav>
+        
+        <table class="table">
+            <tbody>
+            <tr>
+                <td scope="col" class="text-start"><h3 class="display-5">List of invoices on {{month}} / {{year}}</h3></td>
+            </tr>
+            </tbody>
+        </table>
+        
+        <div class="d-flex flex-wrap justify-content-center my-5 py-5">
+            {% for invoice in invoices %}
+                <div class="card border-light m-3" style="max-width: 20rem;">
+                    <div class="card-header">{{invoice.invoice_provider}}</div>
+                    <div class="card-body text-start">
+                        <h4 class="card-title">{{invoice.month}}/{{invoice.year}} - {{invoice.invoice_venue}}</h4>
+                        <h6 class="card-subtitle mb-2 text-muted"><small class="text-body-secondary">TOTAL</small></h6>
+                        <h5 class="card-subtitle mb-2">{{invoice.amount}} €</h5>
+                        <hr>
+                        <br>
+                        {% if superuser %}
+                            <a href="{% url 'invoicedetail' invoice.id %}" class="btn btn-outline-primary">Details</a>
+                        {% endif %}
+                            <a href="{% url 'invoicepdf' invoice.id %}" class="btn btn-outline-dark">PDF</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>  
+    </div>
+{% endblock %}
