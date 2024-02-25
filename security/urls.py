@@ -27,5 +27,5 @@ urlpatterns = [
     path("rota/rotadisplay", views.rotadisplay, name="rotadisplay"),
     path("rotavenue/", views.rotavenue, name="rotavenue"),
     path("rotavenue/rotavdisplay", views.rotavdisplay, name="rotavdisplay"),
-    path("dashboard/<str:date>", views.dashboard, name="dashboard"),
+    path("dashboard/<int:shift_id>", views.dashboard, name="dashboard"),
 ]

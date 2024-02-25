@@ -254,7 +254,7 @@ def index(request):
     })
 
 
-def dashboard(request, date):
+def dashboard(request, shift_id):
     """Index view, main view that will be displayed after login
        provides a form and a calendar with a default current date and a list
        of all the shifts that have been created the selected date (month/year)
@@ -276,27 +276,28 @@ def dashboard(request, date):
             return HttpResponseRedirect(reverse("invoicefilter"))
         
     # Get context values
+    shift = Shift.objects.get(pk=shift_id)
     
     if request.method == "POST":
         month = int(request.POST["month"])
         monthtext = MONTHS.get(str(month))
         year = int(request.POST["year"])
+        venue = Venue.objects.get(pk=int(request.POST["venue"]))
+        provider = Provider.objects.get(pk=int(request.POST["provider"]))
         cal = calendar.Calendar().monthdatescalendar(year,month)
-        date = str(year) + "-" + str(month).zfill(2) + "-" + "01"
-        dateref = parseDate(date)
+        
     else:
-        dateref = parseDate(date)
+        dateref = shift.date
         cal = calendar.Calendar().monthdatescalendar(dateref.year, dateref.month)
         monthtext = MONTHS.get(str(dateref.month))
         month = dateref.month
         year = dateref.year
-
-    for week in cal:
-        if dateref in week:
-            for day in week:
-                if dateref == day:
-                    shift_data = Shift.objects.filter(date__range=[week[0],week[6]]).order_by('date')
-
+        venue = shift.venue
+        provider = shift.shift_provider
+        
+    shift_data = Shift.objects.filter(date__month=month, venue=venue, shift_provider=provider)
+    
+    
     
     providers = Provider.objects.all()
     venues = Venue.objects.all()
@@ -308,16 +309,14 @@ def dashboard(request, date):
     return render(request, 'security/dashboard.html', {
         "shifts": shift_data,
         "providers": providers,
+        "provider": provider,
+        "venue": venue,
         "venues": venues,
         "employees": employees,
         "cal":cal,
-        "date": date,
-        "year_choice": YEARS_CHOICE,
         "year": year,
-        "months": MONTHS,
         "monthtext": monthtext,
         "month": month,
-        "days": DAYS,
     })
 
 def filtershift(request, date=TODAY):
@@ -404,7 +403,7 @@ def setservice(request, shift_id):
         if emp not in working and emp.provider == provider:
             not_working.append(emp)
     # Redirect the view
-    return HttpResponseRedirect(reverse("dashboard", args=(shift.date,)))
+    return HttpResponseRedirect(reverse("dashboard", args=(shift.pk,)))
     # Render the view
     #return render(request, 'security/set.html', {
     #    "services": services,
@@ -429,7 +428,7 @@ def addemployee(request, shift_id):
         employee = Employee.objects.get(pk=employee_id)
         shift.employees.add(employee)
     # Redirect the view
-    return HttpResponseRedirect(reverse("dashboard", args=(shift.date,)))
+    return HttpResponseRedirect(reverse("dashboard", args=(shift.pk,)))
     #return HttpResponseRedirect(reverse("setservice", args=("admin",shift_id,)))
 
 
@@ -440,7 +439,7 @@ def deleteemployeeshift(request, shift_id, employee_id):
     employee = Employee.objects.get(pk=employee_id)
     shift.employees.remove(employee)
 
-    return HttpResponseRedirect(reverse("dashboard", args=(shift.date,)))
+    return HttpResponseRedirect(reverse("dashboard", args=(shift.pk,)))
     # return HttpResponseRedirect(reverse("setservice", args=("admin", shift_id,)))
 
     

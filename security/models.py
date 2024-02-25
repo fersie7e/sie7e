@@ -73,7 +73,7 @@ class Shift(models.Model):
     invoice_num = models.IntegerField(null=True)
 
     def __str__(self):
-        return f"{self.date} - {self.venue}"
+        return f"{self.pk} - {self.date} - {self.venue}"
 
 
 class Invoice(models.Model):

@@ -20,69 +20,61 @@
                 <h3 class="display-6 fw-bold text-body-emphasis"> Total shifts: {{total_shifts}}</h3>
             </div>
         </div>
-    
-        <!-- CREATE CALENDAR -->
-        <div class="col-md-10 offset-md-1">
-            <table class="table align-middle mx-0 my-5">
-                <thead class="table-light">
-                    <tr>
-                        <th>Mon</th>
-                        <th>Tue</th>
-                        <th>Wed</th>
-                        <th>Thu</th>
-                        <th>Fri</th>
-                        <th>Sat</th>
-                        <th>Sun</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for week in cal %}
-                        <tr>
-                            {% for day in week %}
-                                {% if day in filtered_days %}
-                                    <td class="bg-primary border" style="--bs-bg-opacity: .1;">
-                                        <h5 class="p-0 m-0">{{day.day}}</h5>
+
+
+        <div class="d-flex justify-content-center mb-5">
+            <div class="grid-calendar">
+                <div class="d-flex align-items-end justify-content-between mt-5">
+                    <h4>{{monthtext}}</h4> 
+                    <h5><small>{{year}}</small></h5>
+                </div>
+                <div class="row calendar-week-header">
+                    <div class="col-xs-1 grid-cell"><div><div><span>M</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>W</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>F</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                </div>
+
+                {% for week in cal %}
+                    <div class="row calendar-week">
+                        {% for day in week %}
+                            {% if day in filtered_days %}
+                                <div class="col-xs-1 grid-cell bg-primary text-white">
+                                    <div class="d-flex justify-content-start">
                                         {% for shift in filtered_shifts %}
                                             {% for date,venue in shift.items %}
                                                 {% if date == day %}
-                                            
-                                                    <div class="row">
-                                                        <div class="d-sm-block d-md-none">
+                                                        
                                                             <a data-bs-toggle="tooltip" data-bs-title="{{venue}}">
-                                                                <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 30px;">{{venue}}</span>
+                                                                <span class="mx-1 my-0 badge bg-danger d-inline-block"  style="width: 5px;"></span>
                                                             </a>
-                                                        </div>
-                                                        <div class="d-none d-md-block d-lg-none">
-                                                            <a data-bs-toggle="tooltip" data-bs-title="{{venue}}">
-                                                                <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 60px;">{{venue}}</span>
-                                                            </a>
-                                                        </div>
-                                                        <div class="d-none d-lg-block">
-                                                            <a data-bs-toggle="tooltip" data-bs-title="{{venue}}">
-                                                                <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 90px;">{{venue}}</span>
-                                                            </a>
-                                                        </div>   
-                                                    </div>
-
+                                                        
                                                 {% endif %}
-                                            {% endfor %}
+                                            {% endfor %}       
                                         {% endfor %}
-                                    </td>
+                                    </div>
+                                    <div>
+                                        <span>{{day.day}}</span>
+                                    </div>
+                                </div>
+    
+                            {% else %}
+                                {% if day.month == month %}
+                                    <div class="col-xs-1 grid-cell"><div><div><span>{{day.day}}</span></div></div></div>
                                 {% else %}
-                                    <td class="border">
-                                        {% if day.month == month %}
-                                            <h5>{{day.day}}</h5>
-                                        {% else %}
-                                            <h5>-</h5>
-                                        {% endif %}
-                                    </td>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>-</span></div></div></div>
                                 {% endif %}
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                            {% endif %}
 
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    
     </div>
 {% endblock %}

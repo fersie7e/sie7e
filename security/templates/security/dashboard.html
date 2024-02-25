@@ -16,139 +16,115 @@
         <div class="d-flex flex-column">
             <h1 class="display-4 fw-bold text-body-emphasis">Dashboard</h1>
             <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
-        </div>
-        <div class="d-sm-flex text-start justify-content-evenly">
-            <div>
-                <!-- CALENDAR -->
-                <div class="mt-3">
-                    <!-- CREATE CALENDAR -->
-                    <div class="mx-4 py-4 ">
-                        <div class="d-flex align-items-end justify-content-between">
-                                    <h4>{{monthtext}}</h4> 
-                                    <h5><small>{{year}}</small></h5>
-                        </div>
-                        <div class="d-flex text-end">
-                            {% for day in days %}
-                                <div class="p-1 flex-fill text-white"><h6 class="text-light">{{day}}</h6></div>
-                            {% endfor %}
-                        </div>
-                        {% for week in cal %}
-                            <div class="d-flex justify-content-between">
-                                {% for day in week %}
-                                    {% if day.month == month %}
-                                        <div class="p-1 flex-fill text-end"><a href="{% url 'dashboard' day %}"><h6>{{day.day}}</h6></a></div>
-                                    {% else %}
-                                        <div class="p-1 flex-fill text-end">-</div>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-            
-            
-        <!--Result divider-->
-        <table class="table">
-            <tbody>
-            <tr>
-                <td scope="col" class="text-start"><h3 class="display-5">Weekly Shifts</h3></td>
-            </tr>
-            </tbody>
-        </table>
 
-        <!-- ACORDION -->
+            
+        </div>
+        <br>
+        <h4 class="mt-5">{{venue.commercial_name}} - {{provider.name}}</h4>
         
-        <div class="accordion" id="accordionExample">
-            {%for venue in venues %}
-                {% for provider in providers %}
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="{{venue.pk}}{{provider.pk}}">
-                            {% if forloop.counter == 1 %}
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{venue.commercial_name}}{{provider.pk}}" aria-expanded="true" aria-controls="{{venue.commercial_name}}{{provider.pk}}">
-                            {% else %}
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{venue.commercial_name}}{{provider.pk}}" aria-expanded="false" aria-controls="{{venue.commercial_name}}{{provider.pk}}">
-                            {% endif %}
-                                    <h5>{{venue.commercial_name}} - {{provider.name}}</h5>
-                                </button>
-                        </h2>
-                        {% if forloop.counter == 1 %}
-                            <div id="{{venue.commercial_name}}{{provider.pk}}" class="accordion-collapse collapse show" aria-labelledby="{{venue.pk}}{{provider.pk}}" data-bs-parent="#accordionExample">
-                        {% else %}
-                            <div id="{{venue.commercial_name}}{{provider.pk}}" class="accordion-collapse collapse" aria-labelledby="{{venue.pk}}{{provider.pk}}" data-bs-parent="#accordionExample">
-                        {% endif %}
-                                <div class="accordion-body">
+        <div class="d-flex justify-content-center mb-5">
+            <div class="grid-calendar">
+                <div class="d-flex align-items-end justify-content-between mt-5">
+                    <h4>{{monthtext}}</h4> 
+                    <h5><small>{{year}}</small></h5>
+                </div>
+                <div class="row calendar-week-header">
+                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>M</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>W</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>F</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                </div>
 
-                                    <div class="card-wrapper d-flex flex-wrap justify-content-center">
-                                        {% for shift in shifts %}
-                                            {% if shift.venue == venue and shift.shift_provider == provider %}
-                                                <div class="card border-light m-3" style="max-width: 20rem;">
-                                                    <div class="card-header"></div>
-                                                    <div class="card-body text-start">
-                                                        <h4 class="card-title">{{shift.date}}</h4>
-                                                        <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.name}}</h6>
-                                                        <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.servicefee}}</h6>
-                                                        <hr>
-                                                        <br>
-                                                        {% for employee in shift.employees.values %}
-                                                            <ul class="list-group">
-                                                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                                    <strong>{{employee.first_name}} {{employee.last_name}}</strong>
-                                                                    {% if not shift.invoiced %}
-                                                                        <a href="{% url 'deleteemployeeshift' shift.id employee.id %}"><span class="badge bg-danger rounded-pill">X</span></a>
+                {% for week in cal %}
+                    <div class="row calendar-week">
+                        {% for day in week %}
+                            {% if day.month == month %}
+                                
+                                <div class="col-xs-1 grid-cell"><div><div><span><button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#shift{{day.day}}">{{day.day}}</button></span></div></div></div>
+                                {% for shift in shifts %}
+                                    {% if shift.date.day == day.day %}
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="shift{{day.day}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    
+                                                    <div class="modal-body">
+                                                        <div class="card border-light m-3">
+                                                            <div class="card-header"></div>
+                                                            <div class="card-body text-start">
+                                                                <h4 class="card-title">{{shift.date}}</h4>
+                                                                <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.name}}</h6>
+                                                                <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.servicefee}}</h6>
+                                                                <hr>
+                                                                <br>
+                                                                {% for employee in shift.employees.values %}
+                                                                    <ul class="list-group">
+                                                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                            <strong>{{employee.first_name}} {{employee.last_name}}</strong>
+                                                                            {% if not shift.invoiced %}
+                                                                                <a href="{% url 'deleteemployeeshift' shift.id employee.id %}"><span class="badge bg-danger rounded-pill">X</span></a>
+                                                                            {% endif %}
+                                                                        </li>                                                
+                                                                    </ul>
+                                                                    <br>
+                                                                    <hr>
+                                                                {% endfor %}
+                                                                {% if shift.invoiced %}
+                                                                    <h3>INVOICED</h3>
+                                                                {% else %}
+
+                                                                    {% if shift.service_provided %}
+                                                                        <form action="{% url 'addemployee' shift.id %}" method="post">
+                                                                            {% csrf_token %}
+                                                                            <div class="d-flex">
+                                                                                <select class="form-select" name="employee">
+                                                                                    {% for employee in employees.values %}
+                                                                                        {% if not employee in shift.employees.values and employee.provider_id == shift.shift_provider.id %}
+                                                                                            <option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>
+                                                                                        {% endif%}
+                                                                                    {% endfor %}
+                                                                                </select>
+                                                                                <button type="submit" class="btn btn-primary">Add</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    {% else %}
+                                                                        <form action="{% url 'setservice' shift.id %}" method="post">
+                                                                            {% csrf_token %}
+                                                                            <div class="d-flex">
+                                                                                <select class="form-select mb-3" name="service">
+                                                                                    {% for service in provider.services.values %}
+                                                                                        <option value="{{service.id}}">{{service.name}}</option>
+                                                                                    {% endfor %}
+                                                                                </select>
+                                                                                <button type="submit" class="btn btn-primary mb-4">Set</button>
+                                                                            </div>
+                                                                        </form>
                                                                     {% endif %}
-                                                                </li>                                                
-                                                            </ul>
-                                                            <br>
-                                                            <hr>
-                                                        {% endfor %}
-                                                        {% if shift.invoiced %}
-                                                            <h3>INVOICED</h3>
-                                                        {% else %}
 
-                                                            {% if shift.service_provided %}
-                                                                <form action="{% url 'addemployee' shift.id %}" method="post">
-                                                                    {% csrf_token %}
-                                                                    <div class="d-flex">
-                                                                        <select class="form-select" name="employee">
-                                                                            {% for employee in employees.values %}
-                                                                                {% if not employee in shift.employees.values and employee.provider_id == shift.shift_provider.id %}
-                                                                                    <option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>
-                                                                                {% endif%}
-                                                                            {% endfor %}
-                                                                        </select>
-                                                                        <button type="submit" class="btn btn-primary">Add</button>
-                                                                    </div>
-                                                                </form>
-                                                            {% else %}
-                                                                <form action="{% url 'setservice' shift.id %}" method="post">
-                                                                    {% csrf_token %}
-                                                                    <div class="d-flex">
-                                                                        <select class="form-select mb-3" name="service">
-                                                                            {% for service in provider.services.values %}
-                                                                                <option value="{{service.id}}">{{service.name}}</option>
-                                                                            {% endfor %}
-                                                                        </select>
-                                                                        <button type="submit" class="btn btn-primary mb-4">Set</button>
-                                                                    </div>
-                                                                </form>
-                                                            {% endif %}
-
-                                                        {% endif%}
+                                                                {% endif%}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                                
 
-                                </div>
-                            </div>
+                            {% else %}
+                                <div class="col-xs-1 grid-cell"><div><div><span>-</span></div></div></div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
-                {% endfor %}    
-            {% endfor %}    
-        </div>   
-     
+                {% endfor %}
+
+            </div>
+        </div>
+             
     </div>
     
 
