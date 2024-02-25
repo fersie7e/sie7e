@@ -50,17 +50,17 @@
                                                         {% if shift.shift_provider in providers %}
                                                             <div class="row">
                                                                 <div class="d-sm-block d-md-none">
-                                                                    <a href="{% url 'dashboard' shift.date %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                    <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
                                                                         <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 30px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
                                                                     </a>
                                                                 </div>
                                                                 <div class="d-none d-md-block d-lg-none">
-                                                                    <a href="{% url 'dashboard' shift.date %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                    <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
                                                                         <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 60px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
                                                                     </a>
                                                                 </div>
                                                                 <div class="d-none d-lg-block">
-                                                                    <a href="{% url 'dashboard' shift.date %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                    <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
                                                                         <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 100px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
                                                                     </a>
                                                                 </div>   
@@ -69,17 +69,17 @@
                                                     {% else %}
                                                         <div class="row">
                                                             <div class="d-sm-block d-md-none">
-                                                                <a href="{% url 'dashboard' shift.date %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
                                                                     <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 30px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
                                                                 </a>
                                                             </div>
                                                             <div class="d-none d-md-block d-lg-none">
-                                                                <a href="{% url 'dashboard' shift.date %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
                                                                     <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 60px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
                                                                 </a>
                                                             </div>
                                                             <div class="d-none d-lg-block">
-                                                                <a href="{% url 'dashboard' shift.date %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                                <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
                                                                     <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 100px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
                                                                 </a>
                                                             </div>   
@@ -88,17 +88,17 @@
                                                 {% elif request.user.is_superuser %}
                                                     <div class="row">
                                                         <div class="d-sm-block d-md-none">
-                                                            <a href="{% url 'dashboard' shift.date %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                            <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
                                                                 <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 30px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
                                                             </a>
                                                         </div>
                                                         <div class="d-none d-md-block d-lg-none">
-                                                            <a href="{% url 'dashboard' shift.date %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                            <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
                                                                 <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 60px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
                                                             </a>
                                                         </div>
                                                         <div class="d-none d-lg-block">
-                                                            <a href="{% url 'dashboard' shift.date %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
+                                                            <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
                                                                 <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 100px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
                                                             </a>
                                                         </div>   

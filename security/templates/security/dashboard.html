@@ -80,14 +80,16 @@
                                                                         <form action="{% url 'addemployee' shift.id %}" method="post">
                                                                             {% csrf_token %}
                                                                             <div class="d-flex">
-                                                                                <select class="form-select" name="employee">
+                                                                                <select id="select{{shift.pk}}" class="form-select reqrd" name="employee">
                                                                                     {% for employee in employees.values %}
                                                                                         {% if not employee in shift.employees.values and employee.provider_id == shift.shift_provider.id %}
                                                                                             <option value="{{employee.id}}">{{employee.first_name}} {{employee.last_name}}</option>
                                                                                         {% endif%}
                                                                                     {% endfor %}
                                                                                 </select>
-                                                                                <button type="submit" class="btn btn-primary">Add</button>
+                                                                                <button id="{{shift.pk}}" type="submit" class="btn btn-primary">Add</button>
+                                                                                
+                                            
                                                                             </div>
                                                                         </form>
                                                                     {% else %}
@@ -112,6 +114,7 @@
                                             </div>
                                         </div>
                                     {% endif %}
+                                    
                                 {% endfor %}
                                 
 
@@ -126,6 +129,22 @@
         </div>
              
     </div>
+    {% for shift in shifts %}
+    <script>
+        (function ($) {
+            $(document).ready(function() {
+                                                                                    
+                if( $('#select{{shift.pk}}').has('option').length == 0 ) { 
+                
+                    $('#{{shift.pk}}').prop('disabled', true);
+                } else {
+                    $('#{{shift.pk}}').removeAttr('disabled');
+                }
+            
+            });
+        })(jQuery);
+    </script>
+    {% endfor %}
     
 
 {% endblock %}

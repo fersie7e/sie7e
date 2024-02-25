@@ -45,13 +45,22 @@
                                 </select>
                             </div>
                         </div>
-            
-                        <label for="employee">Employee</label>
-                        <select class="form-select mb-3" name="employee">
-                            {% for employee in employees %}
-                                <option value="{{ employee.id }}">{{ employee }}</option>
-                            {% endfor %}
-                        </select>
+                        
+                        
+                        {% if request.user.is_superuser %}
+                            <label for="employee">Employee</label>
+                            <select class="form-select mb-3" name="employee">
+                                {% for employee in employees %}
+                                    <option value="{{ employee.id }}">{{ employee }}</option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            <select class="form-select mb-3" name="employee" hidden>
+                                {% for employee in employees %}
+                                    <option value="{{ employee.id }}">{{ employee }}</option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
                         <button type="submit" class="btn btn-primary my-3 w-100">Show</button>
                     </form>
                 </div>
