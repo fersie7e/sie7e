@@ -669,24 +669,23 @@ def wagesfilterpdf(request):
         "providers": providers_allowed,
     })
 
-def wagespdf(request):
+def wagespdf(request, month, year, provider_id):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
     providers_allowed = get_providers_allowed(request.user)
     if not providers_allowed:
         return HttpResponseRedirect(reverse("invoicefilter"))
     
-    provider = None
-    month = CURRENT_MONTH
-    year = CURRENT_YEAR
-    if request.method == "POST":
-        month = request.POST['month']
-        year = request.POST['year']
-        provider_id = request.POST['wages_provider']
-        provider = Provider.objects.get(pk=provider_id)
-        shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
-    else:
-        shifts = Shift.objects.filter(date__year=year, date__month=month)
+    provider = Provider.objects.get(pk=provider_id)
+    shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
+    #if request.method == "POST":
+    #    month = request.POST['month']
+    #    year = request.POST['year']
+    #    provider_id = request.POST['wages_provider']
+    #    provider = Provider.objects.get(pk=provider_id)
+    #    shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
+    #else:
+    #    shifts = Shift.objects.filter(date__year=year, date__month=month)
     result = calc_wages(shifts=shifts, providers=providers_allowed)
     wages = result
     total_wages = calc_total(wages=wages)
@@ -811,7 +810,7 @@ def wagesemployeefilter(request):
     })
 
 
-def wagesemployeepdf(request):
+def wagesemployeepdf(request, month, year, employee_id):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
     providers_allowed = get_providers_allowed(request.user)
@@ -819,11 +818,8 @@ def wagesemployeepdf(request):
         if not request.user.is_staff:
             return HttpResponseRedirect(reverse("invoicefilter"))
     
-    if request.method == "POST":
-        month = request.POST['month']
-        year = request.POST['year']
-        employee_id = request.POST['wages_employee']
-        employee = Employee.objects.get(pk=employee_id)
+    
+    employee = Employee.objects.get(pk=employee_id)
     shifts = Shift.objects.filter(date__year=year, date__month=month)
     worked_shifts = []
     total_wages = 0

@@ -23,104 +23,107 @@
         </div>
 
         <!-- CREATE CALENDAR -->
-        <div class="col-md-10 offset-md-1">
-            <table class="table align-middle mx-0 my-5">
-                <thead class="table-light">
-                    <tr>
-                        <th>Mon</th>
-                        <th>Tue</th>
-                        <th>Wed</th>
-                        <th>Thu</th>
-                        <th>Fri</th>
-                        <th>Sat</th>
-                        <th>Sun</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for week in cal %}
-                        <tr>
-                            {% for day in week %}
-                                {% if day in filtered_days %}
-                                    <td class="bg-primary border" style="--bs-bg-opacity: .1;">
-                                        <h5 class="p-0 m-0">{{day.day}}</h5>
+        <div class="d-flex justify-content-center mb-5">
+            <div class="grid-calendar">
+                <div class="d-flex align-items-end justify-content-between mt-5">
+                    <h4>{{monthtext}}</h4> 
+                    <h5><small>{{year}}</small></h5>
+                </div>
+                <div class="row calendar-week-header">
+                    <div class="col-xs-1 grid-cell"><div><div><span>M</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>W</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>F</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                </div>
+
+                {% for week in cal %}
+                    <div class="row calendar-week">
+                        {% for day in week %}
+                            {% if day in filtered_days %}
+                                <div class="col-xs-1 grid-cell">
+                                    <div class="d-flex justify-content-start">
                                         {% for shift in shifts %}
-                                            {% if shift.date == day %}
+                                            {% if shift.date == day and shift.employees.values %}
+                                                
                                                 {% if shift.invoiced and not request.user.is_superuser %}
                                                     {% if providers %}
                                                         {% if shift.shift_provider in providers %}
-                                                            <div class="row">
-                                                                <div class="d-sm-block d-md-none">
-                                                                    <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
-                                                                        <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 30px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
-                                                                    </a>
-                                                                </div>
-                                                                <div class="d-none d-md-block d-lg-none">
-                                                                    <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
-                                                                        <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 60px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
-                                                                    </a>
-                                                                </div>
-                                                                <div class="d-none d-lg-block">
-                                                                    <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
-                                                                        <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 100px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
-                                                                    </a>
-                                                                </div>   
-                                                            </div>
+                                                            <a data-bs-toggle="modal" data-bs-target="#shift{{day.day}}">
+                                                                <span class="mx-1 my-0 badge bg-danger d-inline-block"  style="width: 5px;"></span>
+                                                            </a>
                                                         {% endif %}
                                                     {% else %}
-                                                        <div class="row">
-                                                            <div class="d-sm-block d-md-none">
-                                                                <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
-                                                                    <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 30px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="d-none d-md-block d-lg-none">
-                                                                <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
-                                                                    <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 60px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
-                                                                </a>
-                                                            </div>
-                                                            <div class="d-none d-lg-block">
-                                                                <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
-                                                                    <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 100px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
-                                                                </a>
-                                                            </div>   
-                                                        </div>
+                                                        <a data-bs-toggle="modal" data-bs-target="#shift{{day.day}}">
+                                                            <span class="mx-1 my-0 badge bg-danger d-inline-block"  style="width: 5px;"></span>
+                                                        </a>
                                                     {% endif %}
                                                 {% elif request.user.is_superuser %}
-                                                    <div class="row">
-                                                        <div class="d-sm-block d-md-none">
-                                                            <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
-                                                                <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 30px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
-                                                            </a>
-                                                        </div>
-                                                        <div class="d-none d-md-block d-lg-none">
-                                                            <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
-                                                                <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 60px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
-                                                            </a>
-                                                        </div>
-                                                        <div class="d-none d-lg-block">
-                                                            <a href="{% url 'dashboard' shift.pk %}" data-bs-toggle="tooltip" data-bs-title="{{shift.shift_provider}}">
-                                                                <span class="badge rounded-pill bg-primary d-inline-block text-truncate"  style="max-width: 100px;">{{shift.employees.count}}: {{shift.shift_provider}}</span>
-                                                            </a>
-                                                        </div>   
-                                                    </div>
+                                                    <a data-bs-toggle="modal" data-bs-target="#shift{{day.day}}">
+                                                        <span class="mx-1 my-0 badge bg-danger d-inline-block"  style="width: 5px;"></span>
+                                                    </a>
                                                 {% endif %}
+                                               
+
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="shift{{day.day}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            
+                                                            <div class="modal-body">
+                                                                <div class="card border-light m-3">
+                                                                    <div class="card-header"></div>
+                                                                    <div class="card-body text-start">
+                                                                        <h4 class="card-title">{{shift.date}}</h4>
+                                                                        <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.name}}</h6>
+                                                                        <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.servicefee}}</h6>
+                                                                        <hr>
+                                                                        <br>
+                                                                        {% for employee in shift.employees.values %}
+                                                                            <ul class="list-group">
+                                                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                                    <strong>{{employee.first_name}} {{employee.last_name}}</strong>
+                                                                                </li>                                                
+                                                                            </ul>
+                                                                            <br>
+                                                                            <hr>
+                                                                        {% endfor %}
+
+                                                                        {% if shift.invoiced %}
+                                                                            <h3>INVOICED</h3>
+                                                                        {% endif%}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                            {% else %}
+                                                <div></div>
                                             {% endif%}
                                         {% endfor %}
-                                    </td>
+                                    </div>
+                                    <div>
+                                        <span>{{day.day}}</span>
+                                    </div>
+                                </div>
+                            
+                            {% else %}
+                                {% if day.month == month %}
+                                    <div class="col-xs-1 grid-cell"><div><div><span>{{day.day}}</span></div></div></div>
                                 {% else %}
-                                    <td class="border">
-                                        {% if day.month == month %}
-                                            <h5>{{day.day}}</h5>
-                                        {% else %}
-                                            <h5>-</h5>
-                                        {% endif %}
-                                    </td>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>-</span></div></div></div>
                                 {% endif %}
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            {% endif %}
+
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
         </div>
 
     </div>

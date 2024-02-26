@@ -17,18 +17,13 @@
             <div class="d-flex flex-column mt-5">
                 <h1 class="display-4 fw-bold text-body-emphasis">{{employee}}</h1>
                 <h1 class="display-4"><i class="bi bi-cash-coin"></i></h1>
-                <small>Amount of shifts: {{total_shifts}}</small>
+                <h3 class="display-6 fw-bold text-body-emphasis"> Period: {{month}} / {{year}}</h3>
                 <h3 class="display-6 fw-bold text-body-emphasis"> Total wages: <strong>{{total_wages}} €</strong></h3>
+                <small>Amount of shifts: {{total_shifts}}</small>
+                <a href="{% url 'wagesemployeepdf' month year employee.pk %}"><button class="btn btn-primary">Generate PDF</button></a>
             </div>
         </div>
 
-        <table class="table">
-            <tbody>
-            <tr>
-                <td scope="col" class="text-start">Shifts on <strong>{{month}} / {{year}}</strong></td>
-            </tr>
-            </tbody>
-        </table>
         
         <div class="row">
             <div class="col-sm-8 offset-sm-2 table-responsive my-4 py-4">

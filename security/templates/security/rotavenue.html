@@ -45,20 +45,22 @@
                                 </select>
                             </div>
                         </div>
-                        {% if request.user.is_superuser %}
-                            <label for="venue">Venue</label>
-                            <select class="form-select mb-3" name="venue">
-                                {% for venue in venues %}
-                                    <option value="{{ venue.id }}">{{ venue }}</option>
-                                {% endfor %}
-                            </select>
-                        {% else %}
-                            <select class="form-select mb-3" name="venue" hidden>
-                                {% for venue in venues %}
-                                    <option value="{{ venue.id }}">{{ venue }}</option>
-                                {% endfor %}
-                            </select>
-                        {% endif %}
+                        {% for group in request.user.groups.all %}
+                            {% if group.name == "providers" %}
+                                <label for="venue">Venue</label>
+                                <select class="form-select mb-3" name="venue">
+                                    {% for venue in venues %}
+                                        <option value="{{ venue.id }}">{{ venue }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <select class="form-select mb-3" name="venue" hidden>
+                                    {% for venue in venues %}
+                                        <option value="{{ venue.id }}">{{ venue }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        {% endfor %}
                         <button type="submit" class="btn btn-primary w-100 my-3">Show</button>
                     </form>
                 </div>

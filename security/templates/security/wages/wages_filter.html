@@ -45,13 +45,20 @@
                                 </select>
                             </div>
                         </div>
-
-                        <label for="wages_provider">Provider</label>
-                        <select class="form-select mb-1" name="wages_provider">
-                            {% for provider in providers %}
-                                <option value="{{ provider.id }}">{{ provider.name }}</option>
-                            {% endfor %}
-                        </select>
+                        {% if request.user.is_superuser %}
+                            <label for="wages_provider">Provider</label>
+                            <select class="form-select mb-1" name="wages_provider">
+                                {% for provider in providers %}
+                                    <option value="{{ provider.id }}">{{ provider.name }}</option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            <select class="form-select mb-1" name="wages_provider" hidden>
+                                {% for provider in providers %}
+                                    <option value="{{ provider.id }}">{{ provider.name }}</option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
 
                         <button type="submit" class="btn btn-primary mt-3 w-100">Search</button>     
                     </form>

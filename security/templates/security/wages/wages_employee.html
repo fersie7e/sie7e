@@ -45,13 +45,22 @@
                                 </select>
                             </div>
                         </div>
-
-                        <label for="wages_employee">Employee</label>
-                        <select class="form-select mb-1" name="wages_employee">
-                            {% for employee in employees %}
-                                <option value="{{ employee.id }}">{{ employee.first_name }} {{employee.last_name}}</option>
-                            {% endfor %}
-                        </select>
+                        {% for group in request.user.groups.all %}
+                            {% if group.name == "providers" %}
+                                <label for="wages_employee">Employee</label>
+                                <select class="form-select mb-1" name="wages_employee">
+                                    {% for employee in employees %}
+                                        <option value="{{ employee.id }}">{{ employee.first_name }} {{employee.last_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <select class="form-select mb-1" name="wages_employee" hidden>
+                                    {% for employee in employees %}
+                                        <option value="{{ employee.id }}">{{ employee.first_name }} {{employee.last_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        {% endfor %}
                         <button type="submit" class="btn btn-primary mt-3 w-100">Search</button>        
                     </form>
                 </div>
