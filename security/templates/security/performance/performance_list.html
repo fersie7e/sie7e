@@ -1,0 +1,193 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+
+<script>
+    {% block jquery %}
+    var endpoint = '/security/performance/data/{{year}}/{{provider_id}}'
+    var defaultData = []
+    var labels = [];
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function(data){
+            labels = data.labels
+            defaultData = data.default
+            setChart()
+        },
+        error: function(error_data){
+            console.log("error")
+            console.log(error_data)
+        }
+    })
+    
+    function setChart(){
+        var ctx = document.getElementById("myChart");
+        var ctx2 = document.getElementById("myChart2");
+        var myChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '# of Votes',
+                data: defaultData,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+    
+        var myChart = new Chart(ctx, {
+        type: 'polarArea',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '# of Votes',
+                data: defaultData,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+    }
+    // var ctx = document.getElementById("myChart");
+    
+    
+    {% endblock %}
+    </script>
+    
+    <div class="row h-100">
+
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Performances</li>
+            </ol>
+        </nav>
+        
+        <table class="table">
+            <tbody>
+            <tr>
+                <td scope="col" class="text-start"><h3 class="display-5">Financial performance</h3></td>
+            </tr>
+            </tbody>
+        </table>
+        <h5>{{provider}} - {{year}}</h5>
+
+        <br>
+
+        
+        <div class="d-flex flex-wrap justify-content-center my-2 py-2">
+
+            <div class="row">
+                <div class="col">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th class="text-start" scope="col">Date</th>
+                            <th scope="col">Company</th>
+                            <th scope="col">Income</th>
+                            <th scope="col">Wages</th>
+                            <th scope="col">Ss</th>
+                            <th scope="col">Irpf</th>
+                            <th scope="col">Gestoria</th>
+                            <th scope="col">Balance</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for performance, balance in performances.items %}
+                            <tr>
+                                <td class="text-start">{{performance.month}}/{{performance.year}}</td>
+                                <td>{{performance.performance_provider}}</td>
+                                <td>{{balance.0}} €</td>
+                                <td>{{balance.1}} €</td>
+                                <td>{{balance.2}} €</td>
+                                <td>{{balance.3}} €</td>
+                                <td>{{balance.4}} €</td>
+                                <td>{{balance.5}} €</td>
+
+                                <td class="text-end"><a href="{% url 'performance-update' performance.pk %}" class="btn btn-primary">Update</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <td class="text-start"></td>
+                            <td></td>
+                            <td><strong>{{totals.0}} €</strong></td>
+                            <td><strong>{{totals.1}} €</strong></td>
+                            <td><strong>{{totals.2}} €</strong></td>
+                            <td><strong>{{totals.3}} €</strong></td>
+                            <td><strong>{{totals.4}} €</strong></td>
+                            <td><strong>{{totals.5}} €</strong></td>
+                        </tfoot>
+                    </table>
+                </div>
+            </div> 
+            
+              
+        </div> 
+        <div class="row">
+            <div class='col-sm-3 offset-sm-2'>
+                <canvas id="myChart" width="400" height="400"></canvas>
+            </div>
+            <div class='col-sm-3 offset-sm-2'>
+                <canvas id="myChart2" width="400" height="400"></canvas>
+            </div>
+        </div>
+        
+
+    </div>
+{% endblock %}

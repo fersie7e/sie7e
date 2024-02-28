@@ -1,15 +1,21 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.urls import reverse
 from django.template.loader import render_to_string
+
 
 from weasyprint import HTML
 from weasyprint.text.fonts import FontConfiguration
 
-from .models import Venue, Shift, Employee, Provider, Service, Invoice, Fee
+from .models import Venue, Shift, Employee, Provider, Service, Invoice, Fee, Performance
 from .forms import ShiftForm
 import calendar
 import datetime
+
+from django.views.generic import View
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 # Constants declaration
 YEARS_CHOICE = []
@@ -195,8 +201,15 @@ def group_list(list, num):
         end += num
     return grouped_list
 
-    
 
+def get_expenses(invoice_id):
+    invoice = Invoice.objects.get(pk=invoice_id)
+    shifts = Shift.objects.filter(invoice=invoice)
+    expenses = 0
+    for shift in shifts:
+        expenses += shift.employees.count() * shift.service_provided.servicefee.salary
+        
+    return expenses
 
 # Views
 def index(request):
@@ -458,26 +471,43 @@ def invoiceGen(request):
         provider_id = request.POST['invoice_provider']
         venue = Venue.objects.get(pk=venue_id)
         provider = Provider.objects.get(pk=provider_id)
-        invoice = Invoice(invoice_venue=venue,
-                          invoice_provider=provider,
-                          month=month,
-                          year=year
-                          )
-        invoice.save()
-        shifts = Shift.objects.filter(venue=venue, shift_provider=provider, date__year=year, date__month=month, invoiced=False)
+        
+        shifts = Shift.objects.filter(venue=venue, shift_provider=provider, date__year=year, date__month=month, invoiced=False, employees__isnull=False)
+
+        if shifts:
+            performance = Performance.objects.filter(performance_provider=provider, month=month, year=year)
+            if not performance:
+                performance = Performance(performance_provider=provider, month=month, year=year)
+                performance.save()
+            else:
+                performance = Performance.objects.get(performance_provider=provider, month=month, year=year)
+            invoice = Invoice(performance=performance,
+                              invoice_venue=venue,
+                              invoice_provider=provider,
+                              month=month,
+                              year=year
+                            )
+            invoice.save()
+        else:
+            return HttpResponseRedirect(reverse("invoicegen"))
+
         for shift in shifts:
             working_number = shift.employees.count()
-            if not shift.service_provided:
+            if not shift.service_provided or not working_number:
                 continue
             fee = shift.service_provided.servicefee.fee
             total_shift = working_number * fee
             amount = amount + total_shift
             invoice.amount = amount
-            invoice.shifts.add(shift)
             invoice.save()
             shift.invoiced = True
-            shift.invoice_num = invoice.pk
+            shift.invoice = invoice
             shift.save()
+        if performance.income:
+            performance.income += amount
+        else:
+            performance.income = amount
+        performance.save()
         success = True
     
     return render(request, 'security/invoices/invoice_gen.html', {
@@ -567,11 +597,13 @@ def invoicedetail(request, invoice_id):
         return HttpResponseRedirect(reverse("login"))
     
     invoice = Invoice.objects.get(pk=invoice_id)
-    total_shifts = total_month_shifts(invoice.shifts.all())
+    shifts = Shift.objects.filter(invoice=invoice)
+    total_shifts = total_month_shifts(shifts)
     
     
     return render(request, 'security/invoices/invoice_detail.html', {
         "invoice": invoice,
+        "shifts": shifts,
         "total_shifts": total_shifts,
     })
 
@@ -1035,3 +1067,185 @@ def rotavdisplay(request):
         "days": DAYS,
         "set": set,
     })
+
+class ChartView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'security/performance/performance.html')
+
+
+class ChartData(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, year, provider_id, format=None):
+        labels = []
+        default_items = []
+        provider = Provider.objects.get(pk=provider_id)
+        performances = Performance.objects.filter(year=year, performance_provider=provider)
+        performance_dict = get_performance_dict(performances)
+        for perf, values in performance_dict.items():
+            month =  MONTHS.get(str(perf.month))
+            labels.append(month)
+            default_items.append(values[5])
+        
+        data = {
+                "labels": labels,
+                "default": default_items,
+        }
+    
+        return Response(data)
+
+def performance_filter(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    year = CURRENT_YEAR
+    
+    return render(request, 'security/performance/performance_filter.html', {
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "providers": providers_allowed,
+    })
+
+
+def performance_list(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+
+    if request.method == "POST":
+        year = int(request.POST["year"])
+        provider_id = request.POST["provider"]
+        provider = Provider.objects.get(pk=provider_id)
+        performances = Performance.objects.filter(year=year, performance_provider=provider)
+    
+    performance_dict = get_performance_dict(performances)
+    totals = get_totals_performances(performance_dict)    
+
+    return render(request, 'security/performance/performance_list.html', {
+        "performances": performance_dict,
+        "provider_id": provider_id,
+        "year": year,
+        "provider": provider,
+        "totals": totals,
+    })
+
+
+def performance_update(request, performance_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    performance = Performance.objects.get(pk=performance_id)
+    performances = []
+    performances.append(performance)
+
+    performance_dict = get_performance_dict(performances)
+
+    income = performance_dict[performance][0]
+    wages = performance_dict[performance][1]
+    ss = performance.ss
+    irpf = performance.irpf
+    gestoria = performance.gestoria
+
+    if request.method == "POST":
+        ss= float(request.POST["ss"])
+        irpf= float(request.POST["irpf"])
+        gestoria= float(request.POST["gestoria"])
+        performance.ss = ss
+        performance.irpf = irpf
+        performance.gestoria = gestoria
+        performance.save()
+        performances = Performance.objects.filter(year=performance.year, performance_provider=performance.performance_provider)
+        performance_dict = get_performance_dict(performances)
+        totals = get_totals_performances(performance_dict)
+        return render(request, 'security/performance/performance_list.html', {
+            "performances": performance_dict,
+            "year": performance.year,
+            "provider": performance.performance_provider,
+            "totals": totals,
+        })
+
+          
+    return render(request, 'security/performance/performance_update.html', {
+        "performance_id": performance_id,
+        "performance":performance,
+        
+        "income": income,
+        "wages": wages,
+        "ss": ss,
+        "irpf": irpf,
+        "gestoria": gestoria,
+
+    })
+
+    
+       
+    
+
+
+def get_performance_dict(performances):
+    income = 0
+    wages = 0
+    performance_dict = {}
+
+    for performance in performances:
+        invoices = Invoice.objects.filter(performance=performance)
+        for invoice in invoices:
+            income += invoice.amount
+            wages += get_expenses(invoice.pk)
+        
+        if performance.ss:    
+            ss = float(performance.ss)
+        else:
+            ss = 0
+            
+        if performance.irpf:
+            irpf = float(performance.irpf)
+        else:
+            irpf = 0
+
+        if performance.gestoria:
+            gestoria = float(performance.gestoria)
+        else:
+            gestoria = 0
+
+        balance = income - wages - ss - irpf - gestoria
+        performance_dict[performance] = [income, wages, ss, irpf, gestoria, balance]
+        income = 0
+        wages = 0
+        ss = 0
+        irpf = 0
+        gestoria = 0
+        balance = 0
+        
+    return performance_dict
+
+def get_totals_performances(performance_dict):
+    income_total = 0
+    wages_total = 0
+    ss_total = 0
+    irpf_total = 0
+    gestoria_total = 0
+    balance_total = 0
+    for perf, numbers in performance_dict.items():
+        income_total += numbers[0]
+        wages_total += numbers[1]
+        ss_total += numbers[2]
+        irpf_total += numbers[3]
+        gestoria_total += numbers[4]
+        balance_total += numbers[5]
+    totals =[income_total, wages_total, ss_total, irpf_total, gestoria_total, balance_total]
+    return totals
+
+    
+        
+        

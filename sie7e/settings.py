@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'users',
     'security',
     'portfolio',
+    "rest_framework",
 ]
 
 MIDDLEWARE = [

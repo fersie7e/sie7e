@@ -1,0 +1,55 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row h-100">
+
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'performance-filter' %}">Financial-performance</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Update</li>
+            </ol>
+        </nav>
+
+        <!--Header-->
+
+        <div class="masthead">
+            <div class="d-flex flex-column header">
+                <h1 class="display-4 fw-bold text-body-emphasis">Update financial data</h1>
+                <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+                <h5>Update expenses :{{performance.performance_provider}}:  {{performance.month}} - {{performance.year}}</h5>
+            </div>
+        </div>
+
+        <!--Info section-->
+        <div class="d-sm-flex text-start justify-content-evenly">
+            <div>
+                <div class="d-flex justify-content-center pb-5 ">
+                    <form action="{% url 'performance-update' performance_id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{performance}}" class="form-control" id="id"  name="id">
+
+                        <label for="income" class="form-label">income</label>
+                        <input type="number"  value="{{income}}" class="form-control mb-2" id="income"  name="income" placeholder="Income" disabled>
+
+                        <label for="wages" class="form-label">Wages</label>
+                        <input type="number"  value="{{wages}}" class="form-control mb-2" id="wages"  name="wages" placeholder="Wages" disabled>
+                    
+                        <label for="ss" class="form-label">S.S.</label>
+                        <input type="number" value="{{ss}}" class="form-control mb-2" id="ss"  name="ss" placeholder="Social security" step=".01">
+                    
+                        <label for="irpf" class="form-label">Irpf</label>
+                        <input type="number" value="{{irpf}}" class="form-control mb-2" id="irpf"  name="irpf" placeholder="Irpf" step=".01">
+
+                        <label for="gestoria" class="form-label">Gestoria</label>
+                        <input type="number" value="{{gestoria}}" class="form-control mb-2" id="gestoria"  name="gestoria" placeholder="gestoria" step=".01">
+
+                        <button type="submit" class="btn btn-primary mt-3 w-100">Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+{% endblock %}

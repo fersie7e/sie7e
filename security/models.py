@@ -63,6 +63,32 @@ class Employee(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+class Performance(models.Model):
+    performance_provider = models.ForeignKey(Provider, on_delete=models.PROTECT, related_name="performance_provider")
+    month = models.PositiveIntegerField()
+    year = models.PositiveIntegerField(default=0)
+    income = models.FloatField(null=True)
+    ss = models.FloatField(null=True)
+    irpf = models.FloatField(null=True)
+    gestoria = models.FloatField(null=True)
+
+    class Meta:
+        unique_together = ('performance_provider', 'month', 'year',)
+
+    def __str__(self) -> str:
+        return f"{self.performance_provider} - {self.month}"
+
+class Invoice(models.Model):
+    performance = models.ForeignKey(Performance, on_delete=models.SET_NULL, null=True, related_name="performance")
+    invoice_venue = models.ForeignKey(Venue, on_delete=models.PROTECT, related_name="invoice_venue")
+    invoice_provider = models.ForeignKey(Provider, on_delete=models.PROTECT, related_name="invoice_provider")
+    month = models.PositiveIntegerField()
+    year = models.PositiveIntegerField()
+    amount = models.FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.month}/{self.year}: {self.invoice_venue} - {self.invoice_provider} Total: {self.amount} €"
+
 class Shift(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.PROTECT, related_name="venue")
     date = models.DateField()
@@ -70,20 +96,15 @@ class Shift(models.Model):
     shift_provider = models.ForeignKey(Provider, on_delete=models.SET_NULL, null=True, related_name="shift_provider")
     service_provided = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, related_name="service_provided")
     invoiced = models.BooleanField(default=False)
-    invoice_num = models.IntegerField(null=True)
+    invoice= models.ForeignKey(Invoice, on_delete=models.SET_NULL, null=True, related_name="service_provided")
 
     def __str__(self):
         return f"{self.pk} - {self.date} - {self.venue}"
 
 
-class Invoice(models.Model):
-    invoice_venue = models.ForeignKey(Venue, on_delete=models.PROTECT, related_name="invoice_venue")
-    invoice_provider = models.ForeignKey(Provider, on_delete=models.PROTECT, related_name="invoice_provider")
-    month = models.PositiveIntegerField()
-    year = models.PositiveIntegerField()
-    shifts = models.ManyToManyField(Shift, blank=True ,related_name="shifts")
-    amount = models.FloatField(default=0)
 
-    def __str__(self):
-        return f"{self.month}/{self.year}: {self.invoice_venue} - {self.invoice_provider} Total: {self.amount} €"
+    
+
+
+    
 

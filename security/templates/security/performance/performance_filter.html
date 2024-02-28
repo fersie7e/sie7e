@@ -1,0 +1,63 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row h-100">
+
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Financial-performance</li>
+            </ol>
+        </nav>
+
+        <!--Header-->
+        <div class="masthead1">
+            <div class="d-flex flex-column header">
+                <h1 class="display-4 fw-bold text-body-emphasis">Financial Performance</h1>
+                <h1 class="display-4"><i class="bi bi-cash-coin"></i></h1>
+                <h5>Fill the form for the financial analysis</h5>
+            </div>
+        </div>
+
+        <!--Info section-->
+        <div class="d-sm-flex text-start justify-content-evenly">
+            <div>
+                <div class="d-flex justify-content-center pb-5 ">
+                    <form action="{% url 'performance-list' %}" method="post">
+                        {% csrf_token %}
+                       
+                     
+                        <label for="year">Year</label>
+                        <select class="form-select mb-3" name="year">
+                            {% for year in year_choice %}
+                                <option value="{{ year }}">{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                            
+                     
+                        {% if request.user.is_superuser %}
+                            <label for="wages_provider">Provider</label>
+                            <select class="form-select mb-1" name="provider">
+                                {% for provider in providers %}
+                                    <option value="{{ provider.id }}">{{ provider.name }}</option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            <select class="form-select mb-1" name="provider" hidden>
+                                {% for provider in providers %}
+                                    <option value="{{ provider.id }}">{{ provider.name }}</option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
+
+                        <button type="submit" class="btn btn-primary mt-3 w-100">Search</button>     
+                    </form>
+                </div>
+            </div>
+        </div>
+                  
+    </div>
+    
+
+{% endblock %}

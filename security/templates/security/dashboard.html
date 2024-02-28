@@ -77,7 +77,7 @@
                                                                 {% else %}
 
                                                                     {% if shift.service_provided %}
-                                                                        <form action="{% url 'addemployee' shift.id %}" method="post">
+                                                                        <form action="{% url 'addemployee' shift.id %}" method="post" onsubmit="this.submit_button.disabled = true;">
                                                                             {% csrf_token %}
                                                                             <div class="d-flex">
                                                                                 <select id="select{{shift.pk}}" class="form-select reqrd" name="employee">
@@ -93,7 +93,7 @@
                                                                             </div>
                                                                         </form>
                                                                     {% else %}
-                                                                        <form action="{% url 'setservice' shift.id %}" method="post">
+                                                                        <form action="{% url 'setservice' shift.id %}" method="post" onsubmit="this.submit_button.disabled = true;">
                                                                             {% csrf_token %}
                                                                             <div class="d-flex">
                                                                                 <select class="form-select mb-3" name="service">

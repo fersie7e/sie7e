@@ -58,7 +58,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for shift in invoice.shifts.all %}
+                    {% for shift in shifts.all %}
                         <tr>
                             <td class="text-start">{{shift.date}}</td>
                             <td>{{shift.employees.count}}</td>

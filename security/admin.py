@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Venue, Employee, Shift, Provider, Fee, Service, Invoice
+from .models import Venue, Employee, Shift, Provider, Fee, Service, Invoice, Performance
 
 # Register your models here.
 
@@ -21,8 +21,7 @@ class ProviderAdmin(admin.ModelAdmin):
     filter_horizontal = ("services", "users")
 
 
-class InvoiceAdmin(admin.ModelAdmin):
-    filter_horizontal = ("shifts",)
+
 
 
 admin.site.register(Venue, VenueAdmin)
@@ -31,4 +30,5 @@ admin.site.register(Shift, ShiftAdmin)
 admin.site.register(Provider, ProviderAdmin)
 admin.site.register(Fee)
 admin.site.register(Service)
-admin.site.register(Invoice, InvoiceAdmin)
+admin.site.register(Invoice)
+admin.site.register(Performance)
