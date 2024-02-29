@@ -1126,7 +1126,7 @@ def performance_list(request):
         year = int(request.POST["year"])
         provider_id = request.POST["provider"]
         provider = Provider.objects.get(pk=provider_id)
-        performances = Performance.objects.filter(year=year, performance_provider=provider)
+        performances = Performance.objects.filter(year=year, performance_provider=provider).order_by('month')
     
     performance_dict = get_performance_dict(performances)
     totals = get_totals_performances(performance_dict)    
