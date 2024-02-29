@@ -1089,7 +1089,7 @@ class ChartData(APIView):
         for perf, values in performance_dict.items():
             month =  MONTHS.get(str(perf.month))
             labels.append(month)
-            default_items.append(values[5])
+            default_items.append(values[7])
         
         data = {
                 "labels": labels,
