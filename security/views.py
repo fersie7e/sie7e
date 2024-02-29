@@ -464,6 +464,7 @@ def invoiceGen(request):
     
     amount = 0
     success = False
+    shifts = []
     if request.method == "POST":
         month = request.POST['month']
         year = request.POST['year']
@@ -472,7 +473,7 @@ def invoiceGen(request):
         venue = Venue.objects.get(pk=venue_id)
         provider = Provider.objects.get(pk=provider_id)
         
-        shifts = Shift.objects.filter(venue=venue, shift_provider=provider, date__year=year, date__month=month, invoiced=False, employees__isnull=False)
+        shifts = Shift.objects.filter(venue=venue, shift_provider=provider, date__year=year, date__month=month)
 
         if shifts:
             performance = Performance.objects.filter(performance_provider=provider, month=month, year=year)
@@ -481,6 +482,7 @@ def invoiceGen(request):
                 performance.save()
             else:
                 performance = Performance.objects.get(performance_provider=provider, month=month, year=year)
+            
             invoice = Invoice(performance=performance,
                               invoice_venue=venue,
                               invoice_provider=provider,
@@ -497,12 +499,12 @@ def invoiceGen(request):
                 continue
             fee = shift.service_provided.servicefee.fee
             total_shift = working_number * fee
-            amount = amount + total_shift
-            invoice.amount = amount
-            invoice.save()
+            amount += total_shift
             shift.invoiced = True
             shift.invoice = invoice
             shift.save()
+        invoice.amount = amount
+        invoice.save()
         if performance.income:
             performance.income += amount
         else:
@@ -516,6 +518,7 @@ def invoiceGen(request):
         "months": MONTHS,
         "year_choice": YEARS_CHOICE,
         "success": success,
+        "shifts": shifts,
     })
 
 
@@ -1248,4 +1251,10 @@ def get_totals_performances(performance_dict):
 
     
         
-        
+def uninvoiceall(request):
+    shifts = Shift.objects.all()
+    for shift in shifts:
+        shift.invoiced = False
+        shift.save()
+    
+    return render(request, 'security/index.html')

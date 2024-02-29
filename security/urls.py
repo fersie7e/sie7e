@@ -33,4 +33,5 @@ urlpatterns = [
     path("performance/update/<int:performance_id>", views.performance_update, name="performance-update"),
     path("performance/", views.ChartView.as_view(), name="performance"),
     path("performance/data/<int:year>/<int:provider_id>", views.ChartData.as_view()),
+    path("uninvoiceall", views.uninvoiceall, name="uninvoiceall"),
 ]

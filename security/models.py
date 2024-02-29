@@ -99,7 +99,7 @@ class Shift(models.Model):
     invoice= models.ForeignKey(Invoice, on_delete=models.SET_NULL, null=True, related_name="service_provided")
 
     def __str__(self):
-        return f"{self.pk} - {self.date} - {self.venue}"
+        return f"{self.pk} - {self.date} - {self.venue} - {self.invoiced}"
 
 
 
