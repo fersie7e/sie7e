@@ -1084,7 +1084,7 @@ class ChartData(APIView):
         labels = []
         default_items = []
         provider = Provider.objects.get(pk=provider_id)
-        performances = Performance.objects.filter(year=year, performance_provider=provider)
+        performances = Performance.objects.filter(year=year, performance_provider=provider).order_by('month')
         performance_dict = get_performance_dict(performances)
         for perf, values in performance_dict.items():
             month =  MONTHS.get(str(perf.month))
