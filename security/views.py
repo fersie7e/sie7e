@@ -1167,11 +1167,12 @@ def performance_update(request, performance_id):
         performance.irpf = irpf
         performance.gestoria = gestoria
         performance.save()
-        performances = Performance.objects.filter(year=performance.year, performance_provider=performance.performance_provider)
+        performances = Performance.objects.filter(year=performance.year, performance_provider=performance.performance_provider).order_by('month')
         performance_dict = get_performance_dict(performances)
         totals = get_totals_performances(performance_dict)
         return render(request, 'security/performance/performance_list.html', {
             "performances": performance_dict,
+            "provider_id": performance.performance_provider.pk,
             "year": performance.year,
             "provider": performance.performance_provider,
             "totals": totals,
