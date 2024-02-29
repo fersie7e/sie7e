@@ -1245,14 +1245,14 @@ def get_totals_performances(performance_dict):
     impuesto_total = 0
     resultado_total = 0
     for perf, numbers in performance_dict.items():
-        income_total += numbers[0]
-        wages_total += numbers[1]
-        ss_total += numbers[2]
-        irpf_total += numbers[3]
-        gestoria_total += numbers[4]
-        balance_total += numbers[5]
-        impuesto_total += numbers[6]
-        resultado_total += numbers[7]
+        income_total += round(numbers[0],2)
+        wages_total += round(numbers[1],2)
+        ss_total += round(numbers[2],2)
+        irpf_total += round(numbers[3],2)
+        gestoria_total += round(numbers[4],2)
+        balance_total += round(numbers[5],2)
+        impuesto_total += round(numbers[6],2)
+        resultado_total += round(numbers[7],2)
     totals =[income_total, wages_total, ss_total, irpf_total, gestoria_total, balance_total, impuesto_total, resultado_total]
     return totals
 
