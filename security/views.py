@@ -1208,23 +1208,23 @@ def get_performance_dict(performances):
             wages += get_expenses(invoice.pk)
         
         if performance.ss:    
-            ss = float(performance.ss)
+            ss = round(float(performance.ss),2)
         else:
             ss = 0
             
         if performance.irpf:
-            irpf = float(performance.irpf)
+            irpf = round(float(performance.irpf),2)
         else:
             irpf = 0
 
         if performance.gestoria:
-            gestoria = float(performance.gestoria)
+            gestoria = round(float(performance.gestoria),2)
         else:
             gestoria = 0
 
         balance = income - wages - ss - irpf - gestoria
-        impuesto = balance * 0.25
-        resultado = balance - impuesto
+        impuesto = round(balance * 0.25,2)
+        resultado = round(balance - impuesto,2)
         performance_dict[performance] = [income, wages, ss, irpf, gestoria, balance, impuesto, resultado]
         income = 0
         wages = 0
