@@ -143,6 +143,8 @@
                             <th scope="col">Irpf</th>
                             <th scope="col">Gestoria</th>
                             <th scope="col">Balance</th>
+                            <th scope="col">I.S.</th>
+                            <th scope="col">Resultado</th>
                             <th></th>
                         </tr>
                         </thead>
@@ -157,6 +159,8 @@
                                 <td>{{balance.3}}€</td>
                                 <td>{{balance.4}}€</td>
                                 <td>{{balance.5}}€</td>
+                                <td>{{balance.6}}€</td>
+                                <td>{{balance.7}}€</td>
         
                                 <td class="text-end"><a href="{% url 'performance-update' performance.pk %}" class="btn btn-primary">Update</a></td>
                             </tr>
@@ -171,6 +175,8 @@
                             <td><strong>{{totals.3}}€</strong></td>
                             <td><strong>{{totals.4}}€</strong></td>
                             <td><strong>{{totals.5}}€</strong></td>
+                            <td><strong>{{totals.6}}€</strong></td>
+                            <td><strong>{{totals.7}}€</strong></td>
                         </tfoot>
                     </table>
                 </div>
