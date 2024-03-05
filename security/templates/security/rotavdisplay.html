@@ -1,6 +1,74 @@
 {% extends 'security/layoutmain.html' %}
 {% load static %}
 {% block body %}
+
+<script>
+    {% block jquery %}
+    var endpoint = '/security/rotavenue/data/{{month}}/{{year}}/{{venue.pk}}'
+    var defaultData = []
+    var labels = [];
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function(data){
+            labels = data.labels
+            defaultData = data.default
+            setChart()
+        },
+        error: function(error_data){
+            console.log("error")
+            console.log(error_data)
+        }
+    })
+    
+    function setChart(){
+        var ctx = document.getElementById("myChart");
+        
+    
+        var myChart = new Chart(ctx, {
+        type: 'polarArea',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: labels,
+                data: defaultData,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+    }
+    // var ctx = document.getElementById("myChart");
+    
+    
+    {% endblock %}
+    </script>
     
     <div class="row h-100">
 
@@ -12,120 +80,229 @@
             </ol>
         </nav>
 
-       
-        <div>
-            <div class="d-flex flex-column mt-5">
+        <div class="d-flex justify-content-center mb-3">
+            <div class="d-flex flex-column mt-">
                 <h1 class="display-4 fw-bold text-body-emphasis">{{venue}}</h1>
                 <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
-                <h5>{{monthtext}}, {{year}} {{venue}}</h5>
-                <h3 class="display-6 fw-bold text-body-emphasis"> Total shifts: {{total_shifts}}</h3>
+                <h5>{{monthtext}}, {{year}}</h5>
+                <h5 class="fw-bold text-body-emphasis"> Total shifts: {{total_shifts}}</h5>
             </div>
         </div>
 
-        <!-- CREATE CALENDAR -->
-        <div class="d-flex justify-content-center mb-5">
-            <div class="grid-calendar">
-                <div class="d-flex align-items-end justify-content-between mt-5">
-                    <h4>{{monthtext}}</h4> 
-                    <h5><small>{{year}}</small></h5>
-                </div>
-                <div class="row calendar-week-header">
-                    <div class="col-xs-1 grid-cell"><div><div><span>M</span></div></div></div>
-                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
-                    <div class="col-xs-1 grid-cell"><div><div><span>W</span></div></div></div>
-                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
-                    <div class="col-xs-1 grid-cell"><div><div><span>F</span></div></div></div>
-                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
-                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
-                </div>
+        <div class="d-md-flex justify-content-evenly">
+            <div>
 
-                {% for week in cal %}
-                    <div class="row calendar-week">
-                        {% for day in week %}
-                            {% if day in filtered_days %}
-                                <div class="col-xs-1 grid-cell">
-                                    <div class="d-flex justify-content-start">
-                                        {% for shift in shifts %}
-                                            {% if shift.date == day and shift.employees.values %}
-                                                
-                                                {% if shift.invoiced and not request.user.is_superuser %}
-                                                    {% if providers %}
-                                                        {% if shift.shift_provider in providers %}
-                                                            <a data-bs-toggle="modal" data-bs-target="#shift{{day.day}}">
-                                                                <span class="mx-1 my-0 badge bg-danger d-inline-block"  style="width: 5px;"></span>
-                                                            </a>
-                                                        {% endif %}
-                                                    {% else %}
-                                                        <a data-bs-toggle="modal" data-bs-target="#shift{{day.day}}">
-                                                            <span class="mx-1 my-0 badge bg-danger d-inline-block"  style="width: 5px;"></span>
-                                                        </a>
-                                                    {% endif %}
-                                                {% elif request.user.is_superuser %}
-                                                    <a data-bs-toggle="modal" data-bs-target="#shift{{day.day}}">
-                                                        <span class="mx-1 my-0 badge bg-danger d-inline-block"  style="width: 5px;"></span>
-                                                    </a>
-                                                {% endif %}
-                                               
-
-                                                <!-- Modal -->
-                                                <div class="modal fade" id="shift{{day.day}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                    <div class="modal-dialog modal-dialog-centered">
-                                                        <div class="modal-content">
+                <div class="card border-primary mb-3">
+                    <div class="card-body">
+    
+                        <!-- CREATE CALENDAR -->
+                        <div class="d-flex justify-content-center mb-5">
+                            <div class="grid-calendar">
+                                <div class="d-flex align-items-end justify-content-between mt-3">
+                                    <h4>{{monthtext}}</h4> 
+                                    <h5><small>{{year}}</small></h5>
+                                </div>
+                                <div class="row calendar-week-header">
+                                    <div class="col-xs-1 grid-cell"><div><div><span>M</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>W</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>F</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                                </div>
+                                
+                                {% for week in cal %}
+                                    <div class="row calendar-week">
+                                        {% for day in week %}
+                                            {% if day in filtered_days %}
+                                                <div class="col-xs-1 grid-cell">
+                                                    <div class="px-2" >
+                                                        {% for shift in shifts %}
                                                             
-                                                            <div class="modal-body">
-                                                                <div class="card border-light m-3">
-                                                                    <div class="card-header"></div>
-                                                                    <div class="card-body text-start">
-                                                                        <h4 class="card-title">{{shift.date}}</h4>
-                                                                        <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.name}}</h6>
-                                                                        <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.servicefee}}</h6>
-                                                                        <hr>
-                                                                        <br>
-                                                                        {% for employee in shift.employees.values %}
-                                                                            <ul class="list-group">
-                                                                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                                                    <strong>{{employee.first_name}} {{employee.last_name}}</strong>
-                                                                                </li>                                                
-                                                                            </ul>
-                                                                            <br>
-                                                                            <hr>
-                                                                        {% endfor %}
-
-                                                                        {% if shift.invoiced %}
-                                                                            <h3>INVOICED</h3>
-                                                                        {% endif%}
-                                                                        
+                                                            {% if shift.date == day and shift.employees.values %}
+                                                                
+                                                                {% if shift.invoiced and not request.user.is_superuser %}
+                                                                    {% if providers %}
+                                                                        {% if shift.shift_provider in providers %}
+                                                                            <a data-bs-toggle="modal" data-bs-target="#shift{{shift.pk}}">
+                                                                                <span class="mx-1 my-0 badge rounded-pill bg-danger d-inline-block">{{shift.employees.count}}</span>
+                                                                            </a>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        <a data-bs-toggle="modal" data-bs-target="#shift{{shift.pk}}">
+                                                                            <span class="mx-1 my-0 badge bg-danger rounded-pill d-inline-block">{{shift.employees.count}}</span>
+                                                                        </a>
+                                                                    {% endif %}
+                                                                {% elif request.user.is_superuser %}
+                                                                    <a data-bs-toggle="modal" data-bs-target="#shift{{shift.pk}}">
+                                                                        <span class="mx-1 my-0 badge bg-danger rounded-pill d-inline-block">{{shift.employees.count}}</span>
+                                                                    </a>
+                                                                {% endif %}
+                                                            
+            
+                                                                <!-- Modal -->
+                                                                <div class="modal fade" id="shift{{shift.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                    <div class="modal-dialog modal-dialog-centered">
+                                                                        <div class="modal-content">
+                                                                            
+                                                                            <div class="modal-body">
+                                                                                <div class="card border-light m-3">
+                                                                                    <div class="card-header"></div>
+                                                                                    <div class="card-body text-start">
+                                                                                        <h4 class="card-title">{{shift.date}}</h4>
+                                                                                        <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.name}}</h6>
+                                                                                        <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.servicefee}}</h6>
+                                                                                        <hr>
+                                                                                        <br>
+                                                                                        {% for employee in shift.employees.values %}
+                                                                                            <ul class="list-group">
+                                                                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                                                    <strong>{{employee.first_name}} {{employee.last_name}}</strong>
+                                                                                                </li>                                                
+                                                                                            </ul>
+                                                                                            <br>
+                                                                                            <hr>
+                                                                                        {% endfor %}
+            
+                                                                                        {% if shift.invoiced %}
+                                                                                            <h3>INVOICED</h3>
+                                                                                        {% endif%}
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+            
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-
-                                                        </div>
+                                                                
+                                                            {% else %}
+                                                                <div></div>
+                                                            {% endif%}
+            
+                                                            
+                                                            
+                                                        {% endfor %}
+                                                    </div>
+                                                    <div>
+                                                        <span>{{day.day}}</span>
                                                     </div>
                                                 </div>
-                                                
+                                            
                                             {% else %}
-                                                <div></div>
-                                            {% endif%}
+                                                {% if day.month == month %}
+                                                    <div class="col-xs-1 grid-cell"><div><div><span>{{day.day}}</span></div></div></div>
+                                                {% else %}
+                                                    <div class="col-xs-1 grid-cell"><div><div><span>-</span></div></div></div>
+                                                {% endif %}
+                                            {% endif %}
+            
                                         {% endfor %}
                                     </div>
-                                    <div>
-                                        <span>{{day.day}}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+            
+                        <div class="d-flex justify-content-center pb-5">
+                            <form action="{% url 'rotavdisplay' %}" method="post">
+                                {% csrf_token %}
+                                <div class="d-flex justify-content-between">
+                                    <div class="flex-grow-1 me-2">
+                                        <label for="month">Month</label>
+                                        <select class="form-select mb-3" name="month">
+                                            {% for number,month in months.items %}
+                                                <option value="{{ number }}">{{ month }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                
+                                    <div class="">
+                                        <label for="year">Year</label>
+                                        <select class="form-select mb-3" name="year">
+                                            {% for year in year_choice %}
+                                                <option value="{{ year }}">{{ year }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                 </div>
-                            
-                            {% else %}
-                                {% if day.month == month %}
-                                    <div class="col-xs-1 grid-cell"><div><div><span>{{day.day}}</span></div></div></div>
-                                {% else %}
-                                    <div class="col-xs-1 grid-cell"><div><div><span>-</span></div></div></div>
-                                {% endif %}
-                            {% endif %}
-
-                        {% endfor %}
+                                {% for group in request.user.groups.all %}
+                                    {% if group.name == "providers" %}
+                                        <label for="venue">Venue</label>
+                                        <select class="form-select mb-3" name="venue">
+                                            {% for venue in venues %}
+                                                <option value="{{ venue.id }}">{{ venue }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% else %}
+                                        <select class="form-select mb-3" name="venue" hidden>
+                                            {% for venue in venues %}
+                                                <option value="{{ venue.id }}">{{ venue }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% endif %}
+                                {% endfor %}
+                                <button type="submit" class="btn btn-primary w-100 my-3">Show</button>
+                            </form>
+                        </div>
+    
                     </div>
-                {% endfor %}
+                </div>
+
             </div>
+            
+
+            <div>
+                <div class="card border-primary mb-3">
+
+                    <div class="card-header">List of invoices</div>
+    
+                    <div class="card-body">
+            
+                        <div class="d-flex flex-wrap justify-content-center">
+    
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th class="text-start" scope="col">Date</th>
+                                    <th scope="col">Provider</th>
+                                    <th scope="col">Total</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for invoice in invoices %}
+                                    <tr>
+                                        <td class="text-start">{{invoice.month}}/{{invoice.year}}</td>
+                                        <td>{{invoice.invoice_provider}}</td>
+                                        <td>{{invoice.amount}} €</td>
+                                        {% if request.user.is_superuser %}
+                                            <td class="text-end"><a href="{% url 'invoicedetail' invoice.id %}" class="btn btn-outline-primary">Details</a></td>
+                                        {% endif %}
+                                        <td class="text-end"><a href="{% url 'invoicepdf' invoice.id %}" class="btn btn-outline-dark">PDF</a></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+    
+                        </div>
+    
+                    </div>
+                </div>
+
+                <div class="card border-primary mb-3">
+                    <div class="card-header">Chart</div>
+                    <div class="card-body">
+                            <canvas id="myChart" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+    
+            
+
         </div>
+       
+        
 
     </div>
 {% endblock %}

@@ -231,7 +231,7 @@ def index(request):
         if request.user.is_staff:
             return HttpResponseRedirect(reverse("rota"))
         else:
-            return HttpResponseRedirect(reverse("invoicefilter"))
+            return HttpResponseRedirect(reverse("rotavdisplay"))
         
     # Get context values
     if request.method == "POST":
@@ -1032,8 +1032,16 @@ def rotavdisplay(request):
             return HttpResponseRedirect(reverse("rota"))
     
     # Get context values
+        
+    all_groups = request.user.groups.values_list('name',flat = True) # QuerySet Object
+    list_groups = list(all_groups)                                     # QuerySet to `list`
+
+    if "venues" in list_groups:
+        venue = Venue.objects.filter(users__in=[request.user])[0]
+    
+        
     set= False
-    venue = None
+    
     monthtext = MONTHS.get(str(CURRENT_MONTH))
     month = CURRENT_MONTH
     year = CURRENT_YEAR
@@ -1043,14 +1051,24 @@ def rotavdisplay(request):
         year = int(request.POST["year"])
         monthtext = MONTHS.get(str(month))
         set = True
-        
-        
+
     cal = calendar.Calendar().monthdatescalendar(year,month)
     shift_data = Shift.objects.filter(date__month=month, date__year=year).order_by('date')
     filtered_days = [shift.date for shift in shift_data if shift.venue == venue]
     total_shifts = total_month_shifts([shift for shift in shift_data if shift.venue == venue])
     venues_allowed = get_venues_allowed(request.user)
     providers_allowed = get_providers_allowed(request.user)
+
+    invoices_filtered = []
+    invoices = Invoice.objects.filter(year=year, month=month)
+    for invoice in invoices:
+        if providers_allowed:
+            if invoice.invoice_provider in providers_allowed:
+                if invoice.invoice_venue in venues_allowed:
+                    invoices_filtered.append(invoice)
+        else:
+            if invoice.invoice_venue in venues_allowed:
+                invoices_filtered.append(invoice)
    
 
     # Render the view
@@ -1069,34 +1087,9 @@ def rotavdisplay(request):
         "month": month,
         "days": DAYS,
         "set": set,
+        "invoices": invoices_filtered,
     })
 
-class ChartView(View):
-    def get(self, request, *args, **kwargs):
-        return render(request, 'security/performance/performance.html')
-
-
-class ChartData(APIView):
-    authentication_classes = []
-    permission_classes = []
-
-    def get(self, request, year, provider_id, format=None):
-        labels = []
-        default_items = []
-        provider = Provider.objects.get(pk=provider_id)
-        performances = Performance.objects.filter(year=year, performance_provider=provider).order_by('month')
-        performance_dict = get_performance_dict(performances)
-        for perf, values in performance_dict.items():
-            month =  MONTHS.get(str(perf.month))
-            labels.append(month)
-            default_items.append(values[7])
-        
-        data = {
-                "labels": labels,
-                "default": default_items,
-        }
-    
-        return Response(data)
 
 def performance_filter(request):
     if not request.user.is_authenticated:
@@ -1191,10 +1184,6 @@ def performance_update(request, performance_id):
 
     })
 
-    
-       
-    
-
 
 def get_performance_dict(performances):
     income = 0
@@ -1258,10 +1247,51 @@ def get_totals_performances(performance_dict):
 
     
         
-def uninvoiceall(request):
-    shifts = Shift.objects.all()
-    for shift in shifts:
-        shift.invoiced = False
-        shift.save()
+class ChartView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'security/performance/performance.html')
+
+
+class ChartData(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, year, provider_id, format=None):
+        labels = []
+        default_items = []
+        provider = Provider.objects.get(pk=provider_id)
+        performances = Performance.objects.filter(year=year, performance_provider=provider).order_by('month')
+        performance_dict = get_performance_dict(performances)
+        for perf, values in performance_dict.items():
+            month =  MONTHS.get(str(perf.month))
+            labels.append(month)
+            default_items.append(values[7])
+        
+        data = {
+                "labels": labels,
+                "default": default_items,
+        }
     
-    return render(request, 'security/index.html')
+        return Response(data)
+    
+
+class ChartRotaData(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, month, year, venue_id, format=None):
+        labels = []
+        default_items = []
+        venue = Venue.objects.get(pk=venue_id)
+        
+        invoices = Invoice.objects.filter(month=month, year=year, invoice_venue=venue)
+        for invoice in invoices:                 
+            labels.append(invoice.invoice_provider.name)
+            default_items.append(invoice.amount)
+        
+        data = {
+                "labels": labels,
+                "default": default_items,
+        }
+    
+        return Response(data)

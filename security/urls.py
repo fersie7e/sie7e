@@ -27,11 +27,12 @@ urlpatterns = [
     path("rota/rotadisplay", views.rotadisplay, name="rotadisplay"),
     path("rotavenue/", views.rotavenue, name="rotavenue"),
     path("rotavenue/rotavdisplay", views.rotavdisplay, name="rotavdisplay"),
+    path("rotavenue/data/<int:month>/<int:year>/<int:venue_id>", views.ChartRotaData.as_view()),
     path("dashboard/<int:shift_id>", views.dashboard, name="dashboard"),
     path("performance/filter/", views.performance_filter, name="performance-filter"),
     path("performance/list/", views.performance_list, name="performance-list"),
     path("performance/update/<int:performance_id>", views.performance_update, name="performance-update"),
     path("performance/", views.ChartView.as_view(), name="performance"),
     path("performance/data/<int:year>/<int:provider_id>", views.ChartData.as_view()),
-    path("uninvoiceall", views.uninvoiceall, name="uninvoiceall"),
+    
 ]
