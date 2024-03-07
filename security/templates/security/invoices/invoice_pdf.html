@@ -41,7 +41,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for shift in invoice.shifts.all %}
+            {% for shift in shifts %}
                 {% if forloop.counter == 19 %} 
                     <tr  style="break-before: page;">
                 {% else %}

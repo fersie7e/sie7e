@@ -1,0 +1,401 @@
+{% extends 'security/layoutmain.html' %}
+{% load static %}
+{% block body %}
+
+<script>
+    {% block jquery %}
+    var endpoint = '/security/performance/data/{{year}}/{{provider.pk}}'
+    var defaultData = []
+    var labels = [];
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function(data){
+            labels = data.labels
+            defaultData = data.default
+            setChart()
+        },
+        error: function(error_data){
+            console.log("error")
+            console.log(error_data)
+        }
+    })
+    
+    function setChart(){
+        var ctx2 = document.getElementById("myChart2");
+        var myChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Months',
+                data: defaultData,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+    
+    }
+    // var ctx = document.getElementById("myChart");
+    
+    
+    {% endblock %}
+    </script>
+    
+    <div class="row h-100">
+        {% if request.user.is_superuser %}
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+              <li class="breadcrumb-item"><a href="{% url 'providerdashboard' %}">Provider-Dashboard</a></li>
+            </ol>
+        </nav>
+        {% endif %}
+
+        <div class="d-flex justify-content-center mb-3">
+            <div class="d-flex flex-column mt-">
+                <h1 class="display-4 fw-bold text-body-emphasis">{{provider}}</h1>
+                <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+                <h5>{{monthtext}}, {{year}}</h5>
+                <h5 class="fw-bold text-body-emphasis"> Total shifts: {{total_shifts}}</h5>
+            </div>
+        </div>
+
+        <div class="d-md-flex justify-content-evenly">
+            <div>
+
+                <div class="card border-primary mb-3">
+                    <div class="card-body">
+                        <!-- CREATE CALENDAR -->
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="grid-calendar">
+                                
+                                <div class="d-flex align-items-end justify-content-between mt-3">
+                                    <h4>{{monthtext}}</h4> 
+                                    <h5><small>{{year}}</small></h5>
+                                </div>
+                                <div class="row calendar-week-header">
+                                    <div class="col-xs-1 grid-cell"><div><div><span>M</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>W</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>F</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                                </div>
+                                
+                                {% for week in cal %}
+                                    <div class="row calendar-week">
+                                        {% for day in week %}
+                                            {% if day in filtered_days %}
+                                                <div class="col-xs-1 grid-cell">
+                                                    <span>{{day.day}}</span>
+
+                                                        {% for shift in shifts %}
+                                                            
+                                                            {% if shift.date == day and shift.employees.values %}
+                                                                
+                                                                {% if shift.invoiced and not request.user.is_superuser %}
+
+                                                                    <div class="border border-light text-white bg-info fs-6 fw-bold">
+                                                                        <a data-bs-toggle="modal" data-bs-target="#shift{{shift.pk}}">
+                                                                                {{shift.employees.count}}
+                                                                        </a>       
+                                                                {% elif request.user.is_superuser %}
+
+                                                                    <div class="border border-light text-white bg-info fs-6 fw-bold">
+                                                                        <a data-bs-toggle="modal" data-bs-target="#shift{{shift.pk}}">
+                                                                            {{shift.employees.count}}
+                                                                        </a>
+
+                                                                {% endif %}
+                                                            
+                                                                    <!-- Modal -->
+                                                                    <div class="modal fade" id="shift{{shift.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                        <div class="modal-dialog modal-dialog-centered">
+                                                                            <div class="modal-content">
+                                                                                
+                                                                                <div class="modal-body">
+                                                                                    <div class="card border-light m-3">
+                                                                                        <div class="card-header">{{shift.venue}}</div>
+                                                                                        <div class="card-body text-start">
+                                                                                            <h4 class="card-title">{{shift.date}}</h4>
+                                                                                            <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.name}}</h6>
+                                                                                            <h6 class="card-subtitle mb-2 text-muted">{{shift.service_provided.servicefee}}</h6>
+                                                                                            <hr>
+                                                                                            <br>
+                                                                                            {% for employee in shift.employees.values %}
+                                                                                                <ul class="list-group">
+                                                                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                                                        <strong>{{employee.first_name}} {{employee.last_name}}</strong>
+                                                                                                    </li>                                                
+                                                                                                </ul>
+                                                                                                
+                                                                                            {% endfor %}
+                                                                                            <br>
+                                                                                            <hr>
+                                                                                            {% if shift.invoiced %}
+                                                                                                <h3>INVOICED</h3>
+                                                                                            {% endif%}
+                                                                                            
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            {% endif%}
+   
+                                                        {% endfor %}
+                                                        
+                                                    
+                                                </div>
+                                            
+                                            {% else %}
+                                                {% if day.month == month %}
+                                                    <div class="col-xs-1 grid-cell"><div><div><span>{{day.day}}</span></div></div></div>
+                                                {% else %}
+                                                    <div class="col-xs-1 grid-cell"><div><div><span>-</span></div></div></div>
+                                                {% endif %}
+                                            {% endif %}
+            
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+            
+                        <div class="d-flex justify-content-center">
+                            <form action="{% url 'providerdashboard' %}" method="post">
+                                {% csrf_token %}
+                                <div class="d-flex justify-content-between">
+                                    <div class="flex-grow-1 me-2">
+                                        <label for="month">Month</label>
+                                        <select class="form-select mb-3" name="month">
+                                            {% for number,month in months.items %}
+                                                <option value="{{ number }}">{{ month }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                
+                                    <div class="">
+                                        <label for="year">Year</label>
+                                        <select class="form-select mb-3" name="year">
+                                            {% for year in year_choice %}
+                                                <option value="{{ year }}">{{ year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                {% if request.user.is_superuser %}
+                                    <label for="provider">Provider</label>
+                                    <select class="form-select mb-3" name="provider">
+                                        {% for provider in providers %}
+                                            <option value="{{ provider.id }}">{{ provider }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% else %}
+                                    <select class="form-select mb-3" name="provider" hidden>
+                                        {% for provider in providers %}
+                                            <option value="{{ provider.id }}">{{ provider }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+
+                                <button type="submit" class="btn btn-primary w-100 mt-2">Show</button>
+                            </form>
+                        </div>
+    
+                    </div>
+                </div>
+
+                <div>
+
+                    <div class="card border-primary mb-3">
+
+                        <div class="card-header">List of invoices</div>
+        
+                        <div class="card-body">
+                
+                            <div class="table-responsive">
+        
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-start" scope="col">Date</th>
+                                        <th scope="col">Venue</th>
+                                        <th scope="col">Total</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for invoice in invoices %}
+                                        <tr>
+                                            <td class="text-start">{{invoice.month}}/{{invoice.year}}</td>
+                                            <td>{{invoice.invoice_venue}}</td>
+                                            <td>{{invoice.amount}} €</td>
+                                            {% if request.user.is_superuser %}
+                                                <td class="text-end"><a href="{% url 'invoicedetail' invoice.id %}" class="btn btn-outline-primary">Details</a></td>
+                                            {% endif %}
+                                            <td class="text-end"><a href="{% url 'invoicepdf' invoice.id %}" class="btn btn-outline-dark">PDF</a></td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+        
+                            </div>
+        
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div>
+                    <div class="card border-primary mb-3">
+                        <div class="card-header">Chart</div>
+                        <div class="card-body">
+                                <canvas id="myChart2" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+
+            <div>
+                
+                <div class="card border-primary mb-3">
+                    <div class="card-header">Wages</div>
+                    <div class="card-body">
+                        
+                        <div class="table-responsive" >
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col" class="text-start">Employee</th>
+                                    <th scope="col">Shifts</th>
+                                    <th class="text-end" scope="col">Total</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for key,item in wages.items %}
+                                    <tr>
+                                        <td class="text-start">{{key}}</td>
+                                        <td>{{item.0}}</td>
+                                        <td class="text-end">{{item.1}} €</td>
+                                    </tr>
+                                {% endfor %}
+                                    <tr>
+                                        <td class="text-start fw-bold">TOTAL:</td>
+                                        <td></td>
+                                        <td class="text-end fw-bold">{{total_wages}} €</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <a href="{% url 'wagespdf' month year provider.pk %}"><button class="btn btn-primary">Generate PDF</button></a>
+
+                    </div>
+                </div>
+
+                <div class="card border-primary mb-3" style="width: 460px;">
+
+                    <div class="card-header">Financial performance</div>
+    
+                    <div class="card-body">
+
+                        
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-start" scope="col">Date</th>
+                                        <th scope="col">Company</th>
+                                        <th scope="col">Income</th>
+                                        <th scope="col">Wages</th>
+                                        <th scope="col">Ss</th>
+                                        <th scope="col">Irpf</th>
+                                        <th scope="col">Gestoria</th>
+                                        <th scope="col">Balance</th>
+                                        <th scope="col">I.S.</th>
+                                        <th scope="col">Resultado</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for performance, balance in performances.items %}
+                                        <tr>
+                                            <td class="text-start">{{performance.month}}/{{performance.year}}</td>
+                                            <td>{{performance.performance_provider}}</td>
+                                            <td>{{balance.0}}€</td>
+                                            <td>{{balance.1}}€</td>
+                                            <td>{{balance.2}}€</td>
+                                            <td>{{balance.3}}€</td>
+                                            <td>{{balance.4}}€</td>
+                                            <td>{{balance.5}}€</td>
+                                            <td>{{balance.6}}€</td>
+                                            <td>{{balance.7}}€</td>
+                                            {% if request.user.is_superuser %}
+                                                <td class="text-end"><a href="{% url 'performance-update' performance.pk %}" class="btn btn-primary">Update</a></td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <td class="text-start"></td>
+                                        <td></td>
+                                        <td><strong>{{totals.0}}€</strong></td>
+                                        <td><strong>{{totals.1}}€</strong></td>
+                                        <td><strong>{{totals.2}}€</strong></td>
+                                        <td><strong>{{totals.3}}€</strong></td>
+                                        <td><strong>{{totals.4}}€</strong></td>
+                                        <td><strong>{{totals.5}}€</strong></td>
+                                        <td><strong>{{totals.6}}€</strong></td>
+                                        <td><strong>{{totals.7}}€</strong></td>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                  
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+       
+        
+
+    </div>
+{% endblock %}

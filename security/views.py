@@ -225,13 +225,17 @@ def index(request):
     """
 
     # Permissions for the View
+    all_groups = request.user.groups.values_list('name',flat = True) # QuerySet Object
+    list_groups = list(all_groups)
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
     if not request.user.is_superuser:
-        if request.user.is_staff:
-            return HttpResponseRedirect(reverse("rota"))
-        else:
-            return HttpResponseRedirect(reverse("rotavdisplay"))
+        if "employees" in list_groups:
+            return HttpResponseRedirect(reverse("employeedashboard"))
+        elif "venues" in list_groups:
+            return HttpResponseRedirect(reverse("venuedashboard"))
+        elif "providers" in list_groups:
+            return HttpResponseRedirect(reverse("providerdashboard"))
         
     # Get context values
     if request.method == "POST":
@@ -616,12 +620,13 @@ def invoicepdf(request, invoice_id):
         return HttpResponseRedirect(reverse("login"))
     
     invoice = Invoice.objects.get(pk=invoice_id)
-    shifts = invoice.shifts.all()
+    shifts = Shift.objects.filter(invoice=invoice)
     total_shifts = 0
     for shift in shifts:
         total_shifts += shift.employees.count()
     context = {
         "invoice": invoice,
+        "shifts": shifts,
         "total_shifts": total_shifts,
     }
     html = render_to_string("security/invoices/invoice_pdf.html", context)
@@ -943,15 +948,25 @@ def rota(request):
         "set": set,
     })
 
-def rotadisplay(request):
+def employeedashboard(request):
     # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
     if not request.user.is_staff:
-            return HttpResponseRedirect(reverse("invoicefilter"))
+        return HttpResponseRedirect(reverse("invoicefilter"))
     set = False
+
     # Get context values
-    
+
+    empleado = None
+    if request.user.is_superuser:
+        employees = Employee.objects.all()
+        empleado = [employee for employee in employees][0]
+    else:
+        employees = Employee.objects.filter(user=request.user)
+        empleado = [employee for employee in employees if employee.user == request.user][0]
+        set = True
+     
     monthtext = MONTHS.get(str(CURRENT_MONTH))
     month = CURRENT_MONTH
     year = CURRENT_YEAR
@@ -970,9 +985,17 @@ def rotadisplay(request):
     total_shifts = total_month_shifts([shift for shift in shift_data if empleado in shift.employees.all()])
     providers = Provider.objects.all()
     venues = Venue.objects.all()
-   
+
+    worked_shifts = []
+    total_wages = 0
+    for shift in shift_data:
+        if empleado in shift.employees.all():
+            worked_shifts.append(shift)
+    for shift in worked_shifts:
+        total_wages += shift.service_provided.servicefee.salary
+    
     # Render the view
-    return render(request, 'security/rotadisplay.html', {
+    return render(request, 'security/employeedashboard.html', {
         "shifts": shift_data,
         "total_shifts": total_shifts,
         "filtered_shifts": filtered_shifts,
@@ -980,6 +1003,7 @@ def rotadisplay(request):
         "providers": providers,
         "venues": venues,
         "employee": empleado,
+        "employees": employees,
         "cal":cal,
         "year_choice": YEARS_CHOICE,
         "year": year,
@@ -988,6 +1012,9 @@ def rotadisplay(request):
         "month": month,
         "days": DAYS,
         "set": set,
+        "worked_shifts": worked_shifts,
+        "total_shifts": len(worked_shifts),
+        "total_wages": total_wages,
     })
 
 def rotavenue(request):
@@ -1023,7 +1050,7 @@ def rotavenue(request):
         "set": set,
     })
 
-def rotavdisplay(request):
+def venuedashboard(request):
     # Permissions for the View
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
@@ -1036,8 +1063,8 @@ def rotavdisplay(request):
     all_groups = request.user.groups.values_list('name',flat = True) # QuerySet Object
     list_groups = list(all_groups)                                     # QuerySet to `list`
 
-    if "venues" in list_groups:
-        venue = Venue.objects.filter(users__in=[request.user])[0]
+    
+    venue = Venue.objects.filter(users__in=[request.user])[0]
     
         
     set= False
@@ -1072,7 +1099,7 @@ def rotavdisplay(request):
    
 
     # Render the view
-    return render(request, 'security/rotavdisplay.html', {
+    return render(request, 'security/venuedashboard.html', {
         "shifts": shift_data,
         "total_shifts": total_shifts,
         "filtered_days": filtered_days,
@@ -1088,6 +1115,79 @@ def rotavdisplay(request):
         "days": DAYS,
         "set": set,
         "invoices": invoices_filtered,
+    })
+
+
+def providerdashboard(request):
+    # Permissions for the View
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    if not request.user.is_superuser:
+        if request.user.is_staff:
+            return HttpResponseRedirect(reverse("rota"))
+    
+    # Get context values
+    provider = Provider.objects.filter(users__in=[request.user])[0]   
+    set= False
+    monthtext = MONTHS.get(str(CURRENT_MONTH))
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    if request.method == "POST":
+        provider = Provider.objects.get(pk=request.POST["provider"])
+        month = int(request.POST["month"])
+        year = int(request.POST["year"])
+        monthtext = MONTHS.get(str(month))
+        set = True
+
+    cal = calendar.Calendar().monthdatescalendar(year,month)
+    shift_data = Shift.objects.filter(date__month=month, date__year=year, shift_provider=provider).order_by('date')
+    filtered_days = [shift.date for shift in shift_data if shift.shift_provider == provider]
+    total_shifts = total_month_shifts([shift for shift in shift_data if shift.shift_provider == provider])
+
+    venues_allowed = get_venues_allowed(request.user)
+    providers_allowed = get_providers_allowed(request.user)
+
+    invoices_filtered = []
+    invoices = Invoice.objects.filter(year=year, month=month)
+    for invoice in invoices:
+        if providers_allowed:
+            if invoice.invoice_provider in providers_allowed:
+                if invoice.invoice_venue in venues_allowed:
+                    invoices_filtered.append(invoice)
+        else:
+            if invoice.invoice_venue in venues_allowed:
+                invoices_filtered.append(invoice)
+
+    wages = calc_wages(shifts=shift_data, providers=providers_allowed)
+    total_wages = calc_total(wages=wages)
+
+    performances = Performance.objects.filter(year=year, performance_provider=provider).order_by('month')
+    
+    performance_dict = get_performance_dict(performances)
+    totals = get_totals_performances(performance_dict)    
+
+    
+    # Render the view
+    return render(request, 'security/providerdashboard.html', {
+        "shifts": shift_data,
+        "total_shifts": total_shifts,
+        "filtered_days": filtered_days,
+        "venues": venues_allowed,
+        "providers": providers_allowed,
+        "provider": provider,
+        "cal":cal,
+        "year_choice": YEARS_CHOICE,
+        "year": year,
+        "months": MONTHS,
+        "monthtext": monthtext,
+        "month": month,
+        "days": DAYS,
+        "set": set,
+        "invoices": invoices_filtered,
+        "wages": wages,
+        "total_wages": total_wages,
+        "performances": performance_dict,
+        "totals": totals,
     })
 
 
@@ -1295,3 +1395,5 @@ class ChartRotaData(APIView):
         }
     
         return Response(data)
+    
+

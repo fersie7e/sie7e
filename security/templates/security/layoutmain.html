@@ -158,58 +158,47 @@
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="{% url 'index' %}">Home</a>
               </li>
-            {% endif %}
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Rotas
-              </a>
-              <ul class="dropdown-menu">
-                {% if request.user.is_staff %}
-                  <li><a class="dropdown-item" href="{% url 'rota' %}">Employee</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                {% endif %}
-                {% if request.user.is_superuser or not request.user.is_staff %}
-                  <li><a class="dropdown-item" href="{% url 'rotavenue' %}">Venue</a></li>
-                {% endif %}
-              </ul>
-            </li>
-            {% if request.user.is_superuser or not request.user.is_staff %}
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="{% url 'employeedashboard' %}">Employee</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="{% url 'venuedashboard' %}">Venue</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="{% url 'providerdashboard' %}">Provider</a>
+              </li>
+            
+            
+            
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Invoices
                 </a>
                 <ul class="dropdown-menu">
-                  {% if request.user.is_superuser %}
-                    <li><a class="dropdown-item" href="{% url 'invoicegen' %}">Generate</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                  {% endif %}
+                  
+                  <li><a class="dropdown-item" href="{% url 'invoicegen' %}">Generate</a></li>
+                  <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="{% url 'invoicefilter' %}">Details</a></li>
-                  {% for group in request.user.groups.all %}
-                    {% if group.name == "providers"  or group.name == "employees" %}
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="{% url 'performance-filter' %}">Performance</a></li>
-                    {% endif %}
-                  {% endfor %}
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{% url 'performance-filter' %}">Performance</a></li>
+                    
                 </ul>
               </li>
-            {% endif %}
-            {% for group in request.user.groups.all %}
-                {% if group.name == "providers"  or group.name == "employees" %}
+            
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Wages
                     </a>
                     <ul class="dropdown-menu">
-                      {% if group.name == "providers" %}
+                      
                         <li><a class="dropdown-item" href="{% url 'wagesfilter' %}">Provider</a></li>
                         <li><hr class="dropdown-divider"></li>
-                      {% endif %}
-                      <li><a class="dropdown-item" href="{% url 'wagesemployee' %}">Employee</a></li>
-  
+                        <li><a class="dropdown-item" href="{% url 'wagesemployee' %}">Employee</a></li>
+
                     </ul>
                   </li>
-                {% endif %}
-              {% endfor %}
+            {% endif %}
+             
           </ul>
           
         </div>
