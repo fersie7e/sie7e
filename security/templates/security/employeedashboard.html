@@ -21,148 +21,153 @@
             </div>
         </div>
 
-        <div class="d-md-flex justify-content-evenly">
-            
-            <div>
+        <div class="row">
+            <div class="col-lg-10 offset-lg-1">
 
-                <div class="card border-primary mb-3 shadow">
-                    <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-5">
 
-                        <div class="d-flex justify-content-center mb-3">
-                            <div class="grid-calendar">
-                                <div class="d-flex align-items-end justify-content-between mt-3">
-                                    <h4>{{monthtext}}</h4> 
-                                    <h5><small>{{year}}</small></h5>
-                                </div>
-                                <div class="row calendar-week-header">
-                                    <div class="col-xs-1 grid-cell"><div><div><span>M</span></div></div></div>
-                                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
-                                    <div class="col-xs-1 grid-cell"><div><div><span>W</span></div></div></div>
-                                    <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
-                                    <div class="col-xs-1 grid-cell"><div><div><span>F</span></div></div></div>
-                                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
-                                    <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
-                                </div>
+                        <div class="card border-primary mb-3 shadow">
+                            <div class="card-body">
 
-                                {% for week in cal %}
-                                    <div class="row calendar-week">
-                                        {% for day in week %}
-                                            {% if day in filtered_days %}
-                                                <div class="col-xs-1 grid-cell bg-primary text-white">
-                                                    <div class="d-flex justify-content-start">
-                                                        {% for shift in filtered_shifts %}
-                                                            {% for date,venue in shift.items %}
-                                                                {% if date == day %}
-                                                                        
-                                                                            <a data-bs-toggle="tooltip" data-bs-title="{{venue}}">
-                                                                                <span class="mx-1 my-0 badge bg-danger d-inline-block"  style="width: 5px;"></span>
-                                                                            </a>
-                                                                        
-                                                                {% endif %}
-                                                            {% endfor %}       
-                                                        {% endfor %}
-                                                    </div>
-                                                    <div>
-                                                        <span>{{day.day}}</span>
-                                                    </div>
-                                                </div>
-                    
-                                            {% else %}
-                                                {% if day.month == month %}
-                                                    <div class="col-xs-1 grid-cell"><div><div><span>{{day.day}}</span></div></div></div>
-                                                {% else %}
-                                                    <div class="col-xs-1 grid-cell"><div><div><span>-</span></div></div></div>
-                                                {% endif %}
-                                            {% endif %}
+                                <div class="d-flex justify-content-center mb-3">
+                                    <div class="grid-calendar">
+                                        <div class="d-flex align-items-end justify-content-between mt-3">
+                                            <h4>{{monthtext}}</h4> 
+                                            <h5><small>{{year}}</small></h5>
+                                        </div>
+                                        <div class="row calendar-week-header">
+                                            <div class="col-xs-1 grid-cell"><div><div><span>M</span></div></div></div>
+                                            <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                                            <div class="col-xs-1 grid-cell"><div><div><span>W</span></div></div></div>
+                                            <div class="col-xs-1 grid-cell"><div><div><span>T</span></div></div></div>
+                                            <div class="col-xs-1 grid-cell"><div><div><span>F</span></div></div></div>
+                                            <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                                            <div class="col-xs-1 grid-cell"><div><div><span>S</span></div></div></div>
+                                        </div>
 
+                                        {% for week in cal %}
+                                            <div class="row calendar-week">
+                                                {% for day in week %}
+                                                    {% if day in filtered_days %}
+                                                        <div class="col-xs-1 grid-cell bg-primary text-white">
+                                                            <div class="d-flex justify-content-start">
+                                                                {% for shift in filtered_shifts %}
+                                                                    {% for date,venue in shift.items %}
+                                                                        {% if date == day %}
+                                                                                
+                                                                                    <a data-bs-toggle="tooltip" data-bs-title="{{venue}}">
+                                                                                        <span class="mx-1 my-0 badge bg-danger d-inline-block"  style="width: 5px;"></span>
+                                                                                    </a>
+                                                                                
+                                                                        {% endif %}
+                                                                    {% endfor %}       
+                                                                {% endfor %}
+                                                            </div>
+                                                            <div>
+                                                                <span>{{day.day}}</span>
+                                                            </div>
+                                                        </div>
+                            
+                                                    {% else %}
+                                                        {% if day.month == month %}
+                                                            <div class="col-xs-1 grid-cell"><div><div><span>{{day.day}}</span></div></div></div>
+                                                        {% else %}
+                                                            <div class="col-xs-1 grid-cell"><div><div><span>-</span></div></div></div>
+                                                        {% endif %}
+                                                    {% endif %}
+
+                                                {% endfor %}
+                                            </div>
                                         {% endfor %}
+
                                     </div>
-                                {% endfor %}
+                                </div>
+
+                                <div class="d-flex justify-content-center">
+                                    <form action="{% url 'employeedashboard' %}" method="post">
+                                        {% csrf_token %}
+                                        <div class="d-flex justify-content-between">
+                                            <div class="flex-grow-1 me-2">
+                                                <label for="month">Month</label>
+                                                <select class="form-select mb-3" name="month">
+                                                    {% for number,month in months.items %}
+                                                        <option value="{{ number }}">{{ month }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        
+                                            <div class="">
+                                                <label for="year">Year</label>
+                                                <select class="form-select mb-3" name="year">
+                                                    {% for year in year_choice %}
+                                                        <option value="{{ year }}">{{ year }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        {% if request.user.is_superuser %}
+                                            <label for="employee">Employee</label>
+                                            <select class="form-select mb-3" name="employee">
+                                                {% for employee in employees %}
+                                                    <option value="{{ employee.id }}">{{ employee }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        {% else %}
+                                            <select class="form-select mb-3" name="employee" hidden>
+                                                {% for employee in employees %}
+                                                    <option value="{{ employee.id }}">{{ employee }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        {% endif %}
+                                        <button type="submit" class="btn btn-primary my-3 w-100">Show</button>
+                                    </form>
+                                </div>
 
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-center">
-                            <form action="{% url 'employeedashboard' %}" method="post">
-                                {% csrf_token %}
-                                <div class="d-flex justify-content-between">
-                                    <div class="flex-grow-1 me-2">
-                                        <label for="month">Month</label>
-                                        <select class="form-select mb-3" name="month">
-                                            {% for number,month in months.items %}
-                                                <option value="{{ number }}">{{ month }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
+                    </div>
+
+                    <div class="col-lg-7">
+
+                        <div class="card border-primary mb-3 shadow">
+                            <div class="card-header">Wages</div>
+                            <div class="card-body">
                                 
-                                    <div class="">
-                                        <label for="year">Year</label>
-                                        <select class="form-select mb-3" name="year">
-                                            {% for year in year_choice %}
-                                                <option value="{{ year }}">{{ year }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                
-                                {% if request.user.is_superuser %}
-                                    <label for="employee">Employee</label>
-                                    <select class="form-select mb-3" name="employee">
-                                        {% for employee in employees %}
-                                            <option value="{{ employee.id }}">{{ employee }}</option>
+                                <h4> Total wages: <strong>{{total_wages}} €</strong></h4>
+                                <a href="{% url 'wagesemployeepdf' month year employee.pk %}"><button class="btn btn-primary">Generate PDF</button></a>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col" class="text-start">Date</th>
+                                            <th scope="col" class="text-start">Venue</th>
+                                            <th scope="col" class="text-end">Salary</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for shift in worked_shifts %}
+                                            <tr>
+                                                <td class="text-start">{{shift.date}}</td>
+                                                <td class="text-start">{{shift.venue}}</td>
+                                                <td class="text-end"><small>{{shift.service_provided.servicefee.salary}} €</small></td>
+                                            </tr>
                                         {% endfor %}
-                                    </select>
-                                {% else %}
-                                    <select class="form-select mb-3" name="employee" hidden>
-                                        {% for employee in employees %}
-                                            <option value="{{ employee.id }}">{{ employee }}</option>
-                                        {% endfor %}
-                                    </select>
-                                {% endif %}
-                                <button type="submit" class="btn btn-primary my-3 w-100">Show</button>
-                            </form>
+                                        </tbody>
+                                    </table>
+                                </div> 
+
+                            </div>
                         </div>
 
                     </div>
+
                 </div>
-
-            </div>
-
-            <div>
-
-                <div class="card border-primary mb-3 shadow">
-                    <div class="card-header">Wages</div>
-                    <div class="card-body">
-                        
-                        <h4> Total wages: <strong>{{total_wages}} €</strong></h4>
-                        <a href="{% url 'wagesemployeepdf' month year employee.pk %}"><button class="btn btn-primary">Generate PDF</button></a>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th scope="col" class="text-start">Date</th>
-                                    <th scope="col" class="text-start">Venue</th>
-                                    <th scope="col" class="text-end">Salary</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for shift in worked_shifts %}
-                                    <tr>
-                                        <td class="text-start">{{shift.date}}</td>
-                                        <td class="text-start">{{shift.venue}}</td>
-                                        <td class="text-end"><small>{{shift.service_provided.servicefee.salary}} €</small></td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div> 
-
-                    </div>
-                </div>
-
+    
             </div>
         </div>
-    
     </div>
 {% endblock %}
