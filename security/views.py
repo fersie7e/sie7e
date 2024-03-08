@@ -117,6 +117,7 @@ def get_employees_allowed(user):
     return employees_allowed
 
 def total_month_shifts(shifts):
+    
     total_shifts = 0
     for shift in shifts:
         total_shifts += shift.employees.count()
@@ -334,42 +335,6 @@ def dashboard(request, shift_id):
         "year": year,
         "monthtext": monthtext,
         "month": month,
-    })
-
-def filtershift(request, date=TODAY):
-    """View that filters the date and allow the superuser to create a new shift on that
-       filtered date, provides the superuser a form to choose the venue and the company 
-       that will provide the service and a list of all the shift for that particular date
-       if the shfits shown are not invoiced the superuser can edit them
-
-    Args:
-        request (Request): Request from the client
-        date (Date, optional): Date that will be use as a filter to show the data. Defaults to TODAY.
-
-    Returns:
-        render: Renders the view with the context specified
-    """
-
-    # Permissions for the View
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
-    if not request.user.is_superuser:
-        if request.user.is_staff:
-            return HttpResponseRedirect(reverse("rota"))
-        else:
-            return HttpResponseRedirect(reverse("invoicefilter"))
-    # Get context values
-    shift_data = Shift.objects.filter(date=date)
-    grouped_shifts = group_list(list=shift_data, num=3)
-    # Render the view
-    return render(request, 'security/filter.html', {
-        "venues": Venue.objects.all(),
-        "providers": Provider.objects.all(),
-        "shifts": shift_data,
-        "grouped_shifts": grouped_shifts,
-        "service_selected": False,
-        "date": date,
-        "date_selected": True,
     })
 
 
@@ -640,75 +605,6 @@ def invoicepdf(request, invoice_id):
     return response
 
 
-def wagesfilter(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
-    providers_allowed = get_providers_allowed(request.user)
-    if not providers_allowed:
-        return HttpResponseRedirect(reverse("invoicefilter"))
-    
-    month = CURRENT_MONTH
-    year = CURRENT_YEAR
-    
-    
-    return render(request, 'security/wages/wages_filter.html', {
-        "month": month,
-        "year": year,
-        "months": MONTHS,
-        "year_choice": YEARS_CHOICE,
-        "providers": providers_allowed,
-    })
-
-
-def wagesfreport(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
-    providers_allowed = get_providers_allowed(request.user)
-    if not providers_allowed:
-        return HttpResponseRedirect(reverse("invoicefilter"))
-    
-    month = CURRENT_MONTH
-    year = CURRENT_YEAR
-    if request.method == "POST":
-        month = request.POST['month']
-        year = request.POST['year']
-        provider_id = request.POST['wages_provider']
-        provider = Provider.objects.get(pk=provider_id)
-        shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
-    else:
-        shifts = []
-    wages = calc_wages(shifts=shifts, providers=providers_allowed)
-    total_wages = calc_total(wages=wages)
-    
-    return render(request, 'security/wages/wages_filter_report.html', {
-        "month": month,
-        "year": year,
-        "months": MONTHS,
-        "year_choice": YEARS_CHOICE,
-        "wages": wages,
-        "provider": provider,
-        "providers": providers_allowed,
-        "total_wages": total_wages,
-    })
-
-def wagesfilterpdf(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
-    providers_allowed = get_providers_allowed(request.user)
-    if not providers_allowed:
-        return HttpResponseRedirect(reverse("invoicefilter"))
-    
-    month = CURRENT_MONTH
-    year = CURRENT_YEAR
-    
-    return render(request, 'security/wages/wages_filter_pdf.html', {
-        "month": month,
-        "year": year,
-        "months": MONTHS,
-        "year_choice": YEARS_CHOICE,
-        "providers": providers_allowed,
-    })
-
 def wagespdf(request, month, year, provider_id):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("login"))
@@ -747,108 +643,6 @@ def wagespdf(request, month, year, provider_id):
     HTML(string=html).write_pdf(response, font_config=font_config)
     return response
     
-
-def wagesemployee(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
-    providers_allowed = get_providers_allowed(request.user)
-    if not providers_allowed:
-        if not request.user.is_staff:
-            return HttpResponseRedirect(reverse("invoicefilter"))
-    
-    month = CURRENT_MONTH
-    year = CURRENT_YEAR
-    employees = get_employees_allowed(request.user)
-    employee = None
-    show = False
-    
-    shifts = Shift.objects.filter(date__year=year, date__month=month)
-    worked_shifts = []
-    total_wages = 0
-    for shift in shifts:
-        if employee in shift.employees.all():
-            worked_shifts.append(shift)
-    for shift in worked_shifts:
-        total_wages += shift.service_provided.servicefee.salary
-    
-    return render(request, 'security/wages/wages_employee.html', {
-        "shifts": shifts,
-        "month": month,
-        "year": year,
-        "months": MONTHS,
-        "year_choice": YEARS_CHOICE,
-        "worked_shifts": worked_shifts,
-        "total_shifts": len(worked_shifts),
-        "employees": employees,
-        "employee": employee,
-        "show":show,
-        "total_wages": total_wages,
-    })
-
-
-def wagesereport(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
-    providers_allowed = get_providers_allowed(request.user)
-    if not providers_allowed:
-        if not request.user.is_staff:
-            return HttpResponseRedirect(reverse("invoicefilter"))
-    
-    month = CURRENT_MONTH
-    year = CURRENT_YEAR
-    employees = get_employees_allowed(request.user)
-    employee = None
-    show = False
-    if request.method == "POST":
-        month = request.POST['month']
-        year = request.POST['year']
-        employee_id = request.POST['wages_employee']
-        employee = Employee.objects.get(pk=employee_id)
-        show = True
-    shifts = Shift.objects.filter(date__year=year, date__month=month)
-    worked_shifts = []
-    total_wages = 0
-    for shift in shifts:
-        if employee in shift.employees.all():
-            worked_shifts.append(shift)
-    for shift in worked_shifts:
-        total_wages += shift.service_provided.servicefee.salary
-    
-    return render(request, 'security/wages/wages_employee_report.html', {
-        "shifts": shifts,
-        "month": month,
-        "year": year,
-        "months": MONTHS,
-        "year_choice": YEARS_CHOICE,
-        "worked_shifts": worked_shifts,
-        "total_shifts": len(worked_shifts),
-        "employees": employees,
-        "employee": employee,
-        "show":show,
-        "total_wages": total_wages,
-    })
-
-
-def wagesemployeefilter(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
-    providers_allowed = get_providers_allowed(request.user)
-    if not providers_allowed:
-        if not request.user.is_staff:
-            return HttpResponseRedirect(reverse("invoicefilter"))
-    
-    month = CURRENT_MONTH
-    year = CURRENT_YEAR
-    employees = get_employees_allowed(request.user)
-    
-    return render(request, 'security/wages/wages_employee_filter.html', {
-        "month": month,
-        "year": year,
-        "months": MONTHS,
-        "year_choice": YEARS_CHOICE,
-        "employees": employees,
-    })
-
 
 def wagesemployeepdf(request, month, year, employee_id):
     if not request.user.is_authenticated:
@@ -902,51 +696,6 @@ def setfullmonth(request):
             shift.save()
     return HttpResponseRedirect(reverse("index"))
 
-def rota(request):
-    # Permissions for the View
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
-    if not request.user.is_staff:
-            return HttpResponseRedirect(reverse("invoicefilter"))
-    set = False
-    # Get context values
-    empleado = None
-    if request.user.is_superuser:
-        employees = Employee.objects.all()
-    else:
-        employees = Employee.objects.filter(user=request.user)
-        empleado = [employee for employee in employees if employee.user == request.user][0]
-        set = True
-    
-    monthtext = MONTHS.get(str(CURRENT_MONTH))
-    month = CURRENT_MONTH
-    year = CURRENT_YEAR
-
-    if request.method == "POST":
-        empleado = Employee.objects.get(pk=request.POST["employee"])
-        month = int(request.POST["month"])
-        year = int(request.POST["year"])
-        monthtext = MONTHS.get(str(month))
-        set = True
-
-    providers = Provider.objects.all()
-    venues = Venue.objects.all()
-   
-
-    # Render the view
-    return render(request, 'security/rota.html', {
-        "providers": providers,
-        "venues": venues,
-        "employee": empleado,
-        "employees": employees,
-        "year_choice": YEARS_CHOICE,
-        "year": year,
-        "months": MONTHS,
-        "monthtext": monthtext,
-        "month": month,
-        "days": DAYS,
-        "set": set,
-    })
 
 def employeedashboard(request):
     # Permissions for the View
@@ -1017,38 +766,6 @@ def employeedashboard(request):
         "total_wages": total_wages,
     })
 
-def rotavenue(request):
-    # Permissions for the View
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
-    if not request.user.is_superuser:
-        if request.user.is_staff:
-            return HttpResponseRedirect(reverse("rota"))
-    
-    # Get context values
-    set= False
-    venue = None
-    monthtext = MONTHS.get(str(CURRENT_MONTH))
-    month = CURRENT_MONTH
-    year = CURRENT_YEAR
-    
-    venues_allowed = get_venues_allowed(request.user)
-    providers_allowed = get_providers_allowed(request.user)
-   
-
-    # Render the view
-    return render(request, 'security/rotavenue.html', {
-        "venues": venues_allowed,
-        "providers": providers_allowed,
-        "venue": venue,
-        "year_choice": YEARS_CHOICE,
-        "year": year,
-        "months": MONTHS,
-        "monthtext": monthtext,
-        "month": month,
-        "days": DAYS,
-        "set": set,
-    })
 
 def venuedashboard(request):
     # Permissions for the View
@@ -1345,13 +1062,6 @@ def get_totals_performances(performance_dict):
     totals =[round(income_total, 2), round(wages_total, 2), round(ss_total, 2), round(irpf_total, 2), round(gestoria_total, 2), round(balance_total, 2), round(impuesto_total, 2), round(resultado_total, 2)]
     return totals
 
-    
-        
-class ChartView(View):
-    def get(self, request, *args, **kwargs):
-        return render(request, 'security/performance/performance.html')
-
-
 class ChartData(APIView):
     authentication_classes = []
     permission_classes = []
@@ -1397,3 +1107,301 @@ class ChartRotaData(APIView):
         return Response(data)
     
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# LEGACY CODE------------------------------------------------------------------------------
+"""
+def filtershift(request, date=TODAY):
+   
+    # Permissions for the View
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    if not request.user.is_superuser:
+        if request.user.is_staff:
+            return HttpResponseRedirect(reverse("rota"))
+        else:
+            return HttpResponseRedirect(reverse("invoicefilter"))
+    # Get context values
+    shift_data = Shift.objects.filter(date=date)
+    grouped_shifts = group_list(list=shift_data, num=3)
+    # Render the view
+    return render(request, 'security/filter.html', {
+        "venues": Venue.objects.all(),
+        "providers": Provider.objects.all(),
+        "shifts": shift_data,
+        "grouped_shifts": grouped_shifts,
+        "service_selected": False,
+        "date": date,
+        "date_selected": True,
+    })
+
+def rota(request):
+    # Permissions for the View
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    if not request.user.is_staff:
+            return HttpResponseRedirect(reverse("invoicefilter"))
+    set = False
+    # Get context values
+    empleado = None
+    if request.user.is_superuser:
+        employees = Employee.objects.all()
+    else:
+        employees = Employee.objects.filter(user=request.user)
+        empleado = [employee for employee in employees if employee.user == request.user][0]
+        set = True
+    
+    monthtext = MONTHS.get(str(CURRENT_MONTH))
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+
+    if request.method == "POST":
+        empleado = Employee.objects.get(pk=request.POST["employee"])
+        month = int(request.POST["month"])
+        year = int(request.POST["year"])
+        monthtext = MONTHS.get(str(month))
+        set = True
+
+    providers = Provider.objects.all()
+    venues = Venue.objects.all()
+   
+
+    # Render the view
+    return render(request, 'security/rota.html', {
+        "providers": providers,
+        "venues": venues,
+        "employee": empleado,
+        "employees": employees,
+        "year_choice": YEARS_CHOICE,
+        "year": year,
+        "months": MONTHS,
+        "monthtext": monthtext,
+        "month": month,
+        "days": DAYS,
+        "set": set,
+    })
+
+def rotavenue(request):
+    # Permissions for the View
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    if not request.user.is_superuser:
+        if request.user.is_staff:
+            return HttpResponseRedirect(reverse("rota"))
+    
+    # Get context values
+    set= False
+    venue = None
+    monthtext = MONTHS.get(str(CURRENT_MONTH))
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    
+    venues_allowed = get_venues_allowed(request.user)
+    providers_allowed = get_providers_allowed(request.user)
+   
+
+    # Render the view
+    return render(request, 'security/rotavenue.html', {
+        "venues": venues_allowed,
+        "providers": providers_allowed,
+        "venue": venue,
+        "year_choice": YEARS_CHOICE,
+        "year": year,
+        "months": MONTHS,
+        "monthtext": monthtext,
+        "month": month,
+        "days": DAYS,
+        "set": set,
+    })
+
+def wagesfilter(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    
+    
+    return render(request, 'security/wages/wages_filter.html', {
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "providers": providers_allowed,
+    })
+
+def wagesfreport(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    if request.method == "POST":
+        month = request.POST['month']
+        year = request.POST['year']
+        provider_id = request.POST['wages_provider']
+        provider = Provider.objects.get(pk=provider_id)
+        shifts = Shift.objects.filter(date__year=year, date__month=month, shift_provider=provider)
+    else:
+        shifts = []
+    wages = calc_wages(shifts=shifts, providers=providers_allowed)
+    total_wages = calc_total(wages=wages)
+    
+    return render(request, 'security/wages/wages_filter_report.html', {
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "wages": wages,
+        "provider": provider,
+        "providers": providers_allowed,
+        "total_wages": total_wages,
+    })
+
+def wagesfilterpdf(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    
+    return render(request, 'security/wages/wages_filter_pdf.html', {
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "providers": providers_allowed,
+    })
+
+def wagesemployee(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        if not request.user.is_staff:
+            return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    employees = get_employees_allowed(request.user)
+    employee = None
+    show = False
+    
+    shifts = Shift.objects.filter(date__year=year, date__month=month)
+    worked_shifts = []
+    total_wages = 0
+    for shift in shifts:
+        if employee in shift.employees.all():
+            worked_shifts.append(shift)
+    for shift in worked_shifts:
+        total_wages += shift.service_provided.servicefee.salary
+    
+    return render(request, 'security/wages/wages_employee.html', {
+        "shifts": shifts,
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "worked_shifts": worked_shifts,
+        "total_shifts": len(worked_shifts),
+        "employees": employees,
+        "employee": employee,
+        "show":show,
+        "total_wages": total_wages,
+    })
+
+def wagesereport(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        if not request.user.is_staff:
+            return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    employees = get_employees_allowed(request.user)
+    employee = None
+    show = False
+    if request.method == "POST":
+        month = request.POST['month']
+        year = request.POST['year']
+        employee_id = request.POST['wages_employee']
+        employee = Employee.objects.get(pk=employee_id)
+        show = True
+    shifts = Shift.objects.filter(date__year=year, date__month=month)
+    worked_shifts = []
+    total_wages = 0
+    for shift in shifts:
+        if employee in shift.employees.all():
+            worked_shifts.append(shift)
+    for shift in worked_shifts:
+        total_wages += shift.service_provided.servicefee.salary
+    
+    return render(request, 'security/wages/wages_employee_report.html', {
+        "shifts": shifts,
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "worked_shifts": worked_shifts,
+        "total_shifts": len(worked_shifts),
+        "employees": employees,
+        "employee": employee,
+        "show":show,
+        "total_wages": total_wages,
+    })
+
+
+def wagesemployeefilter(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+    providers_allowed = get_providers_allowed(request.user)
+    if not providers_allowed:
+        if not request.user.is_staff:
+            return HttpResponseRedirect(reverse("invoicefilter"))
+    
+    month = CURRENT_MONTH
+    year = CURRENT_YEAR
+    employees = get_employees_allowed(request.user)
+    
+    return render(request, 'security/wages/wages_employee_filter.html', {
+        "month": month,
+        "year": year,
+        "months": MONTHS,
+        "year_choice": YEARS_CHOICE,
+        "employees": employees,
+    })
+
+class ChartView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'security/performance/performance.html')
+
+"""

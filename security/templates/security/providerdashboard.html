@@ -91,7 +91,7 @@
         <div class="d-md-flex justify-content-evenly">
             <div>
 
-                <div class="card border-primary mb-3">
+                <div class="card border-primary mb-3 shadow">
                     <div class="card-body">
                         <!-- CREATE CALENDAR -->
                         <div class="d-flex justify-content-center mb-3">
@@ -121,22 +121,12 @@
                                                         {% for shift in shifts %}
                                                             
                                                             {% if shift.date == day and shift.employees.values %}
+                     
+                                                                <div class="border border-light text-white bg-info fs-6 fw-bold">
+                                                                    <a data-bs-toggle="modal" data-bs-target="#shift{{shift.pk}}">
+                                                                        {{shift.employees.count}}
+                                                                    </a>       
                                                                 
-                                                                {% if shift.invoiced and not request.user.is_superuser %}
-
-                                                                    <div class="border border-light text-white bg-info fs-6 fw-bold">
-                                                                        <a data-bs-toggle="modal" data-bs-target="#shift{{shift.pk}}">
-                                                                                {{shift.employees.count}}
-                                                                        </a>       
-                                                                {% elif request.user.is_superuser %}
-
-                                                                    <div class="border border-light text-white bg-info fs-6 fw-bold">
-                                                                        <a data-bs-toggle="modal" data-bs-target="#shift{{shift.pk}}">
-                                                                            {{shift.employees.count}}
-                                                                        </a>
-
-                                                                {% endif %}
-                                                            
                                                                     <!-- Modal -->
                                                                     <div class="modal fade" id="shift{{shift.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                                         <div class="modal-dialog modal-dialog-centered">
@@ -172,6 +162,7 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
+
                                                                 </div>
 
                                                             {% endif%}
@@ -242,7 +233,7 @@
 
                 <div>
 
-                    <div class="card border-primary mb-3">
+                    <div class="card border-primary mb-3 shadow">
 
                         <div class="card-header">List of invoices</div>
         
@@ -286,7 +277,7 @@
 
             <div>
                 
-                <div class="card border-primary mb-3">
+                <div class="card border-primary mb-3 shadow">
                     <div class="card-header">Wages</div>
                     <div class="card-body">
                         
@@ -321,7 +312,7 @@
                 </div>
 
                 <div>
-                    <div class="card border-primary mb-3" style="max-width: 99%;">
+                    <div class="card border-primary mb-3 shadow" style="max-width: 99%;">
                         <div class="card-header">Chart</div>
                         <div class="card-body">
                                 <canvas id="myChart2"></canvas>
@@ -339,7 +330,7 @@
 
         <div class="d-md-flex justify-content-evenly">
 
-            <div class="card border-primary mb-3">
+            <div class="card border-primary mb-3 shadow">
 
                 <div class="card-header">Financial performance</div>
 
