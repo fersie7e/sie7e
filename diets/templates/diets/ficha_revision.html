@@ -1,0 +1,322 @@
+{% extends 'diets/layoutmain.html' %}
+{% load static %}
+{% block body %}
+
+<script>
+    {% block jquery %}
+    var endpoint = 'data/{{cliente.pk}}'
+    var defaultData = []
+    var labels = [];
+    $.ajax({
+        method: "GET",
+        url: endpoint,
+        success: function(data){
+            labels = data.labels
+            defaultData = data.default
+            cinturaData = data.cintura
+            caderaData = data.cadera
+            setChart()
+        },
+        error: function(error_data){
+            console.log("error")
+            console.log(error_data)
+        }
+    })
+    
+    function setChart(){
+        var ctx2 = document.getElementById("myChart2");
+        var myChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Peso',
+                data: defaultData,
+                borderWidth: 1,
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+            },{
+                label: 'Cintura',
+                data: cinturaData,
+                borderWidth: 1,
+                fill: false,
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1,
+            },{
+                label: 'Cadera',
+                data: caderaData,
+                borderWidth: 1,
+                fill: false,
+                borderColor: 'rgba(54, 162, 235)',
+                tension: 0.1,
+            }]
+        },
+        
+       
+    });
+    
+    }
+    // var ctx = document.getElementById("myChart");
+    
+    
+    {% endblock %}
+    </script>
+    
+    <div class="row h-100">
+        <!--Nav map-->
+        <div class="text-start mt-2">
+            <p><a href="{% url 'indexdiets' 1 %}">Inicio</a> > > Ficha Revision</p>
+        </div>
+
+        <!--Header-->
+        <div class="row">
+            <div class="col text-center my-5">
+                <a data-bs-toggle="modal" data-bs-target="#cliente{{revision.cliente.pk}}"><h1 class="text-secondary">{{cliente.nombre}} {{cliente.apellidos}}</h1></a>
+                <!-- Modal -->
+                <div class="modal fade" id="cliente{{revision.cliente.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-lg-6 text-start">
+                                        <dl>
+                                            <dt>Edad</dt>
+                                                <dd>{{edad}} años</dd>
+                                            <dt>Fecha inicio</dt>
+                                                <dd>{{cliente.f_inicio}}</dd>
+                                            <dt>Fumador</dt>
+                                            {% if cliente.fumador %}
+                                                <dd>Si</dd>
+                                            {% else %}
+                                                <dd>No</dd>
+                                            {% endif %}
+                                            <dt>Activo</dt>
+                                            {% if cliente.activo %}
+                                                <dd>Si</dd>
+                                            {% else %}
+                                                <dd>No</dd>
+                                            {% endif %}
+                                            <dt>Transito normal</dt>
+                                            {% if cliente.transito_intestinal_normal %}
+                                                <dd>Si</dd>
+                                            {% else %}
+                                                <dd>No</dd>
+                                            {% endif %}
+                                        </dl>
+                                        
+                                    </div>
+                                    <div class="col-lg-6 text-start">
+                                        <dl>
+                                            <dt>Hidratacion</dt>
+                                                <dd>{{cliente.hidratacion}}</dd>
+                                            <dt>Alergias</dt>
+                                                <dd>{{cliente.alergias}}</dd>
+                                            <dt>Tratamientos</dt>
+                                                <dd>{{cliente.tratamientos}}</dd>
+                                            <dt>Habitos</dt>
+                                                <dd>{{cliente.habitos}}</dd>
+                                            
+                                        </dl>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col">
+                                        <dt>Observaciones</dt>
+                                        <dd>{{revision.cliente.observaciones}}</dd>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <h5 class="text-secondary">{{fecha}}</h5>
+            </div>
+        </div>
+            
+
+
+        <div class="row">
+            <div class="col-lg-10 offset-lg-1">
+
+                <div class="row">
+
+                    <div class="col-lg-6">
+
+                        <div class="card border-light mb-3 shadow">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-8 text-start">Ultima Revision</div>
+                                    {% if ultima_revision %}
+                                    <div class="col-4 text-end"><a href="{% url 'pdf_revision' ultima_revision.pk %}"><span class="badge text-bg-primary">Generar PDF</span></a></div>
+                                    {% endif%}
+                                </div>
+                            </div>
+                            <div class="card-body text-start">
+                                <dl>
+                                    <dt>Fecha</dt>
+                                    <dd>{{ultima_revision.fecha}}</dd>
+                                    <dt>Peso</dt>
+                                    <dd>{{ultima_revision.peso}}</dd>
+                                    <dt>Contorno cintura</dt>
+                                    <dd>{{ultima_revision.contorno_cintura}}</dd>
+                                    <dt>Contorno cadera</dt>
+                                    <dd>{{ultima_revision.contorno_cadera}}</dd>
+                                    <dt>Grasa corporal</dt>
+                                    <dd>{{ultima_revision.grasa_corporal}}</dd>
+                                    <dt>I.M.C.</dt>
+                                    <dd>{{ultima_revision.IMC}}</dd>
+                                    <br>
+                                    <h4>Dieta</h4>
+                                    <hr>
+                                    <dt>Desayuno</dt>
+                                    <dd><pre>{{ultima_revision.desayuno}}</pre></dd>
+                                    <dt>Media mañana</dt>
+                                    <dd><pre>{{ultima_revision.media_manana}}</pre></dd>
+                                    <dt>Almuerzo</dt>
+                                    <dd><pre>{{ultima_revision.almuerzo}}</pre></dd>
+                                    <dt>Merienda</dt>
+                                    <dd><pre>{{ultima_revision.merienda}}</pre></dd>
+                                    <dt>Cena</dt>
+                                    <dd><pre>{{ultima_revision.cena}}</pre></dd>
+                                    <dt>post_cena</dt>
+                                    <dd><pre>{{ultima_revision.post_cena}}</pre></dd>
+                                    <br>
+                                    <h4>Observaciones</h4>
+                                    <hr>
+                                    <dd><pre>{{ultima_revision.observaciones}}</pre></dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <div class="card border-light mb-3 shadow">
+                            <div class="card-header">Historico</div>
+                            <div class="card-body text-start">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Peso</th>
+                                                <th>Cintura</th>
+                                                <th>Cadera</th>
+                                                <th>Grasa</th>
+                                                <th>IMC</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for rev in revisiones %}
+                                                <tr>
+                                                    <td>{{rev.fecha}}</td>
+                                                    <td>{{rev.peso}}</td>
+                                                    <td>{{rev.contorno_cintura}}</td>
+                                                    <td>{{rev.contorno_cadera}}</td>
+                                                    <td>{{rev.grasa_corporal}}</td>
+                                                    <td>{{rev.IMC}}</td>
+
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card border-light mb-3 shadow">
+                            <div class="card-header">Historico</div>
+                            <div class="card-body text-start">
+                                <div class="card-body">
+                                    <canvas id="myChart2"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    
+                    </div>
+                    <div class="col-lg-6">
+
+                        <div class="card border-light mb-3 shadow">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-8 text-start">Nueva Revision</div>
+                                    {% if revision %}
+                                    <div class="col-4 text-end"><a href="{% url 'pdf_revision' revision.pk %}"><span class="badge text-bg-primary">Generar PDF</span></a></div>
+                                    {% endif%}
+                                </div>
+                            </div>
+                            
+                            <div class="card-body text-start">
+
+                                <form method="post" action="{% url 'ficha_revision' cliente.pk %}">
+                                    {% csrf_token %}
+                                    
+                                    <input type="hidden" name="revision" value="{{revision.pk}}">
+             
+                                    <label for="f_prox">Proxima revision: <strong>{{revision.fecha_proxima}}</strong></label>
+                                    <input type="date" class="form-control mb-3" name="f_prox" value="{{revision.fecha_proxima}}" min="2018-01-01" max="2030-12-31" required/>
+                                    <label for="peso">Peso</label>
+                                    <div class="input-group mb-3">
+                                        <input type="number" step="any" class="form-control" name="peso" value="{{revision.peso}}" min="10" max="300" required/>
+                                        <span class="input-group-text">kgs.</span>
+                                    </div>
+                                    <label for="cintura">Contorno de cintura</label>
+                                    <div class="input-group mb-3">
+                                        <input type="number" step="any" class="form-control" name="cintura" value="{{revision.contorno_cintura}}" min="10" max="3000" required/>
+                                        <span class="input-group-text">cms.</span>
+                                    </div>
+                                    <label for="cadera">Contorno de cadera</label>
+                                    <div class="input-group mb-3">
+                                        <input type="number" step="any" class="form-control" name="cadera" value="{{revision.contorno_cadera}}" min="10" max="3000" required/>
+                                        <span class="input-group-text">cms.</span>
+                                    </div>
+                                    <label for="grasa">Grasa corporal</label>
+                                    <div class="input-group mb-3">
+                                        <input type="number" step="any" class="form-control" name="grasa" value="{{revision.grasa_corporal}}" min="0" max="3000" required/>
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                    <label for="imc">I.M.C.</label>
+                                    <input type="number" step="any" class="form-control mb-3" name="imc" value="{{revision.IMC}}" min="0" max="3000" required/>
+                                    <br>
+                                    <h4>Dieta</h4>
+                                    <hr>
+                                    <label for="DesayunoTextarea"><h5>Desayuno</h5></label>
+                                    <textarea class="form-control" name="desayuno" id="DesayunoTextarea" style="height: 70px">{{revision.desayuno}}</textarea>
+                                    <label for="Media_mananaTextarea"><h5>Media Mañana</h5></label>
+                                    <textarea class="form-control" name="media_manana" id="Media_mananaTextarea" style="height: 70px">{{revision.media_manana}}</textarea>
+                                    <label for="AlmuerzoTextarea"><h5>Almuerzo</h5></label>
+                                    <textarea class="form-control" name="almuerzo" id="AlmuerzoTextarea" style="height: 70px">{{revision.almuerzo}}</textarea>
+                                    <label for="MeriendaTextarea"><h5>Merienda</h5></label>
+                                    <textarea class="form-control" name="merienda" id="MeriendaTextarea" style="height: 70px">{{revision.merienda}}</textarea>
+                                    <label for="CenaTextarea"><h5>Cena</h5></label>
+                                    <textarea class="form-control" name="cena" id="CenaTextarea" style="height: 70px">{{revision.cena}}</textarea>
+                                    <label for="Post_cenaTextarea"><h5>Post-cena</h5></label>
+                                    <textarea class="form-control" name="post_cena" id="Post_cenaTextarea" style="height: 70px">{{revision.post_cena}}</textarea>
+                                    <br>
+                                    <h4>Observaciones</h4>
+                                    <hr>
+                                    <textarea class="form-control" name="observaciones" id="ObservacionesTextarea" style="height: 70px">{{revision.observaciones}}</textarea>
+                                    {% if revision %}
+                                        <button type="submit" class="btn btn-primary my-4" type="button">Actualizar</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-primary my-4" type="button">Guardar</button>
+                                    {% endif %}
+                                    
+                                </form>
+
+                                
+
+                            </div>
+                        </div>
+
+                    </div>
+                
+                </div>
+            
+            </div>
+        </div>
+
+    
+    </div>
+{% endblock %}

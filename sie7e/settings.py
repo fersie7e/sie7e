@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'users',
     'security',
     'portfolio',
+    'diets',
     "rest_framework",
 ]
 

@@ -1,0 +1,106 @@
+{% extends 'diets/layoutmain_pdf.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row py-3">
+        <h1 class="display-4 fw-bold text-body-emphasis">Revision</h1>
+        <h2>{{revision.cliente.nombre}} {{revision.cliente.apellidos}}</h2>
+        <h3>{{revision.fecha}} - Proxima revision: {{revision.fecha_proxima}}</h3>
+        <table class="table mt-3">
+            <thead>
+                <tr>
+                    <th>Peso</th>
+                    <th>Cintura</th>
+                    <th>Cadera</th>
+                    <th>Grasa</th>
+                    <th>IMC</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{revision.peso}} kg.</td>
+                    <td>{{revision.contorno_cintura}} cm.</td>
+                    <td>{{revision.contorno_cadera}} cm.</td>
+                    <td>{{revision.grasa_corporal}} %</td>
+                    <td>{{revision.IMC}}</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="my-3">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><h2 class="display-4 fw-bold text-body-emphasis">Plan Nutricional</h2></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th><h3 class="display-5 fw-bold text-body-emphasis">Desayuno</h3></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre>{{revision.desayuno}}</pre>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th><h3 class="display-5 fw-bold text-body-emphasis">M.Mañana</h3></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre>{{revision.media_manana}}</pre>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th><h3 class="display-5 fw-bold text-body-emphasis">Almuerzo</h3></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre>{{revision.almuerzo}}</pre>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th><h3 class="display-5 fw-bold text-body-emphasis">Merienda</h3></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre>{{revision.merienda}}</pre>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th><h3 class="display-5 fw-bold text-body-emphasis">Cena</h3></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre>{{revision.cena}}</pre>
+                        </td>
+                    </tr> 
+                    
+                    <tr>
+                        <th><h3 class="display-5 fw-bold text-body-emphasis">Post-cena</h3></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre>{{revision.post_cena}}</pre>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+
+            <table class="table my-5">
+                <thead>
+                    <tr>
+                        <th><h1 class="display-4 fw-bold text-body-emphasis">Observaciones</h1></th>
+                    </tr>
+                </thead>
+            </table>
+            <p>{{revision.observaciones}}</p>
+        </div>
+    </div>
+{% endblock %}

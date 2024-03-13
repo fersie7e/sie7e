@@ -19,8 +19,10 @@ from rest_framework.response import Response
 
 # Constants declaration
 YEARS_CHOICE = []
+
 for year in range(2023, datetime.datetime.now().year + 2):
     YEARS_CHOICE.append(year)
+
 MONTHS = {	'1':'January',
 		'2':'February',
 		'3':'March',
@@ -33,13 +35,17 @@ MONTHS = {	'1':'January',
 		'10':'October',
 		'11':'November',
 		'12':'December'		}
+
 DAYSLONG = dict(enumerate(calendar.day_name))
 DAYS = []
+
 for number,day in DAYSLONG.items():
     DAYS.append(day[0:2])
+
 CURRENT_MONTH = datetime.datetime.now().month
 CURRENT_YEAR = datetime.datetime.now().year
 TODAY = datetime.date.today()
+
 # End of constant declaration
 
 # Functions
@@ -176,7 +182,7 @@ def calc_total(wages):
         wages[name] = list
         total_wages += list[1]
     return total_wages
-# End of functions
+
 
 def group_list(list, num):
     """transform a list in a list of list of as much item as specified
@@ -211,6 +217,7 @@ def get_expenses(invoice_id):
         expenses += shift.employees.count() * shift.service_provided.servicefee.salary
         
     return expenses
+# End of functions
 
 # Views
 def index(request):
@@ -237,6 +244,8 @@ def index(request):
             return HttpResponseRedirect(reverse("venuedashboard"))
         elif "providers" in list_groups:
             return HttpResponseRedirect(reverse("providerdashboard"))
+        elif "diets" in list_groups:
+            return HttpResponseRedirect(reverse("indexdiets"))
         
     # Get context values
     if request.method == "POST":
@@ -314,14 +323,9 @@ def dashboard(request, shift_id):
         provider = shift.shift_provider
         
     shift_data = Shift.objects.filter(date__month=month, venue=venue, shift_provider=provider)
-    
-    
-    
     providers = Provider.objects.all()
     venues = Venue.objects.all()
     employees = Employee.objects.all()
-
-    
 
     # Render the view
     return render(request, 'security/dashboard.html', {
@@ -505,11 +509,9 @@ def invoicefilter(request):
     else:
         superuser = True      
 
-    
     month = CURRENT_MONTH
     year = CURRENT_YEAR
     
-
     return render(request, 'security/invoices/invoice_filter.html', {
         "month": month,
         "year": year,
@@ -536,10 +538,9 @@ def invoicefreport(request):
     invoices_filtered = []
     venues_allowed = get_venues_allowed(request.user)
     providers_allowed = get_providers_allowed(request.user)
-
-
     month = CURRENT_MONTH
     year = CURRENT_YEAR
+
     if request.method == "POST":
         month = request.POST['month']
         year = request.POST['year']
@@ -571,7 +572,6 @@ def invoicedetail(request, invoice_id):
     invoice = Invoice.objects.get(pk=invoice_id)
     shifts = Shift.objects.filter(invoice=invoice)
     total_shifts = total_month_shifts(shifts)
-    
     
     return render(request, 'security/invoices/invoice_detail.html', {
         "invoice": invoice,
@@ -992,7 +992,6 @@ def performance_update(request, performance_id):
     return render(request, 'security/performance/performance_update.html', {
         "performance_id": performance_id,
         "performance":performance,
-        
         "income": income,
         "wages": wages,
         "ss": ss,
@@ -1084,7 +1083,6 @@ class ChartData(APIView):
     
         return Response(data)
     
-
 class ChartRotaData(APIView):
     authentication_classes = []
     permission_classes = []

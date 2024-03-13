@@ -1,0 +1,242 @@
+{% extends 'diets/layoutmain.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="row h-100">
+        
+
+         <!--Header
+         <div class="masthead p-4 my-3">
+            <div class="d-flex flex-column header">
+                <h1 class="display-4 fw-bold text-body-emphasis">Seleccione un cliente</h1>
+                <i class="fa fa-calendar fa-2x mt-3 mb-2 text-opacity-75" aria-hidden="true"></i>
+                <h5>Use el buscador...</h5>
+                <h5 class="text-success mb-4">o cree un cliente nuevo </h5>
+            </div>
+        </div>-->
+        
+        <!--Info section-->
+
+        
+
+        <div class="row mt-5">
+            <div class="col-lg-10 offset-lg-1">
+
+                <div class="row">
+                    <h1 class="text-secondary my-5">Gabinete de nutrición</h1>
+                    <div class="col">
+
+                        <div class="card border-light mb-3 shadow">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-8 text-start">Listado clientes</div>
+                                    <div class="col-4 text-end">
+                                        <a data-bs-toggle="modal" data-bs-target="#newclient"><span class="badge text-bg-primary">+ Nuevo</span></a>
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="newclient" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    
+                                                    <div class="modal-body">
+    
+                                                        <form action="{% url 'nuevo_cliente' %}" method="post">
+                                                            {% csrf_token %}
+                                            
+                                                            <div class="row">
+                                                                <div id="datosPersonales" class="col text-start">
+                                                                    <label for="nombre">Nombre</label>
+                                                                    <input type="text" class="form-control mb-3" name="nombre" aria-label="Nombre Cliente">
+                                                                    <label for="apellidos">Apellidos</label>
+                                                                    <input type="text" class="form-control mb-3" name="apellidos" aria-label="Apellidos Cliente">
+                                                                    <label for="apellidos">Altura</label>
+                                                                    <input type="text" class="form-control mb-3" name="altura" aria-label="Altura Cliente">
+                                                                    <label for="f_inicio">Fecha de inicio</label>
+                                                                    <input type="date" class="form-control mb-3" name="f_inicio">
+                                                                    <label for="f_nacimiento">Fecha de Nacimiento</label>
+                                                                    <input type="date" class="form-control mb-3" name="f_nacimiento">
+                                                                    <label for="direccion">Direccion</label>
+                                                                    <input type="text" class="form-control mb-3" name="direccion"  aria-label="Direccion Cliente">
+                                                                    <label for="telefono">Telefono</label>
+                                                                    <input type="text" class="form-control mb-3" name="telefono" aria-label="Telefono Cliente">
+                                                                    <div class="btn-group mb-3 bg-white" role="group" aria-label="Basic checkbox toggle button group">
+                                                                        <input class="btn-check" type="checkbox" name="fumador"  id="flexCheckFumador" autocomplete="off">
+                                                                        <label class="btn btn-outline-dark" for="flexCheckFumador">Fumador</label>
+                                                                        <input class="btn-check" type="checkbox" name="activo"  id="flexCheckActivo" autocomplete="off">
+                                                                        <label class="btn btn-outline-dark" for="flexCheckActivo">Activo</label>
+                                                                        <input class="btn-check" type="checkbox" name="transito_intestinal_normal"  id="flexCheckTransito" autocomplete="off">
+                                                                        <label class="btn btn-outline-dark" for="flexCheckTransito">Transito normal</label>
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                                    
+                                                                <div id="datosMedicos" class="col text-start">
+                                                                    <div>
+                                                                        <label for="hidratacion">Hidratacion</label>
+                                                                        <select class="form-select mb-3" name="hidratacion">
+                                                                            <option value="Más de 1,5 litros diarios">Más de 1,5 litros diarios</option>
+                                                                            <option value="Menos de 1,5 litros diarios">Menos de 1,5 litros diarios</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <label for="AlergiasTextarea">Alergias del cliente...</label>
+                                                                    <textarea class="form-control" name="alergias" id="AlergiasTextarea" style="height: 70px"></textarea>
+                                                                    <label for="TratamientosTextarea">Tratamientos del cliente...</label>
+                                                                    <textarea class="form-control" name="tratamientos" id="TratamientosTextarea" style="height: 70px"></textarea>
+                                                                    <label for="HabitosTextarea">Habitos alimenticios del cliente...</label>
+                                                                    <textarea class="form-control" name="habitos" id="HabitosTextarea" style="height: 70px"></textarea>
+                                                                    <label for="ObservacionesTextarea">Observaciones...</label>
+                                                                    <textarea class="form-control" name="observaciones" id="ObservacionesTextarea" style="height: 70px"></textarea>
+                                                                        
+                                                                    <button type="submit" class="btn btn-primary mt-3" type="button">Dar de alta</button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+    
+                                                    </div>
+    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+
+                                    
+                                </div>    
+                            </div>
+                            
+                            <div class="card-body">
+
+                                <div class="table-responsive text-start">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <form action="{% url 'indexdiets' 1 %}" method="post">
+                                                        {% csrf_token %}
+                                                        <div class="input-group mb-3">
+                                                            <input type="text" class="form-control" name="nombre" aria-label="Buscar cliente..." aria-describedby="button-addon3" >
+                                                            <button type="submit"  class="btn btn-primary" type="button" id="button-addon3">Buscar</button>
+                                                        </div>                                                       
+                                                    </form>
+                                                </th>
+                                                <th></th>
+                                                <th></th>
+                                            </tr>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Telefono</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for client in clientes%}
+                                                <tr>
+                                                    <td>{{client.nombre.title}} {{client.apellidos.title}}</td>
+                                                    <td>{{client.telefono}}</td>
+                                                    <td>
+                                                        <a data-bs-toggle="modal" data-bs-target="#cliente{{client.pk}}"><span class="badge text-bg-primary">Ficha</span></a>
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="cliente{{client.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                <div class="modal-content">
+                                                                    
+                                                                    <div class="modal-body">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-6">
+                                                                                <dl>
+                                                                                    <dt>Edad</dt>
+                                                                                    {% for cli,edad in edades.items %}
+                                                                                        {% if cli == client.pk %}
+                                                                                            <dd>{{edad}} años</dd>
+                                                                                        {% endif %}
+                                                                                    {% endfor %}
+                                                                                    <dt>Fecha inicio</dt>
+                                                                                    <dd>{{client.f_inicio}}</dd>
+                                                                                    <dt>Fumador</dt>
+                                                                                    {% if client.fumador %}
+                                                                                        <dd>Si</dd>
+                                                                                    {% else %}
+                                                                                        <dd>No</dd>
+                                                                                    {% endif %}
+                                                                                    <dt>Activo</dt>
+                                                                                    {% if client.activo %}
+                                                                                        <dd>Si</dd>
+                                                                                    {% else %}
+                                                                                        <dd>No</dd>
+                                                                                    {% endif %}
+                                                                                    <dt>Transito normal</dt>
+                                                                                    {% if client.transito_intestinal_normal %}
+                                                                                        <dd>Si</dd>
+                                                                                    {% else %}
+                                                                                        <dd>No</dd>
+                                                                                    {% endif %}
+                                                                                </dl>
+                                                                                
+                                                                            </div>
+                                                                            <div class="col-lg-6">
+                                                                                <dl>
+                                                                                    <dt>Hidratacion</dt>
+                                                                                    <dd>{{client.hidratacion}}</dd>
+                                                                                    <dt>Alergias</dt>
+                                                                                    <dd>{{client.alergias}}</dd>
+                                                                                    <dt>Tratamientos</dt>
+                                                                                    <dd>{{client.tratamientos}}</dd>
+                                                                                    <dt>Habitos</dt>
+                                                                                    <dd>{{client.habitos}}</dd>
+                                                                                    
+                                                                                </dl>
+                                                                            </div>
+                                                                        </div>
+                                                                        <hr>
+                                                                        <div class="row">
+                                                                            <div class="col">
+                                                                                <dt>Observaciones</dt>
+                                                                                <dd>{{client.observaciones}}</dd>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td><a href="{% url 'ficha_revision' client.pk %}"><span class="badge text-bg-primary">+ Revision</span></a></td>
+                                                </tr>
+                                            {% endfor%}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                          </div>
+
+                        
+
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            {% if previous == 0 %}    
+                                <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="{% url 'indexdiets' previous %}">Previous</a></li>
+                            {% endif %}
+                            {% for i in total_paginas %}
+                                <li class="page-item"><a class="page-link" href="{% url 'indexdiets' i %}">{{i}}</a></li>
+                            {% endfor %}
+                            {% if next == 0 %}
+                                <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="{% url 'indexdiets' next %}">Next</a></li>
+                            {% endif %}
+
+                        </ul>
+                      </nav>
+                </div>
+                
+            </div>
+        </div>
+   
+    </div>
+    
+
+{% endblock %}

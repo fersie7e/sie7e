@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include("portfolio.urls")),
     path('users/', include("users.urls")),
     path('security/', include("security.urls")),
+    path('diets/', include("diets.urls")),
 ]
 
 
