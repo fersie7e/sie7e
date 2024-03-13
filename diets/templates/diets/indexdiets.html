@@ -133,72 +133,73 @@
                                                     <td>{{client.telefono}}</td>
                                                     <td>
                                                         <a data-bs-toggle="modal" data-bs-target="#cliente{{client.pk}}"><span class="badge text-bg-primary">Ficha</span></a>
-                                                        <!-- Modal -->
-                                                        <div class="modal fade" id="cliente{{client.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                            <div class="modal-dialog modal-dialog-centered">
-                                                                <div class="modal-content">
-                                                                    
-                                                                    <div class="modal-body">
-                                                                        <div class="row">
-                                                                            <div class="col-lg-6">
-                                                                                <dl>
-                                                                                    <dt>Edad</dt>
-                                                                                    {% for cli,edad in edades.items %}
-                                                                                        {% if cli == client.pk %}
-                                                                                            <dd>{{edad}} años</dd>
-                                                                                        {% endif %}
-                                                                                    {% endfor %}
-                                                                                    <dt>Fecha inicio</dt>
-                                                                                    <dd>{{client.f_inicio}}</dd>
-                                                                                    <dt>Fumador</dt>
-                                                                                    {% if client.fumador %}
-                                                                                        <dd>Si</dd>
-                                                                                    {% else %}
-                                                                                        <dd>No</dd>
-                                                                                    {% endif %}
-                                                                                    <dt>Activo</dt>
-                                                                                    {% if client.activo %}
-                                                                                        <dd>Si</dd>
-                                                                                    {% else %}
-                                                                                        <dd>No</dd>
-                                                                                    {% endif %}
-                                                                                    <dt>Transito normal</dt>
-                                                                                    {% if client.transito_intestinal_normal %}
-                                                                                        <dd>Si</dd>
-                                                                                    {% else %}
-                                                                                        <dd>No</dd>
-                                                                                    {% endif %}
-                                                                                </dl>
-                                                                                
-                                                                            </div>
-                                                                            <div class="col-lg-6">
-                                                                                <dl>
-                                                                                    <dt>Hidratacion</dt>
-                                                                                    <dd>{{client.hidratacion}}</dd>
-                                                                                    <dt>Alergias</dt>
-                                                                                    <dd>{{client.alergias}}</dd>
-                                                                                    <dt>Tratamientos</dt>
-                                                                                    <dd>{{client.tratamientos}}</dd>
-                                                                                    <dt>Habitos</dt>
-                                                                                    <dd>{{client.habitos}}</dd>
-                                                                                    
-                                                                                </dl>
-                                                                            </div>
-                                                                        </div>
-                                                                        <hr>
-                                                                        <div class="row">
-                                                                            <div class="col">
-                                                                                <dt>Observaciones</dt>
-                                                                                <dd>{{client.observaciones}}</dd>
-                                                                            </div>
-                                                                        </div>
+                                                        
+                                                    </td>
+                                                    <td><a href="{% url 'ficha_revision' client.pk %}"><span class="badge text-bg-primary">+ Revision</span></a></td>
+                                                </tr>
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="cliente{{client.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            
+                                                            <div class="modal-body">
+                                                                <div class="row">
+                                                                    <div class="col-lg-6">
+                                                                        <dl>
+                                                                            <dt>Edad</dt>
+                                                                            {% for cli,edad in edades.items %}
+                                                                                {% if cli == client.pk %}
+                                                                                    <dd>{{edad}} años</dd>
+                                                                                {% endif %}
+                                                                            {% endfor %}
+                                                                            <dt>Fecha inicio</dt>
+                                                                            <dd>{{client.f_inicio}}</dd>
+                                                                            <dt>Fumador</dt>
+                                                                            {% if client.fumador %}
+                                                                                <dd>Si</dd>
+                                                                            {% else %}
+                                                                                <dd>No</dd>
+                                                                            {% endif %}
+                                                                            <dt>Activo</dt>
+                                                                            {% if client.activo %}
+                                                                                <dd>Si</dd>
+                                                                            {% else %}
+                                                                                <dd>No</dd>
+                                                                            {% endif %}
+                                                                            <dt>Transito normal</dt>
+                                                                            {% if client.transito_intestinal_normal %}
+                                                                                <dd>Si</dd>
+                                                                            {% else %}
+                                                                                <dd>No</dd>
+                                                                            {% endif %}
+                                                                        </dl>
+                                                                        
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                        <dl>
+                                                                            <dt>Hidratacion</dt>
+                                                                            <dd>{{client.hidratacion}}</dd>
+                                                                            <dt>Alergias</dt>
+                                                                            <dd>{{client.alergias}}</dd>
+                                                                            <dt>Tratamientos</dt>
+                                                                            <dd>{{client.tratamientos}}</dd>
+                                                                            <dt>Habitos</dt>
+                                                                            <dd>{{client.habitos}}</dd>
+                                                                            
+                                                                        </dl>
+                                                                    </div>
+                                                                </div>
+                                                                <hr>
+                                                                <div class="row">
+                                                                    <div class="col">
+                                                                        <dt>Observaciones</dt>
+                                                                        <dd>{{client.observaciones}}</dd>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </td>
-                                                    <td><a href="{% url 'ficha_revision' client.pk %}"><span class="badge text-bg-primary">+ Revision</span></a></td>
-                                                </tr>
+                                                    </div>
+                                                </div>
                                             {% endfor%}
                                         </tbody>
                                     </table>
